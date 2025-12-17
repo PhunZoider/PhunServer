@@ -1,0 +1,71 @@
+
+Sandbox_EN = {
+
+    Sandbox_PhunServer = "PhunServer",
+    Sandbox_PhunServer_NotificationCountdown = "Countdown",
+    Sandbox_PhunServer_NotificationCountdown_tooltip = "A semi comma separated string of seconds between notification to clients",
+
+    Sandbox_PhunServer_QuitDelaySeconds = "Quit Delay",
+    Sandbox_PhunServer_QuitDelaySeconds_tooltip = "Number of seconds after saving before quiting",
+
+    Sandbox_PhunServer_RestartDelayMinutes = "Mod Update Notice",
+    Sandbox_PhunServer_RestartDelayMinutes_tooltip = "Default number of mins to give players notice of restart",
+
+    Sandbox_PhunServer_WorkshopPollingIntervalMinutes = "Check for updates",
+    Sandbox_PhunServer_WorkshopPollingIntervalMinutes_tooltip = "Number of minutes between checking for changes to workshop",
+
+    Sandbox_PhunServer_WelcomeAnnounce= "Welcome Players",
+    Sandbox_PhunServer_WelcomeAnnounce_tooltip = "Announce when players join",
+
+    Sandbox_PhunServer_GoodbyeAnnouncements = "Player Goodbye",
+    Sandbox_PhunServer_GoodbyeAnnouncements_tooltip = "Announce when players leave",
+
+    Sandbox_PhunServer_NotificationChime = "Chime",
+    Sandbox_PhunServer_NotificationChime_tooltip = "Play a chime when notifying user of impending restart",
+
+    Sandbox_PhunServer_Players = "Players Command",
+    Sandbox_PhunServer_Players_tooltip = "Allow players to see who is online by typing /players into chat",
+
+    Sandbox_PhunServer_PlayersOffline24 = "Include recent Players",
+    Sandbox_PhunServer_PlayersOffline24_tooltip = "Include the list of players that have been online in the last 24 hours",
+    
+    Sandbox_PhunServer_PlayersOnMap = "Players on Map",
+    Sandbox_PhunServer_PlayersOnMap_tooltip = "Show markers of player positions on map",
+
+    Sandbox_PhunServer_PlayersOnMiniMap = "Players on Mini Map",
+    Sandbox_PhunServer_PlayersOnMiniMap_tooltip = "Show player positions on mini map",
+
+    Sandbox_PlayersOnMap_option1 = "None",
+    Sandbox_PlayersOnMap_option2 = "All",
+    Sandbox_PlayersOnMap_option3 = "Faction",
+    
+    Sandbox_PhunServer_DaySpeed = "Day Speed",
+    Sandbox_PhunServer_DaySpeed_tooltip = "The speed at which daytime passes",
+
+    Sandbox_PhunServer_DayOffset = "Dawn offset",
+    Sandbox_PhunServer_DaySpeed_tooltip = "+/- hours from dawn in which to trigger Day Speed",
+
+    Sandbox_PhunServer_NightSpeed = "Night Speed",
+    Sandbox_PhunServer_NightSpeed_tooltip = "The speed at which night passes",
+
+    Sandbox_PhunServer_NightOffset = "Dusk offset",
+    Sandbox_PhunServer_NightSpeed_tooltip = "+/- hours from dusk in which to trigger Night Speed",
+
+    Sandbox_PhunServer_WipeKey = "Wipe Key"
+    Sandbox_PhunServer_WipeKey_tooltip = "Changing this value (as long as it isn't empty) will cause players to rewipe map on next login. A good rule of thumb here is to enter the version/season number. If a player comes back to the server and the season has changed... pop... there goes their map!"
+
+    Sandbox_PhunServer_WipePerCharacter = "Wipe Per Character"
+    Sandbox_PhunServer_WipePerCharacter_tooltip = "Wipes the map whenever the players character dies and they create a new one. A bit hardcore if you ask me, but you didn't did you?"
+
+    Sandbox_PhunServer_WipeMap = "Wipe Map"
+    Sandbox_PhunServer_WipeMap_tooltip = "Turn to false to skip erasure of the map, even if the key changes"
+
+    Sandbox_PhunServer_WipeSymbols = "Wipe symbols"
+    Sandbox_PhunServer_Debug_tooltip = "Turn this off to skip erasure of symbols even if the key changes"
+
+    Sandbox_PhunServer_Debug = "Debug"
+    Sandbox_PhunServer_Debug_tooltip = "Tick this box to get more verbose logging on mod activities"    
+
+
+}
+

@@ -1,0 +1,190 @@
+VERSION = 1,
+
+option PhunServer.WelcomeAnnounce
+{
+    type = boolean,
+    default = true,
+    page = PhunServer,
+    translation = PhunServer_WelcomeAnnounce,
+}
+
+option PhunServer.GoodbyeAnnouncements
+{
+    type = boolean,
+    default = true,
+    page = PhunServer,
+    translation = PhunServer_GoodbyeAnnouncements,
+}
+
+option PhunServer.RestartDelayMinutes
+{
+    type = integer,
+    default = 5,
+    min=1,
+    max=100,
+    page = PhunServer,
+    translation = PhunServer_RestartDelayMinutes,
+}
+
+
+option PhunServer.QuitDelaySeconds
+{
+    type = integer,
+    default = 15,
+    min=1,
+    max=100,    
+    page = PhunServer,
+    translation = PhunServer_QuitDelaySeconds,
+}
+
+
+option PhunServer.WorkshopPollingIntervalMinutes
+{
+    type = integer,
+    default = 5,
+    min=1,
+    max=100,    
+    page = PhunServer,
+    translation = PhunServer_WorkshopPollingIntervalMinutes,
+}
+
+option PhunServer.NotificationCountdown
+{
+    type = string,
+    default = 300;120;60;30;10;9;8;7;6;5;3;2;1,
+    page = PhunServer,
+    translation = PhunServer_NotificationCountdown,
+}
+
+option PhunServer.NotificationChime
+{
+    type = boolean,
+    default = true,
+    page = PhunServer,
+    translation = PhunServer_NotificationChime,
+}
+
+option PhunServer.Players
+{
+    type = boolean,
+    default = true,
+    page = PhunServer,
+    translation = PhunServer_Players,
+}
+
+option PhunServer.PlayersOffline24
+{
+    type = boolean,
+    default = true,
+    page = PhunServer,
+    translation = PhunServer_PlayersOffline24,
+}
+
+option PhunServer.PlayersUpdateMs
+{
+    type = integer,
+    default = 1500,
+    min = 0,
+    max = 10000,
+    translation = PhunServer_PlayersUpdateMs
+}
+
+option PhunServer.PlayersOnMap
+{ 
+    type = enum,
+    numValues = 3,
+    default = 2, 
+    page = PhunServer, 
+    translation = PhunServer_PlayersOnMap,
+    valueTranslation = PlayersOnMap,
+}
+
+option PhunServer.PlayersOnMiniMap
+{ 
+    type = enum,
+    numValues = 3,
+    default = 2, 
+    page = PhunServer, 
+    translation = PhunServer_PlayersOnMiniMap,
+    valueTranslation = PlayersOnMap,
+}
+
+option PhunServer.NightSpeed
+{ 
+    type = enum,
+    numValues = 26,
+    default = 3, 
+    page = PhunServer, 
+    translation = PhunServer_NightSpeed,
+    valueTranslation = DayLength,
+}
+
+option PhunServer.NightOffset
+{ 
+    type = integer, 
+    default = 0,
+    min = 0,
+    max = 24,
+    page = PhunServer,
+    translation = PhunServer_NightOffset,
+}
+
+option PhunServer.DaySpeed
+{ 
+    type = enum,
+    numValues = 26,
+    default = 3, 
+    page = PhunServer, 
+    translation = PhunServer_DaySpeed,
+    valueTranslation = DayLength,
+}
+
+option PhunServer.DayOffset
+{ 
+    type = integer, 
+    default = 0,
+    min = 0,
+    max = 24,
+    page = PhunServer,
+    translation = PhunServer_DayOffset,
+}
+
+option PhunServer.WipeMap
+{
+    type = boolean, 
+    default = true,
+    page=PhunServer,
+    translation = PhunServer_WipeMap,
+}
+
+option PhunServer.WipeSymbols
+{
+    type = boolean, 
+    default = true,
+    page=PhunServer,
+    translation = PhunServer_WipeSymbols,
+}
+
+option PhunServer.WipePerCharacter
+{
+    type = boolean, 
+    default = false,
+    page=PhunServer,
+    translation = PhunServer_WipePerCharacter,
+}
+
+option PhunServer.WipeKey
+{
+    type = string,
+    default =,
+    page = PhunServer,
+    translation = PhunServer_WipeKey,
+}
+
+option PhunServer.Debug
+{
+    type = boolean, 
+    default = false,
+    page=PhunServer,
+    translation = PhunServer_Debug,
+}

@@ -1,0 +1,9 @@
+module Base {
+
+    sound restartNotice
+    {
+        category = Player, loop = false, is3D = false,
+        clip { file = media/sound/restart-notice.mp3, distanceMax = 20, volume = 1, reverbFactor = 0, }
+    }
+
+}

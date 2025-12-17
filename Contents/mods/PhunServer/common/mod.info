@@ -1,0 +1,7 @@
+name=PhunServer
+id=phunserver
+author=UburGeek
+Restart and announce on mod updates
+poster=poster.png
+require=\phunlib
+icon=icon.png
