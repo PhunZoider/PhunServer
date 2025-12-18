@@ -7,9 +7,9 @@ description=[list]
 description=[*][b]Detect mod updates[/b]. It is no phun being unable to join a server because their mods are out of date. We will help keep your apocolypse open for business by ensuring your server is always up to date!
 description=[*][b]Players on map[/b]. Allow players to see one another on the mini and not so mini map. Faction only viewing is a wip
 description=[*][b]Greetings[/b]. Welcome new and returning players. Say farewell to those leaving.
-description=[*][b]Day/Night lengths[b]. Set different speeds for day and night. eg 2 hour day lengths and 1 hour nights!
-description=[*][b]Wipe map[b]. Automatically wipe players maps when they relog! Designed for servers running multiple seasons that want a proper reset of their players world view.
-description=[*][b]Commands[b]. Enable the /players command so others can see who is currently online or who has been online today
+description=[*][b]Day/Night lengths[/b]. Set different speeds for day and night. eg 2 hour day lengths and 1 hour nights!
+description=[*][b]Wipe map[/b]. Automatically wipe players maps when they relog! Designed for servers running multiple seasons that want a proper reset of their players world view.
+description=[*][b]Commands[/b]. Enable the /players command so others can see who is currently online or who has been online today
 description=[/list]
 description=
 description=[h2]Detect mod updates Settings[/h2]
@@ -30,7 +30,7 @@ description=[tr][td][b]Countdown[/b][/td][td]A semi-colon separated value of sec
 description=[tr][td][b]Chime[/b][/td][td]Tick this box to play a little tinkle when notice is sent[/td][/tr]
 description=[/table]
 description=
-description=[h2]Grettings[/h2]
+description=[h2]Greetings[/h2]
 description=Settings for making players feel welcome
 description=[table]
 description=[tr][th]Setting[/th][th]Description[/th][/tr]
@@ -67,8 +67,6 @@ description=[/table]
 description=
 description=[H2]More Phun Stuff[/h2]
 description=[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3388867450][img]https://i.ibb.co/x8H5KRhs/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3606988132][img]https://i.ibb.co/ZtQtmJd/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3532685233][img]https://i.ibb.co/k6cQ4h7d/preview.png[/img][/url]
-description=
-description=[url=https://discord.gg/v2USyAtP6q][img]https://i.ibb.co/p6bcnj2m/zcat.png[/img][/url]
 description=
 description=Coded with love for our awesome [url=https://discord.gg/v2USyAtP6q]PhunZoid[/url] community.  
 description=Check out the [url=https://github.com/PhunZoider/PhunServer]GitHub repo[/url] for more info.
