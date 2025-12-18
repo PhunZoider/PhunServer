@@ -71,6 +71,6 @@ description=
 description=[url=https://discord.gg/v2USyAtP6q][img]https://i.ibb.co/p6bcnj2m/zcat.png[/img][/url]
 description=
 description=Coded with love for our awesome [url=https://discord.gg/v2USyAtP6q]PhunZoid[/url] community.  
-description=Check out the [url=https://github.com/PhunZoider/PhunLewt]GitHub repo[/url] for more info.
+description=Check out the [url=https://github.com/PhunZoider/PhunServer]GitHub repo[/url] for more info.
 tags=Build 41;Build 42;Multiplayer
 visibility=public
