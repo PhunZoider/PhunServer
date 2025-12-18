@@ -1,10 +1,40 @@
 VERSION = 1,
 
+
+option PhunServer.Players
+{
+    type = boolean,
+    default = true,
+    page = PhunServer_Other,
+    translation = PhunServer_Players,
+}
+
+option PhunServer.PlayersOffline24
+{
+    type = boolean,
+    default = true,
+    page = PhunServer_Other,
+    translation = PhunServer_PlayersOffline24,
+}
+
+
+
+option PhunServer.Debug
+{
+    type = boolean, 
+    default = false,
+    page=PhunServer_Other,
+    translation = PhunServer_Debug,
+}
+
+
+
+
 option PhunServer.WelcomeAnnounce
 {
     type = boolean,
     default = true,
-    page = PhunServer,
+    page = PhunServer_Announcements,
     translation = PhunServer_WelcomeAnnounce,
 }
 
@@ -12,8 +42,30 @@ option PhunServer.GoodbyeAnnouncements
 {
     type = boolean,
     default = true,
-    page = PhunServer,
+    page = PhunServer_Announcements,
     translation = PhunServer_GoodbyeAnnouncements,
+}
+
+
+
+
+
+option PhunServer.EnableModWatch
+{
+    type = boolean,
+    default = true,
+    page = PhunServer_ModWatch,
+    translation = PhunServer_EnableModWatch,
+}
+
+option PhunServer.WorkshopPollingIntervalMinutes
+{
+    type = integer,
+    default = 5,
+    min=1,
+    max=100,    
+    page = PhunServer_ModWatch,
+    translation = PhunServer_WorkshopPollingIntervalMinutes,
 }
 
 option PhunServer.RestartDelayMinutes
@@ -22,37 +74,15 @@ option PhunServer.RestartDelayMinutes
     default = 5,
     min=1,
     max=100,
-    page = PhunServer,
+    page = PhunServer_ModWatch,
     translation = PhunServer_RestartDelayMinutes,
-}
-
-
-option PhunServer.QuitDelaySeconds
-{
-    type = integer,
-    default = 15,
-    min=1,
-    max=100,    
-    page = PhunServer,
-    translation = PhunServer_QuitDelaySeconds,
-}
-
-
-option PhunServer.WorkshopPollingIntervalMinutes
-{
-    type = integer,
-    default = 5,
-    min=1,
-    max=100,    
-    page = PhunServer,
-    translation = PhunServer_WorkshopPollingIntervalMinutes,
 }
 
 option PhunServer.NotificationCountdown
 {
     type = string,
     default = 300;120;60;30;10;9;8;7;6;5;3;2;1,
-    page = PhunServer,
+    page = PhunServer_ModWatch,
     translation = PhunServer_NotificationCountdown,
 }
 
@@ -60,24 +90,46 @@ option PhunServer.NotificationChime
 {
     type = boolean,
     default = true,
-    page = PhunServer,
+    page = PhunServer_ModWatch,
     translation = PhunServer_NotificationChime,
 }
 
-option PhunServer.Players
+option PhunServer.QuitDelaySeconds
 {
-    type = boolean,
-    default = true,
-    page = PhunServer,
-    translation = PhunServer_Players,
+    type = integer,
+    default = 15,
+    min=1,
+    max=100,    
+    page = PhunServer_ModWatch,
+    translation = PhunServer_QuitDelaySeconds,
 }
 
-option PhunServer.PlayersOffline24
-{
-    type = boolean,
-    default = true,
-    page = PhunServer,
-    translation = PhunServer_PlayersOffline24,
+
+
+
+
+
+
+
+
+option PhunServer.PlayersOnMap
+{ 
+    type = enum,
+    numValues = 2,
+    default = 2, 
+    page = PhunServer_Map, 
+    translation = PhunServer_PlayersOnMap,
+    valueTranslation = PlayersOnMap,
+}
+
+option PhunServer.PlayersOnMiniMap
+{ 
+    type = enum,
+    numValues = 2,
+    default = 2, 
+    page = PhunServer_Map, 
+    translation = PhunServer_PlayersOnMiniMap,
+    valueTranslation = PlayersOnMap,
 }
 
 option PhunServer.PlayersUpdateMs
@@ -86,27 +138,17 @@ option PhunServer.PlayersUpdateMs
     default = 1500,
     min = 0,
     max = 10000,
-    translation = PhunServer_PlayersUpdateMs
+    page=PhunServer_Map,
+    translation = PhunServer_PlayersUpdateMs,
 }
 
-option PhunServer.PlayersOnMap
-{ 
-    type = enum,
-    numValues = 3,
-    default = 2, 
-    page = PhunServer, 
-    translation = PhunServer_PlayersOnMap,
-    valueTranslation = PlayersOnMap,
-}
 
-option PhunServer.PlayersOnMiniMap
-{ 
-    type = enum,
-    numValues = 3,
-    default = 2, 
-    page = PhunServer, 
-    translation = PhunServer_PlayersOnMiniMap,
-    valueTranslation = PlayersOnMap,
+option PhunServer.EnableDayNightChange
+{
+    type = boolean,
+    default = true,
+    page = PhunServer_Cycles,
+    translation = PhunServer_EnableDayNightChange,
 }
 
 option PhunServer.NightSpeed
@@ -114,7 +156,7 @@ option PhunServer.NightSpeed
     type = enum,
     numValues = 26,
     default = 3, 
-    page = PhunServer, 
+    page = PhunServer_Cycles, 
     translation = PhunServer_NightSpeed,
     valueTranslation = DayLength,
 }
@@ -125,7 +167,7 @@ option PhunServer.NightOffset
     default = 0,
     min = 0,
     max = 24,
-    page = PhunServer,
+    page = PhunServer_Cycles,
     translation = PhunServer_NightOffset,
 }
 
@@ -134,9 +176,9 @@ option PhunServer.DaySpeed
     type = enum,
     numValues = 26,
     default = 3, 
-    page = PhunServer, 
-    translation = PhunServer_DaySpeed,
-    valueTranslation = DayLength,
+    page = PhunServer_DayNight, 
+    translation = PhunServer_Cycles,
+    valueTranslation = PhunServer_DaySpeed,
 }
 
 option PhunServer.DayOffset
@@ -145,15 +187,23 @@ option PhunServer.DayOffset
     default = 0,
     min = 0,
     max = 24,
-    page = PhunServer,
+    page = PhunServer_Cycles,
     translation = PhunServer_DayOffset,
+}
+
+option PhunServer.EnableWipeMap
+{
+    type = boolean, 
+    default = true,
+    page=PhunServer_Map,
+    translation = PhunServer_EnableWipeMap,
 }
 
 option PhunServer.WipeMap
 {
     type = boolean, 
     default = true,
-    page=PhunServer,
+    page=PhunServer_Map,
     translation = PhunServer_WipeMap,
 }
 
@@ -161,7 +211,7 @@ option PhunServer.WipeSymbols
 {
     type = boolean, 
     default = true,
-    page=PhunServer,
+    page=PhunServer_Map,
     translation = PhunServer_WipeSymbols,
 }
 
@@ -169,7 +219,7 @@ option PhunServer.WipePerCharacter
 {
     type = boolean, 
     default = false,
-    page=PhunServer,
+    page=PhunServer_Map,
     translation = PhunServer_WipePerCharacter,
 }
 
@@ -177,14 +227,7 @@ option PhunServer.WipeKey
 {
     type = string,
     default =,
-    page = PhunServer,
+    page = PhunServer_Map,
     translation = PhunServer_WipeKey,
 }
 
-option PhunServer.Debug
-{
-    type = boolean, 
-    default = false,
-    page=PhunServer,
-    translation = PhunServer_Debug,
-}

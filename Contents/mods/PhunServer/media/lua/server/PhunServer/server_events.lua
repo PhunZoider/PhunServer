@@ -11,7 +11,7 @@ Events.OnInitGlobalModData.Add(function()
     if not Core.data.wipeKeys then
         Core.data.wipeKeys = {}
     end
-    PhunLib.debug("PhunServer: Loaded wipe keys:", Core.data)
+    Core.debug("PhunServer: Loaded data:", Core.data)
 
 end)
 
@@ -23,7 +23,7 @@ Events.OnClientCommand.Add(function(module, command, playerObj, arguments)
 end)
 
 Events.OnDisconnect.Add(function()
-    if Core.getOption("RestartDelayMinutes", 5) == 0 then
+    if Core.getOption("EnableModWatch") == true then
         Core.pollWorkshop()
     end
 end)
@@ -61,7 +61,9 @@ Events.OnTickEvenPaused.Add(function()
     local timestamp = getTimestamp()
     if not nextPoll or timestamp >= nextPoll then
         nextPoll = timestamp + (Core.getOption("WorkshopPollingInterval", 15) * 60)
-        return Core.pollWorkshop()
+        if Core.getOption("EnableModWatch") == true then
+            return Core.pollWorkshop()
+        end
     end
 end)
 

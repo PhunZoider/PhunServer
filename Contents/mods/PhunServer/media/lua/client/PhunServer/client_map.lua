@@ -97,7 +97,6 @@ function ISMiniMapOuter:render(...)
 end
 
 function Core.map.OnPreUIDraw()
-    -- if (not SandboxVars.PlayersOnMap.Enabled) then return end
 
     if (ISWorldMap_instance) then
         ISWorldMap_players = ISWorldMap_instance.mapAPI:getBoolean("Players");
@@ -111,7 +110,6 @@ function Core.map.OnPreUIDraw()
 end
 
 function Core.map.OnPostUIDraw()
-    ---if (not SandboxVars.PlayersOnMap.Enabled) then return end
 
     if (ISWorldMap_instance and (ISWorldMap_players ~= nil)) then
         ISWorldMap_instance.mapAPI:setBoolean("Players", ISWorldMap_players);

@@ -1,15 +1,27 @@
 
 Sandbox_EN = {
 
-    Sandbox_PhunServer = "PhunServer",
+    Sandbox_PhunServer_Other = "PhunServer: Misc",
+    Sandbox_PhunServer_ModWatch = "PhunServer: ModWatch",
+    Sandbox_PhunServer_Announcements = "PhunServer: Announcements",
+    Sandbox_PhunServer_Cycles = "PhunServer: Cycles",
+    
+    Sandbox_PhunServer_Map = "PhunServer: Maps",
+
     Sandbox_PhunServer_NotificationCountdown = "Countdown",
     Sandbox_PhunServer_NotificationCountdown_tooltip = "A semi comma separated string of seconds between notification to clients",
 
-    Sandbox_PhunServer_QuitDelaySeconds = "Quit Delay",
-    Sandbox_PhunServer_QuitDelaySeconds_tooltip = "Number of seconds after saving before quiting",
+    Sandbox_PhunServer_EnableModWatch = "Enable",
+    Sandbox_PhunServer_EnableModWatch_tooltip = "When ticked, will poll Steam for updates to your servers mods and insigate a reboot if any are found. Untick to disable",
+
+    Sandbox_PhunServer_EnableDayNightChange = "Enable",
+    Sandbox_PhunServer_EnableDayNightChange_tooltip = "When ticked, the below options will change the speed of your day and/or night cycles. Untick to disable these changes",
 
     Sandbox_PhunServer_RestartDelayMinutes = "Mod Update Notice",
     Sandbox_PhunServer_RestartDelayMinutes_tooltip = "Default number of mins to give players notice of restart",
+
+    Sandbox_PhunServer_QuitDelaySeconds = "Quit Delay",
+    Sandbox_PhunServer_QuitDelaySeconds_tooltip = "Number of seconds after the final save to wait before quitting server",
 
     Sandbox_PhunServer_WorkshopPollingIntervalMinutes = "Check for updates",
     Sandbox_PhunServer_WorkshopPollingIntervalMinutes_tooltip = "Number of minutes between checking for changes to workshop",
@@ -23,11 +35,14 @@ Sandbox_EN = {
     Sandbox_PhunServer_NotificationChime = "Chime",
     Sandbox_PhunServer_NotificationChime_tooltip = "Play a chime when notifying user of impending restart",
 
-    Sandbox_PhunServer_Players = "Players Command",
+    Sandbox_PhunServer_Players = "/Players",
     Sandbox_PhunServer_Players_tooltip = "Allow players to see who is online by typing /players into chat",
 
-    Sandbox_PhunServer_PlayersOffline24 = "Include recent Players",
+    Sandbox_PhunServer_PlayersOffline24 = "Include recent",
     Sandbox_PhunServer_PlayersOffline24_tooltip = "Include the list of players that have been online in the last 24 hours",
+
+    Sandbox_PhunServer_PlayersUpdateMs = "Update frequency",
+    Sandbox_PhunServer_PlayersUpdateMs_tooltip = "Frequency in which to scan online players. 1000 = every second and should be a decent default",    
     
     Sandbox_PhunServer_PlayersOnMap = "Players on Map",
     Sandbox_PhunServer_PlayersOnMap_tooltip = "Show markers of player positions on map",
@@ -43,7 +58,7 @@ Sandbox_EN = {
     Sandbox_PhunServer_DaySpeed_tooltip = "The speed at which daytime passes",
 
     Sandbox_PhunServer_DayOffset = "Dawn offset",
-    Sandbox_PhunServer_DaySpeed_tooltip = "+/- hours from dawn in which to trigger Day Speed",
+    Sandbox_PhunServer_DayOffset_tooltip = "+/- hours from dawn in which to trigger Day Speed",
 
     Sandbox_PhunServer_NightSpeed = "Night Speed",
     Sandbox_PhunServer_NightSpeed_tooltip = "The speed at which night passes",
@@ -57,14 +72,17 @@ Sandbox_EN = {
     Sandbox_PhunServer_WipePerCharacter = "Wipe Per Character"
     Sandbox_PhunServer_WipePerCharacter_tooltip = "Wipes the map whenever the players character dies and they create a new one. A bit hardcore if you ask me, but you didn't did you?"
 
+    Sandbox_PhunServer_EnableWipeMap = "Enable Map Wipes"
+    Sandbox_PhunServer_EnableWipeMap_tooltip = "Untick to disable map wipe checks"
+
     Sandbox_PhunServer_WipeMap = "Wipe Map"
-    Sandbox_PhunServer_WipeMap_tooltip = "Turn to false to skip erasure of the map, even if the key changes"
+    Sandbox_PhunServer_WipeMap_tooltip = "Turn to false to skip erasure of the main map, even if the key changes"
 
     Sandbox_PhunServer_WipeSymbols = "Wipe symbols"
     Sandbox_PhunServer_Debug_tooltip = "Turn this off to skip erasure of symbols even if the key changes"
 
     Sandbox_PhunServer_Debug = "Debug"
-    Sandbox_PhunServer_Debug_tooltip = "Tick this box to get more verbose logging on mod activities"    
+    Sandbox_PhunServer_Debug_tooltip = "Tick this to get more verbose debug info in your logs"
 
 
 }

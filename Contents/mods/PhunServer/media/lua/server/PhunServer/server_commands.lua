@@ -8,6 +8,10 @@ local getTimestamp = getTimestamp
 local Commands = {}
 
 local function wipekeyCheck(username)
+
+    if not Core.getOption("EnableWipeKey", false) then
+        return
+    end
     local wipeKey = Core.getOption("WipeKey", nil)
     if wipeKey and wipeKey ~= "" and wipeKey ~= Core.data.online[username].wipeKey then
         Core.data.online[username].wipeKey = wipeKey

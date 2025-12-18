@@ -22,9 +22,7 @@ PhunServer = {
         wipeMap = "wipeMap"
     },
     events = {
-        OnReady = "PhunServerOnReady",
-        OnDawn = "OnPhunServerDawn",
-        OnDusk = "OnPhunServerDusk"
+        OnReady = "PhunServerOnReady"
     },
     settings = {},
     ui = {},
@@ -92,21 +90,28 @@ function Core:setIsNight(value)
         return
     end
     self.isNight = value
-    local speed = self.getOption("DaySpeed")
-    if value then
-        speed = self.getOption("NightSpeed")
+
+    if self.getOption("EnableDayNightChange") == true then
+        local speed = self.getOption("DaySpeed")
+        if value then
+            speed = self.getOption("NightSpeed")
+        end
+
+        getSandboxOptions():getOptionByName("DayLength"):setValue(speed)
+        getSandboxOptions():applySettings()
     end
 
-    getSandboxOptions():getOptionByName("DayLength"):setValue(speed)
-    getSandboxOptions():applySettings()
+    PL:setIsNight(value)
 
-    if isServer() then
-        sendServerCommand(self.name, value and self.commands.onDusk or self.commands.onDawn, {})
-    end
-    triggerEvent(value and self.events.OnDusk or self.events.OnDawn)
+    -- if isServer() then
+    --     sendServerCommand(self.name, value and self.commands.onDusk or self.commands.onDawn, {})
+    -- end
+    -- triggerEvent(value and self.events.OnDusk or self.events.OnDawn)
 end
 
 function Core:testNight()
+
+    local enabled = self.getOption("EnableDayNightChange", false) == true
 
     if not climateManager and getClimateManager then
         climateManager = getClimateManager()
@@ -119,13 +124,13 @@ function Core:testNight()
         local season = climateManager:getSeason()
         if season and season.getDawn then
             local time = gt:getTimeOfDay()
-            self.dawnTime = season:getDawn() + self.settings.DayOffset
-            self.duskTime = season:getDusk() + self.settings.NightOffset
+            PL.dawnTime = season:getDawn() + (enabled and self.getOption("DayOffset") or 0)
+            PL.duskTime = season:getDusk() + (enabled and self.getOption("NightOffset") or 0)
         end
     end
-    if self.duskTime and self.dawnTime then
+    if PL.duskTime and PL.dawnTime then
         local currentTime = gt:getTimeOfDay()
-        local night = currentTime > self.duskTime or currentTime < self.dawnTime
+        local night = currentTime > PL.duskTime or currentTime < PL.dawnTime
         if night ~= self.isNight then
             self:setIsNight(night)
         end
