@@ -68,6 +68,31 @@ function Core.checkPlayers()
 
 end
 
+function Core.wipeKeyCheck(username)
+
+    if not Core.getOption("EnableWipeMap", false) then
+        Core.debugLn("WipeKey check disabled.")
+        return
+    end
+
+    local wipeKey = Core.getOption("WipeKey", nil)
+    local data = Core.data.online[username]
+
+    if wipeKey and wipeKey ~= "" and data and wipeKey ~= data.wipeKey then
+
+        Core.debugLn(
+            username .. " has an outdated wipeKey (" .. tostring(data.wipeKey) .. " vs " .. tostring(wipeKey) ..
+                " , performing wipe.")
+        data.wipeKey = wipeKey
+        sendServerCommand(Core.name, Core.commands.wipeMap, {
+            username = username,
+            args = {}
+        })
+    else
+        Core.debugLn(username .. " has current wipeKey, no wipe needed.")
+    end
+end
+
 function Core.scheduleServerRestart(timestamp)
 
     Core.restartingAt = timestamp

@@ -8,11 +8,26 @@ local Core = PhunServer
 Events.OnInitGlobalModData.Add(function()
 
     Core.data = ModData.getOrCreate(Core.name)
-    if not Core.data.wipeKeys then
-        Core.data.wipeKeys = {}
+    if not Core.data.online then
+        Core.data.online = {}
     end
-    Core.debug("PhunServer: Loaded data:", Core.data)
+    -- if not Core.data.wipeKeys then
+    --     Core.data.wipeKeys = {}
+    -- end
 
+end)
+
+Events.OnCharacterDeath.Add(function(player)
+    if instanceof(player, "IsoPlayer") then
+        -- a player died
+        local username = player:getUsername()
+        Core.debugLn("Player " .. username .. " died.")
+        if Core.getOption("EnableWipeMap") and Core.getOption("WipePerCharacter", false) then
+            Core.debugLn("Player " .. username .. " died, wiping their wipe key.")
+            Core.data.online[username].wipeKey = tostring(getTimestamp())
+            Core.wipeKeyCheck(username)
+        end
+    end
 end)
 
 Events.OnClientCommand.Add(function(module, command, playerObj, arguments)
@@ -78,7 +93,7 @@ end)
 
 Events.EveryTenMinutes.Add(function()
     -- refresh periodically so we aren't constantly reading from function
-    Core.settings.debug = Core.getOption("debug", false)
+    Core.settings.Debug = Core.getOption("Debug", false)
 end)
 
 -- print('- -- -- EVENTS! --  - ')

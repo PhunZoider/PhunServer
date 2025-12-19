@@ -5,6 +5,8 @@ local Core = PhunServer
 
 function Core.map.wipeMap(player, args)
 
+    Core.debugLn("Wiping map for player " .. player:getUsername())
+
     if args.map == true or args.map ~= true and Core.getOption("WipeMap") == true then
         print("[" .. Core.name .. "] Wiping world map for player " .. player:getUsername())
         ISWorldMap.ShowWorldMap(player and player:getPlayerNum() or getPlayer())

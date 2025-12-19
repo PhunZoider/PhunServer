@@ -7,27 +7,9 @@ local PL = PhunLib
 local getTimestamp = getTimestamp
 local Commands = {}
 
-local function wipekeyCheck(username)
-
-    if not Core.getOption("EnableWipeKey", false) then
-        return
-    end
-    local wipeKey = Core.getOption("WipeKey", nil)
-    if wipeKey and wipeKey ~= "" and wipeKey ~= Core.data.online[username].wipeKey then
-        Core.data.online[username].wipeKey = wipeKey
-        PL.debug("[" .. Core.name .. "] Player " .. username .. " has an outdated wipeKey, performing wipe.")
-        sendServerCommand(Core.name, Core.commands.wipeMap, {
-            username = username,
-            args = {}
-        })
-    else
-        Core.debugLn(username .. " has current wipeKey, no wipe needed.")
-    end
-end
-
 Commands[Core.commands.playerSetup] = function(player, args)
     Core.debugLn("Setting up player " .. player:getUsername())
-    wipekeyCheck(player:getUsername())
+    Core.wipeKeyCheck(player:getUsername())
     Core.players[player:getOnlineID()] = {
         wipeKey = Core.getOption("WipeKey"),
         playerObj = player,

@@ -19,13 +19,6 @@ Events.OnServerCommand.Add(function(module, command, arguments)
     end
 end)
 
-Events.OnPlayerDeath.Add(function(player)
-    if Core.getOption("WipePerCharacter") then
-        -- reset to random key to force wipe next time
-        Core.data.wipeKeys[player:getUsername()] = tostring(getTimestampMs())
-    end
-end)
-
 Events[Core.events.OnReady].Add(function()
     Core.debugLn("Client is ready")
 end)

@@ -2,8 +2,7 @@ PhunServer = {
     name = "PhunServer",
     consts = {},
     data = {
-        online = {},
-        wipeKeys = {}
+        online = {}
     },
     commands = {
         playerSetup = "playerSetup",
@@ -64,13 +63,13 @@ function Core:ini()
 end
 
 function Core.debugLn(str)
-    if Core.settings.debug then
-        PL.debugLn("[" .. Core.name .. "] " .. str)
+    if Core.settings.Debug then
+        print("[" .. Core.name .. "] " .. str)
     end
 end
 
 function Core.debug(...)
-    if Core.settings.debug then
+    if Core.settings.Debug then
         PL.debug(Core.name, ...)
     end
 end

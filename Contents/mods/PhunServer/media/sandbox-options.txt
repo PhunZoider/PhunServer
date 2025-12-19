@@ -176,9 +176,9 @@ option PhunServer.DaySpeed
     type = enum,
     numValues = 26,
     default = 3, 
-    page = PhunServer_DayNight, 
-    translation = PhunServer_Cycles,
-    valueTranslation = PhunServer_DaySpeed,
+    page = PhunServer_Cycles, 
+    translation = PhunServer_DaySpeed,
+    valueTranslation = DayLength,
 }
 
 option PhunServer.DayOffset
