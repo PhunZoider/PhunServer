@@ -33,6 +33,63 @@ local function wrapText(text)
     return white .. " " .. text .. " " .. popit
 end
 
+local function isEmptyTable(t)
+    if type(t) ~= "table" then
+        return true
+    end
+    for _ in pairs(t) do
+        return false
+    end
+    return true
+end
+
+-- highlight tokens in a segment that contains NO <...> tags
+-- local function highlightSegment(seg, lookup)
+--     local s = seg:gsub("([%w_%.%-]+)", function(token)
+--         local key = string.lower(token)
+--         if lookup[key] then
+--             return "<PUSHRGB:255,255,255>" .. token .. "<POPRGB>"
+--         end
+--         return token
+--     end)
+--     return s
+-- end
+
+-- local function highlightUsernamesPreservingTags(text, lookup)
+--     if not text or text == "" then
+--         return text
+--     end
+
+--     -- Quick exit if no players (or no lookup)
+--     if isEmptyTable(lookup) then
+--         return text
+--     end
+
+--     -- Split around Zomboid markup tags like <RGB:...>, <SIZE:...>, etc.
+--     -- We only highlight outside tags.
+--     local out = {}
+--     local i = 1
+
+--     while true do
+--         local tagStart, tagEnd = text:find("<[^>]*>", i)
+--         if not tagStart then
+--             table.insert(out, highlightSegment(text:sub(i), lookup))
+--             break
+--         end
+
+--         -- text before tag
+--         if tagStart > i then
+--             table.insert(out, highlightSegment(text:sub(i, tagStart - 1), lookup))
+--         end
+
+--         -- the tag itself untouched
+--         table.insert(out, text:sub(tagStart, tagEnd))
+--         i = tagEnd + 1
+--     end
+
+--     return table.concat(out)
+-- end
+
 function Core.playersList(list)
     local finalText = ""
 
@@ -97,7 +154,7 @@ function Core.goodbye(username)
 end
 
 function Core.usernameMessage(translation, username, color)
-    local text = getText(translation, wrapText(username))
+    local text = getText(translation, username)
     Core.message(text, {}, {
         color = color or "<RGB:255,255,0>"
     })
@@ -280,3 +337,174 @@ ISChat["onCommandEntered"] = function(self)
 
     original_command(self)
 end
+
+local original_addLIneInChat = ISChat["addLineInChat"]
+local lastLineChecked = 0
+
+local function newGetTextWithPrefix(message)
+    return message:getTextWithPrefix()
+end
+
+-- return the first <RGB:...> tag exactly as-is (Zomboid often uses 0..1 floats)
+local function getRestoreRGBTag(text)
+    local tag = text:match("(<RGB:[^>]+>)")
+    return tag or "<RGB:1.0,1.0,1.0>"
+end
+
+local function highlightRawText(raw, lookup, restoreTag)
+    if not raw or raw == "" then
+        return raw
+    end
+
+    local highlightTag = "<RGB:1.0,1.0,1.0>" -- white in Zomboid's float RGB
+
+    -- IMPORTANT: only return the string (gsub returns 2 values)
+    local s = raw:gsub("([%w_%.%-]+)", function(token)
+        local key = string.lower(token)
+        if lookup[key] then
+            return "<PUSHRGB:255,255,255><SPACE> " .. token .. " <SPACE><POPRGB>"
+        end
+        return token
+    end)
+
+    return s
+end
+
+local function findLastPlain(haystack, needle)
+    local lastS, lastE
+    local s, e = haystack:find(needle, 1, true) -- plain find
+    while s do
+        lastS, lastE = s, e
+        s, e = haystack:find(needle, e + 1, true)
+    end
+    return lastS, lastE
+end
+
+local function highlightUsernamesInChatLine(message, lookup)
+    local baseLine = message:getTextWithPrefix()
+    if not baseLine or baseLine == "" then
+        return baseLine
+    end
+    if isEmptyTable(lookup) then
+        return baseLine
+    end
+
+    local raw = message:getText() -- body only
+    if not raw or raw == "" then
+        -- system-ish line: no separate body, just highlight the whole thing
+        local restore = getRestoreRGBTag(baseLine)
+        return highlightRawText(baseLine, lookup, restore)
+    end
+
+    local s, e = findLastPlain(baseLine, raw)
+    if not s then
+        -- fallback if we can't locate the raw inside the formatted line
+        local restore = getRestoreRGBTag(baseLine)
+        return highlightRawText(baseLine, lookup, restore)
+    end
+
+    local restore = getRestoreRGBTag(baseLine)
+    local highlightedRaw = highlightRawText(raw, lookup, restore)
+
+    return baseLine:sub(1, s - 1) .. highlightedRaw .. baseLine:sub(e + 1)
+end
+
+ISChat.addLineInChat = function(message, tabID)
+    local line = highlightUsernamesInChatLine(message, Core.usernames)
+
+    if message:getAuthor() and ISChat.instance.mutedUsers[message:getAuthor()] then
+        message:setText("* * *")
+        return
+    end
+    if not ISChat.instance.chatText then
+        ISChat.instance.chatText = ISChat.instance.defaultTab;
+        ISChat.instance:onActivateView();
+    end
+    local chatText;
+    for i, tab in ipairs(ISChat.instance.tabs) do
+        if tab and tab.tabID == tabID then
+            chatText = tab;
+            break
+        end
+    end
+    if chatText.tabTitle ~= ISChat.instance.chatText.tabTitle then
+        local alreadyExist = false;
+        for i, blinkedTab in ipairs(ISChat.instance.panel.blinkTabs) do
+            if blinkedTab == chatText.tabTitle then
+                alreadyExist = true;
+                break
+            end
+        end
+        if alreadyExist == false then
+            table.insert(ISChat.instance.panel.blinkTabs, chatText.tabTitle);
+        end
+    end
+    local vscroll = chatText.vscroll
+    local scrolledToBottom = (chatText:getScrollHeight() <= chatText:getHeight()) or (vscroll and vscroll.pos == 1)
+    if #chatText.chatTextLines > ISChat.maxLine then
+        local newLines = {};
+        for i, v in ipairs(chatText.chatTextLines) do
+            if i ~= 1 then
+                table.insert(newLines, v);
+            end
+        end
+        table.insert(newLines, line .. " <LINE> ");
+        chatText.chatTextLines = newLines;
+    else
+        table.insert(chatText.chatTextLines, line .. " <LINE> ");
+    end
+    chatText.text = "";
+    local newText = "";
+    for i, v in ipairs(chatText.chatTextLines) do
+        if i == #chatText.chatTextLines then
+            v = string.gsub(v, " <LINE> $", "")
+        end
+        newText = newText .. v;
+    end
+    chatText.text = newText;
+    table.insert(chatText.chatMessages, message);
+    chatText:paginate();
+    if scrolledToBottom then
+        chatText:setYScroll(-10000);
+    end
+end
+
+-- ISChat.addLineInChat = function(message, tabID)
+--     local line = message:getTextWithPrefix();
+--     if message:getAuthor() and ISChat.instance.mutedUsers[message:getAuthor()] then
+--         message:setText("* * *")
+--         return
+--     end
+--     if not ISChat.instance.chatText then
+--         ISChat.instance.chatText = ISChat.instance.defaultTab;
+--         ISChat.instance:onActivateView();
+--     end
+--     local chatText;
+--     for i, tab in ipairs(ISChat.instance.tabs) do
+--         if tab and tab.tabID == tabID then
+--             chatText = tab;
+--             break
+--         end
+--     end
+
+--     local txt = message and message.getText and message:getText() or nil
+--     if txt then
+
+--         local newTxt = highlightUsernamesPreservingTags(txt, Core.usernames)
+
+--         -- Only mutate if it actually changed
+--         if newTxt ~= txt then
+--             -- Depending on Zomboid build, ChatMessage may have setText / setTextAndShow / etc.
+--             if message.setText then
+--                 message:setText(newTxt)
+--             elseif message.setTextInBuffer then
+--                 message:setTextInBuffer(newTxt)
+--             else
+--                 -- Fallback: leave unchanged if we can't set it safely
+--                 -- (better than breaking chat)
+--             end
+--         end
+--     end
+
+--     return original_addLIneInChat(message, tabID)
+-- end

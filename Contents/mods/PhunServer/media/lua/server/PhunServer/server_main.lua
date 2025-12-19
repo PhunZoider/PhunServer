@@ -17,53 +17,50 @@ local onliners = {}
 
 function Core.checkPlayers()
 
-    if not Core.isServerEmpty() then
-        -- players online 
-        local online = PL.onlinePlayers()
+    -- players online 
+    local online = PL.onlinePlayers()
 
-        local now = getTimestamp()
-        for i = 0, online:size() - 1 do
-            local p = online:get(i)
-            local username = p:getUsername()
+    local now = getTimestamp()
+    for i = 0, online:size() - 1 do
+        local p = online:get(i)
+        local username = p:getUsername()
 
-            onliners[username] = true
-            if not Core.data.online[username] then
-                -- just joined
-                Core.data.online[username] = {}
-                Core.debugLn("Player connected for the first time: " .. username)
-                sendServerCommand(Core.name, Core.commands.welcomeFirstTime, {username})
+        onliners[username] = true
+        if not Core.data.online[username] then
+            -- just joined
+            Core.data.online[username] = {}
+            Core.debugLn("Player connected for the first time: " .. username)
+            sendServerCommand(Core.name, Core.commands.welcomeFirstTime, {username})
 
-            elseif not Core.data.online[username].online then
-                -- re-joined
-                Core.debugLn("Player re-connected: " .. username)
-                sendServerCommand(Core.name, Core.commands.welcome, {username})
+        elseif not Core.data.online[username].online then
+            -- re-joined
+            Core.debugLn("Player re-connected: " .. username)
+            sendServerCommand(Core.name, Core.commands.welcome, {username})
 
-            end
-            Core.data.online[username].lastSeen = now
-            Core.data.online[username].online = true
         end
-        for name, data in pairs(onliners) do
-            if Core.data.online[name].online then
-                if now - Core.data.online[name].lastSeen > 1 then
-                    -- player left
-                    Core.debugLn("Player disconnected: " .. name)
-                    local suffix = ZombRand(4)
-                    local t = {
-                        soundName = "",
-                        text = "IGUI_PhunServer_Goodbye" .. tostring(suffix),
-                        args = {},
-                        types = {
-                            chat = true
-                        }
+        Core.data.online[username].lastSeen = now
+        Core.data.online[username].online = true
+    end
+    for name, data in pairs(onliners) do
+        if Core.data.online[name].online then
+            if now - Core.data.online[name].lastSeen > 1 then
+                -- player left
+                Core.debugLn("Player disconnected: " .. name)
+                local suffix = ZombRand(4)
+                local t = {
+                    soundName = "",
+                    text = "IGUI_PhunServer_Goodbye" .. tostring(suffix),
+                    args = {},
+                    types = {
+                        chat = true
                     }
-                    table.insert(t.args, name)
-                    sendServerCommand(Core.name, Core.commands.goodbye, {name})
-                    Core.data.online[name].online = false
-                    onliners[name] = nil
-                end
+                }
+                table.insert(t.args, name)
+                sendServerCommand(Core.name, Core.commands.goodbye, {name})
+                Core.data.online[name].online = false
+                onliners[name] = nil
             end
         end
-
     end
 
 end
