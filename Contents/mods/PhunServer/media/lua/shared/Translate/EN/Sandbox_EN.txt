@@ -32,6 +32,13 @@ Sandbox_EN = {
     Sandbox_PhunServer_GoodbyeAnnouncements = "Player Goodbye",
     Sandbox_PhunServer_GoodbyeAnnouncements_tooltip = "Announce when players leave",
 
+    Sandbox_PhunServer_ReplaceMusic = "Replace img",
+    Sandbox_PhunServer_ReplaceMusic_tooltip = "Replace [image=music] clutter in text with a little cute music note",
+
+    Sandbox_PhunServer_ReplaceRadio = "Replace radio",
+    Sandbox_PhunServer_ReplaceRadio_tooltip = "Replace radio prefix with symbol to declutter chat",
+
+
     Sandbox_PhunServer_NotificationChime = "Chime",
     Sandbox_PhunServer_NotificationChime_tooltip = "Play a chime when notifying user of impending restart",
 

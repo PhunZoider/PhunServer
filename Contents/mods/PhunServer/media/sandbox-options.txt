@@ -46,7 +46,29 @@ option PhunServer.GoodbyeAnnouncements
     translation = PhunServer_GoodbyeAnnouncements,
 }
 
+option PhunServer.ColorUsernames
+{
+    type = boolean,
+    default = true,
+    page = PhunServer_Announcements,
+    translation = PhunServer_GoodbyeAnnouncements,
+}
 
+option PhunServer.ReplaceMusic
+{
+    type = boolean,
+    default = true,
+    page = PhunServer_Announcements,
+    translation = PhunServer_ReplaceMusic,
+}
+
+option PhunServer.ReplaceRadio
+{
+    type = boolean,
+    default = true,
+    page = PhunServer_Announcements,
+    translation = PhunServer_ReplaceRadio,
+}
 
 
 

@@ -409,9 +409,43 @@ local function highlightUsernamesInChatLine(message, lookup)
     return baseLine:sub(1, s - 1) .. highlightedRaw .. baseLine:sub(e + 1)
 end
 
+local function replaceMusicImg(text)
+    if not text then
+        return text
+    end
+    if Core.getOption("ReplaceMusic") ~= true then
+        return text
+    end
+
+    text = text:gsub("%[img=([%w_%-]+)%]", function(name)
+        if name == "music" then
+            return "<IMAGE:media/textures/music_note.png>"
+        end
+        return "[img=" .. name .. "]"
+    end)
+    return text
+end
+
+local function replaceRadioPrefix(text)
+    if not text then
+        return text
+    end
+    if Core.getOption("ReplaceRadio") ~= true then
+        return text
+    end
+
+    -- Match ONLY at the start of the line
+    -- ^Radio %([^%)]+%):
+    text = text:gsub("(%s)Radio%s*%([^%)]+%):", "%1<IMAGE:media/textures/sound_icon.png> ", 1)
+
+    return text
+end
+
 ISChat.addLineInChat = function(message, tabID)
     local line = highlightUsernamesInChatLine(message, Core.usernames)
-
+    line = replaceMusicImg(line)
+    line = replaceRadioPrefix(line)
+    -- line = line .. "<IMAGE:media/textures/music_note.png>"
     if message:getAuthor() and ISChat.instance.mutedUsers[message:getAuthor()] then
         message:setText("* * *")
         return
@@ -468,43 +502,3 @@ ISChat.addLineInChat = function(message, tabID)
         chatText:setYScroll(-10000);
     end
 end
-
--- ISChat.addLineInChat = function(message, tabID)
---     local line = message:getTextWithPrefix();
---     if message:getAuthor() and ISChat.instance.mutedUsers[message:getAuthor()] then
---         message:setText("* * *")
---         return
---     end
---     if not ISChat.instance.chatText then
---         ISChat.instance.chatText = ISChat.instance.defaultTab;
---         ISChat.instance:onActivateView();
---     end
---     local chatText;
---     for i, tab in ipairs(ISChat.instance.tabs) do
---         if tab and tab.tabID == tabID then
---             chatText = tab;
---             break
---         end
---     end
-
---     local txt = message and message.getText and message:getText() or nil
---     if txt then
-
---         local newTxt = highlightUsernamesPreservingTags(txt, Core.usernames)
-
---         -- Only mutate if it actually changed
---         if newTxt ~= txt then
---             -- Depending on Zomboid build, ChatMessage may have setText / setTextAndShow / etc.
---             if message.setText then
---                 message:setText(newTxt)
---             elseif message.setTextInBuffer then
---                 message:setTextInBuffer(newTxt)
---             else
---                 -- Fallback: leave unchanged if we can't set it safely
---                 -- (better than breaking chat)
---             end
---         end
---     end
-
---     return original_addLIneInChat(message, tabID)
--- end

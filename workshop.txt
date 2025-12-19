@@ -29,13 +29,15 @@ description=[tr][td][b]Debug[/b][/td][td]Print more verbose debug info in consol
 description=[/table]
 description=
 
-description=[h2]PhunServer: Announcements[/h2]
+description=[h2]PhunServer: Chat[/h2]
 description=Ensure your players feel seen!
 description=
 description=[table]
 description=[tr][th]Setting[/th][th]Description[/th][/tr]
 description=[tr][td][b]Welcome Players[/b][/td][td]Tick to send notice to all users that a player has joined (or returned)[/td][/tr]
 description=[tr][td][b]Player Goodbye[/b][/td][td]Tick to send notice to all users that a player has logged off.[/td][/tr]
+description=[tr][td][b]Replace img[/b][/td][td]Tick to replace instances of [image=music] tags in text (from music) with music notes. Its prettier and cleaner. If you like uglier and dirtier, untick this box[/td][/tr]
+description=[tr][td][b]Replace radio[/b][/td][td]Tick this to replace the prefix Radio(station#): with a speaker icon. Because... it looks cleaner. Though there is less info (the source). Up to you[/td][/tr]
 description=[/table]
 description=
 
