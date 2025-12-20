@@ -137,7 +137,7 @@ option PhunServer.QuitDelaySeconds
 option PhunServer.PlayersOnMap
 { 
     type = enum,
-    numValues = 2,
+    numValues = 3,
     default = 2, 
     page = PhunServer_Map, 
     translation = PhunServer_PlayersOnMap,
@@ -147,7 +147,7 @@ option PhunServer.PlayersOnMap
 option PhunServer.PlayersOnMiniMap
 { 
     type = enum,
-    numValues = 2,
+    numValues = 3,
     default = 2, 
     page = PhunServer_Map, 
     translation = PhunServer_PlayersOnMiniMap,

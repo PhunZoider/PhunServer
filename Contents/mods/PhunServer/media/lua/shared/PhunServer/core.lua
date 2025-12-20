@@ -57,7 +57,8 @@ function Core:ini()
         self.started = getTimestamp()
         self.pendingReboot = false
         self.rebooting = false
-
+    else
+        self.usernames = ModData.getOrCreate("PhunServer_Usernames") or {}
     end
     triggerEvent(self.events.OnReady, self)
 end

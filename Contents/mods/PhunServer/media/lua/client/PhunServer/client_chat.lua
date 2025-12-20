@@ -442,10 +442,19 @@ local function replaceRadioPrefix(text)
 end
 
 ISChat.addLineInChat = function(message, tabID)
+
+    Core.debug("Adding Chat", Core.usernames)
+    -- local current = getPlayer():getRole()
+    -- local roles = getRoles()
+    -- local rollList = {}
+    -- for i = 0, roles:size() - 1 do
+    --     local role = roles:get(i);
+    --     table.insert(rollList, role:getName());
+    -- end
     local line = highlightUsernamesInChatLine(message, Core.usernames)
     line = replaceMusicImg(line)
     line = replaceRadioPrefix(line)
-    -- line = line .. "<IMAGE:media/textures/music_note.png>"
+
     if message:getAuthor() and ISChat.instance.mutedUsers[message:getAuthor()] then
         message:setText("* * *")
         return

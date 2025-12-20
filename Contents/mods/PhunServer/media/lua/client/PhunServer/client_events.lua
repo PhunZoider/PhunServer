@@ -28,6 +28,8 @@ Events.OnTick.Add(function()
     if getTimestampMs() >= nextTick then
 
         local players = getOnlinePlayers()
+        local me = getPlayer()
+
         local playerInfo = {}
         for i = 0, players:size() - 1 do
             local p = players:get(i)
@@ -37,6 +39,8 @@ Events.OnTick.Add(function()
             end
             playerInfo[p:getOnlineID()] = {
                 id = p:getOnlineID(),
+                me = (p == me),
+                faction = faction and faction.getName and faction:getName() or nil,
                 num = p:getPlayerNum(),
                 username = p:getUsername(),
                 x = p:getX(),
@@ -58,8 +62,8 @@ Events.OnPostUIDraw.Add(function()
 end);
 
 Events.EveryTenMinutes.Add(function()
-    Core.map.pom = Core.getOption("PlayersOnMap") or 1
-    Core.map.pomm = Core.getOption("PlayersOnMiniMap") or 1
+    Core.map.pom = Core.getOption("PlayersOnMap", 1)
+    Core.map.pomm = Core.getOption("PlayersOnMiniMap", 1)
 end);
 Events.EveryOneMinute.Add(function()
     Core:testNight()

@@ -30,19 +30,9 @@ function Core.map.drawPlayerOnMap(map, player, isMinimap)
     -- Get myself player
     local me_player = getPlayer();
 
-    -- If online then get and update online player
-    local o_player = nil;
-
-    o_player = getPlayerByOnlineID(player.id);
-
-    local l_player = nil;
-
     if (map.inner) then
         map = map.inner;
     end
-
-    -- Of course if we are not drawing ourself and faction option is enabled
-    local faction = Faction.getPlayerFaction(me_player);
 
     -- Get position where to draw
     local x = math.floor(map.mapAPI:worldToUIX(player.x, player.y));
@@ -55,11 +45,10 @@ function Core.map.drawPlayerOnMap(map, player, isMinimap)
 
     -- Check if we should draw player name
     local bPlayerNames = true;
-    -- if (isMe and (not SandboxVars.PlayersOnMap.ShowMyName)) then return end --Don't draw my name if setting is disabled
+
     if (ISWorldMap_instance) then
         bPlayerNames = ISWorldMap_instance.mapAPI:getBoolean("PlayerNames");
     end -- Get client setting if to draw player names
-    -- if ((not bPlayerNames) or (not SandboxVars.PlayersOnMap.ShowPlayerNames)) then return end --Don't draw name if disabled by server or client settings
 
     -- Draw player name on a map
 
@@ -70,13 +59,54 @@ function Core.map.drawPlayerOnMap(map, player, isMinimap)
 
 end
 
+local canSeeAll = nil
+local factionNames = nil
+
+local function canSeeAllPlayers()
+    if canSeeAll == nil then
+        local p = getPlayer()
+        canSeeAll = PL.isAdmin(p) or
+                        (p and p.getRole and p:getRole().hasCapability and
+                            p:getRole():hasCapability(Capability.CanSeeAll))
+    end
+    return canSeeAll
+end
+
+local function getFactionNameForPlayer(player)
+    if factionNames == nil then
+        local f = {}
+        for _, player in pairs(PL.onlinePlayers()) do
+            local faction = Faction.getPlayerFaction(player)
+            f[player:getPlayerNum()] = faction and faction.getName and faction:getName() or nil
+        end
+        factionNames = f
+    end
+    return factionNames[player:getPlayerNum()]
+end
+
+Events.EveryOneMinute.Add(function()
+    canSeeAll = nil
+end)
+
 function ISWorldMap:render(...)
+
     ISWorldMap_instance = self;
     ISWorldMap_render(self, ...);
 
-    if Core.map.pom > 1 then
+    if Core.map.pom == 2 or canSeeAllPlayers() then
+        -- show all
         for _, player in pairs(Core.players or {}) do
             Core.map.drawPlayerOnMap(self, player, false);
+        end
+
+    elseif Core.map.pom == 3 then
+        -- show only if faction match
+        local f = Faction.getPlayerFaction(getPlayer())
+
+        for _, player in pairs(Core.players or {}) do
+            if player.faction == f then
+                Core.map.drawPlayerOnMap(self, player, false);
+            end
         end
     end
 end
@@ -87,9 +117,20 @@ function ISMiniMapOuter:render(...)
 
     self.inner:setStencilRect(0, 0, self:getWidth(), self:getHeight());
 
-    if Core.map.pomm > 1 then
+    if Core.map.pom == 2 or canSeeAllPlayers() then
+        -- show all
         for _, player in pairs(Core.players or {}) do
-            Core.map.drawPlayerOnMap(self, player, true);
+            Core.map.drawPlayerOnMap(self, player, false);
+        end
+
+    elseif Core.map.pom == 3 then
+        -- show only if faction match
+        local f = Faction.getPlayerFaction(getPlayer())
+
+        for _, player in pairs(Core.players or {}) do
+            if player.faction == f then
+                Core.map.drawPlayerOnMap(self, player, true);
+            end
         end
     end
 
