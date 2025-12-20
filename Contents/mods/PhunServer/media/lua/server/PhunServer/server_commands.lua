@@ -10,13 +10,6 @@ local Commands = {}
 Commands[Core.commands.playerSetup] = function(player, args)
     Core.debugLn("Setting up player " .. player:getUsername())
     Core.wipeKeyCheck(player:getUsername())
-    Core.players[player:getOnlineID()] = {
-        wipeKey = Core.getOption("WipeKey"),
-        playerObj = player,
-        username = player:getUsername(),
-        online = true
-    }
-    Core.usernames[string.lower(player:getUsername())] = player:getUsername()
 end
 
 Commands[Core.commands.checkworkshop] = function(player, args)

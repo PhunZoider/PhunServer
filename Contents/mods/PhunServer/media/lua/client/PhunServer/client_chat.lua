@@ -43,53 +43,6 @@ local function isEmptyTable(t)
     return true
 end
 
--- highlight tokens in a segment that contains NO <...> tags
--- local function highlightSegment(seg, lookup)
---     local s = seg:gsub("([%w_%.%-]+)", function(token)
---         local key = string.lower(token)
---         if lookup[key] then
---             return "<PUSHRGB:255,255,255>" .. token .. "<POPRGB>"
---         end
---         return token
---     end)
---     return s
--- end
-
--- local function highlightUsernamesPreservingTags(text, lookup)
---     if not text or text == "" then
---         return text
---     end
-
---     -- Quick exit if no players (or no lookup)
---     if isEmptyTable(lookup) then
---         return text
---     end
-
---     -- Split around Zomboid markup tags like <RGB:...>, <SIZE:...>, etc.
---     -- We only highlight outside tags.
---     local out = {}
---     local i = 1
-
---     while true do
---         local tagStart, tagEnd = text:find("<[^>]*>", i)
---         if not tagStart then
---             table.insert(out, highlightSegment(text:sub(i), lookup))
---             break
---         end
-
---         -- text before tag
---         if tagStart > i then
---             table.insert(out, highlightSegment(text:sub(i, tagStart - 1), lookup))
---         end
-
---         -- the tag itself untouched
---         table.insert(out, text:sub(tagStart, tagEnd))
---         i = tagEnd + 1
---     end
-
---     return table.concat(out)
--- end
-
 function Core.playersList(list)
     local finalText = ""
 
@@ -150,10 +103,18 @@ function Core.goodbye(username)
         return
     end
     local rnd = ZombRand(4)
-    Core.usernameMessage("IGUI_PhunServer_Goodbye" .. tostring(rnd), username, "<RGB:0,0,255>")
+    Core.usernameMessage("IGUI_PhunServer_Goodbye" .. tostring(rnd), username, "<RGB:255,255,0>")
 end
 
 function Core.usernameMessage(translation, username, color)
+    if not Core.players then
+        Core.updatePlayers()
+    end
+    if not Core.players[string.lower(username)] then
+        Core.players[string.lower(username)] = {
+            username = username
+        }
+    end
     local text = getText(translation, username)
     Core.message(text, {}, {
         color = color or "<RGB:255,255,0>"
@@ -443,15 +404,7 @@ end
 
 ISChat.addLineInChat = function(message, tabID)
 
-    Core.debug("Adding Chat", Core.usernames)
-    -- local current = getPlayer():getRole()
-    -- local roles = getRoles()
-    -- local rollList = {}
-    -- for i = 0, roles:size() - 1 do
-    --     local role = roles:get(i);
-    --     table.insert(rollList, role:getName());
-    -- end
-    local line = highlightUsernamesInChatLine(message, Core.usernames)
+    local line = highlightUsernamesInChatLine(message, Core.getPlayers())
     line = replaceMusicImg(line)
     line = replaceRadioPrefix(line)
 

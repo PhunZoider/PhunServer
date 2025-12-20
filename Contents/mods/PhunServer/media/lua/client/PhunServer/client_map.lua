@@ -33,6 +33,9 @@ function Core.map.drawPlayerOnMap(map, player, isMinimap)
     if (map.inner) then
         map = map.inner;
     end
+    if not player.x or not player.y then
+        return
+    end
 
     -- Get position where to draw
     local x = math.floor(map.mapAPI:worldToUIX(player.x, player.y));
@@ -63,6 +66,7 @@ local canSeeAll = nil
 local factionNames = nil
 
 local function canSeeAllPlayers()
+
     if canSeeAll == nil then
         local p = getPlayer()
         canSeeAll = PL.isAdmin(p) or
@@ -104,7 +108,7 @@ function ISWorldMap:render(...)
         local f = Faction.getPlayerFaction(getPlayer())
 
         for _, player in pairs(Core.players or {}) do
-            if player.faction == f then
+            if player.me or f and player.faction == f then
                 Core.map.drawPlayerOnMap(self, player, false);
             end
         end
@@ -128,7 +132,7 @@ function ISMiniMapOuter:render(...)
         local f = Faction.getPlayerFaction(getPlayer())
 
         for _, player in pairs(Core.players or {}) do
-            if player.faction == f then
+            if player.me or f and player.faction == f then
                 Core.map.drawPlayerOnMap(self, player, true);
             end
         end
