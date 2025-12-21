@@ -32,6 +32,9 @@ Sandbox_EN = {
     Sandbox_PhunServer_GoodbyeAnnouncements = "Player Goodbye",
     Sandbox_PhunServer_GoodbyeAnnouncements_tooltip = "Announce when players leave",
 
+    Sandbox_PhunServer_ColorUsernames = "Color Username",
+    Sandbox_PhunServer_ColorUsernames_tooltip = "Highlight known usernames in chat",    
+
     Sandbox_PhunServer_ReplaceMusic = "Replace img",
     Sandbox_PhunServer_ReplaceMusic_tooltip = "Replace [image=music] clutter in text with a little cute music note",
 

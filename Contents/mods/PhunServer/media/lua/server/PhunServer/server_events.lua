@@ -74,11 +74,15 @@ Events.OnTickEvenPaused.Add(function()
     end
 
     local timestamp = getTimestamp()
-    if not nextPoll or timestamp >= nextPoll then
-        nextPoll = timestamp + (Core.getOption("WorkshopPollingInterval", 15) * 60)
+    if timestamp >= (nextPoll or 0) then
+        nextPoll = timestamp + (Core.getOption("WorkshopPollingIntervalMinutes", 15) * 60)
+        -- print("[" .. Core.name .. "] Next workshop poll scheduled for " .. tostring(nextPoll))
+        Core.debugLn("Polling workshop for updates (scheduled) for " .. tostring(nextPoll))
         if Core.getOption("EnableModWatch") == true then
             return Core.pollWorkshop()
         end
+    else
+        -- print("[" .. Core.name .. "] Next workshop poll scheduled for " .. tostring(nextPoll))
     end
 end)
 

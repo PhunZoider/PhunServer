@@ -51,7 +51,7 @@ option PhunServer.ColorUsernames
     type = boolean,
     default = true,
     page = PhunServer_Announcements,
-    translation = PhunServer_GoodbyeAnnouncements,
+    translation = PhunServer_ColorUsernames,
 }
 
 option PhunServer.ReplaceMusic

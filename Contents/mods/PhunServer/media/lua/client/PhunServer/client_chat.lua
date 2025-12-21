@@ -82,28 +82,39 @@ function Core.playersList(list)
 end
 
 function Core.welcomeFirstTime(username)
-    if username == getPlayer():getUsername() then
-        Core.usernameMessage("IGUI_PhunServer_WelcomeMyFirstTime", username, "<RGB:0,255,0>")
-    else
-        Core.usernameMessage("IGUI_PhunServer_WelcomeFirstTime", username)
+    if Core.getOption("WelcomeAnnounce", false) then
+
+        if username == getPlayer():getUsername() then
+            Core.usernameMessage("IGUI_PhunServer_WelcomeMyFirstTime", username, "<RGB:0,255,0>")
+        else
+            Core.usernameMessage("IGUI_PhunServer_WelcomeFirstTime", username)
+        end
+
     end
+
 end
 
 function Core.welcomeBack(username)
-    if username == getPlayer():getUsername() then
-        Core.usernameMessage("IGUI_PhunServer_WelcomeBack", username, "<RGB:0,255,0>")
-    else
-        local rnd = ZombRand(4)
-        Core.usernameMessage("IGUI_PhunServer_Welcome" .. tostring(rnd), username)
+
+    if Core.getOption("WelcomeAnnounce", false) then
+        if username == getPlayer():getUsername() then
+            Core.usernameMessage("IGUI_PhunServer_WelcomeBack", username, "<RGB:0,255,0>")
+        else
+            local rnd = ZombRand(4)
+            Core.usernameMessage("IGUI_PhunServer_Welcome" .. tostring(rnd), username)
+        end
     end
 end
 
 function Core.goodbye(username)
-    if username == getPlayer():getUsername() then
-        return
+
+    if Core.getOption("GoodbyeAnnouncements", false) then
+        if username == getPlayer():getUsername() then
+            return
+        end
+        local rnd = ZombRand(4)
+        Core.usernameMessage("IGUI_PhunServer_Goodbye" .. tostring(rnd), username, "<RGB:255,255,0>")
     end
-    local rnd = ZombRand(4)
-    Core.usernameMessage("IGUI_PhunServer_Goodbye" .. tostring(rnd), username, "<RGB:255,255,0>")
 end
 
 function Core.usernameMessage(translation, username, color)
@@ -404,7 +415,8 @@ end
 
 ISChat.addLineInChat = function(message, tabID)
 
-    local line = highlightUsernamesInChatLine(message, Core.getPlayers())
+    local line = Core.getOption("ColorUsernames", false) and highlightUsernamesInChatLine(message, Core.getPlayers()) or
+                     message:getTextWithPrefix()
     line = replaceMusicImg(line)
     line = replaceRadioPrefix(line)
 

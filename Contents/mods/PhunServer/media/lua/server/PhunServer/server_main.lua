@@ -30,12 +30,15 @@ function Core.checkPlayers()
             -- just joined
             Core.data.online[username] = {}
             Core.debugLn("Player connected for the first time: " .. username)
-            sendServerCommand(Core.name, Core.commands.welcomeFirstTime, {username})
-
+            if Core.getOption("WelcomeAnnounce", false) then
+                sendServerCommand(Core.name, Core.commands.welcomeFirstTime, {username})
+            end
         elseif not Core.data.online[username].online then
             -- re-joined
             Core.debugLn("Player re-connected: " .. username)
-            sendServerCommand(Core.name, Core.commands.welcome, {username})
+            if Core.getOption("WelcomeAnnounce", false) then
+                sendServerCommand(Core.name, Core.commands.welcome, {username})
+            end
 
         end
         Core.data.online[username].lastSeen = now
@@ -56,7 +59,10 @@ function Core.checkPlayers()
                     }
                 }
                 table.insert(t.args, name)
-                sendServerCommand(Core.name, Core.commands.goodbye, {name})
+                if Core.getOption("GoodbyeAnnouncements", false) then
+                    sendServerCommand(Core.name, Core.commands.goodbye, {name})
+                end
+
                 Core.data.online[name].online = false
                 onliners[name] = nil
             end
@@ -231,6 +237,7 @@ function Core.outdatedWorkshop()
 end
 
 function Core.pollWorkshop(player)
+    Core.debugLn("Polling Workshop for updates...")
     if Core.pendingReboot then
         if player then
             sendServerCommand(player, Core.name, Core.commands.message, {
