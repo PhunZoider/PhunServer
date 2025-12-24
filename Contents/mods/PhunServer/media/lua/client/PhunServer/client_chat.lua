@@ -77,7 +77,7 @@ function Core.playersList(list)
                     table.concat(csv, ", "))
         end
     end
-    print(finalText)
+    -- print(finalText)
     Core.message(finalText)
 end
 

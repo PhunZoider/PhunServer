@@ -27,8 +27,6 @@ local pom_dot_color = {
 local pom_dot_size = 3;
 
 function Core.map.drawPlayerOnMap(map, player, isMinimap)
-    -- Get myself player
-    local me_player = getPlayer();
 
     if (map.inner) then
         map = map.inner;
@@ -45,13 +43,6 @@ function Core.map.drawPlayerOnMap(map, player, isMinimap)
     map:drawRect(x - pom_dot_size, y - pom_dot_size, pom_dot_size * 2 - 1, pom_dot_size * 2 - 1, pom_dot_color.a,
         pom_dot_color.r, pom_dot_color.g, pom_dot_color.b);
     map:drawRectBorder(x - pom_dot_size, y - pom_dot_size, pom_dot_size * 2, pom_dot_size * 2, 1, 0, 0, 0);
-
-    -- Check if we should draw player name
-    local bPlayerNames = true;
-
-    if (ISWorldMap_instance) then
-        bPlayerNames = ISWorldMap_instance.mapAPI:getBoolean("PlayerNames");
-    end -- Get client setting if to draw player names
 
     -- Draw player name on a map
 
@@ -89,30 +80,54 @@ local function getFactionNameForPlayer(player)
 end
 
 Events.EveryOneMinute.Add(function()
-    canSeeAll = nil
+    Core.canSeeAllPlayers(true)
 end)
+
+local function doDrawPlayers(self, mini)
+    local players = Core.getPlayers()
+    if Core.map.pom == 2 or Core.canSeeAllPlayers() then
+        -- show all
+        for _, player in pairs(players or {}) do
+            Core.map.drawPlayerOnMap(self, player, mini);
+        end
+
+    elseif Core.map.pom == 3 then
+        -- show only if faction match
+        for _, player in pairs(players or {}) do
+            if player.myFaction then
+                Core.map.drawPlayerOnMap(self, player, mini);
+            end
+        end
+    end
+end
 
 function ISWorldMap:render(...)
 
     ISWorldMap_instance = self;
     ISWorldMap_render(self, ...);
+    doDrawPlayers(self, false);
+    -- if Core.map.pom == 2 or canSeeAllPlayers() then
+    --     -- show all
+    --     local seen = getTimestamp() - 5;
+    --     for _, player in pairs(Core.players or {}) do
+    --         if (player.seen or 0) > seen then
+    --             -- stale info, skip
+    --             Core.map.drawPlayerOnMap(self, player, false);
+    --         end
+    --     end
 
-    if Core.map.pom == 2 or canSeeAllPlayers() then
-        -- show all
-        for _, player in pairs(Core.players or {}) do
-            Core.map.drawPlayerOnMap(self, player, false);
-        end
-
-    elseif Core.map.pom == 3 then
-        -- show only if faction match
-        local f = Faction.getPlayerFaction(getPlayer())
-
-        for _, player in pairs(Core.players or {}) do
-            if player.me or f and player.faction == f then
-                Core.map.drawPlayerOnMap(self, player, false);
-            end
-        end
-    end
+    -- elseif Core.map.pom == 3 then
+    --     -- show only if faction match
+    --     local f = Faction.getPlayerFaction(getPlayer())
+    --     local seen = getTimestamp() - 5;
+    --     for _, player in pairs(Core.players or {}) do
+    --         if player.me or f and player.faction == f then
+    --             if (player.seen or 0) > seen then
+    --                 Core.map.drawPlayerOnMap(self, player, false);
+    --             end
+    --         end
+    --     end
+    -- end
 end
 
 function ISMiniMapOuter:render(...)
@@ -120,23 +135,29 @@ function ISMiniMapOuter:render(...)
     ISMiniMapOuter_render(self, ...);
 
     self.inner:setStencilRect(0, 0, self:getWidth(), self:getHeight());
+    doDrawPlayers(self, true);
+    -- if Core.map.pom == 2 or canSeeAllPlayers() then
+    --     -- show all
+    --     local seen = getTimestamp() - 5;
+    --     for _, player in pairs(Core.players or {}) do
+    --         if (player.seen or 0) > seen then
+    --             -- stale info, skip
+    --             Core.map.drawPlayerOnMap(self, player, true);
+    --         end
+    --     end
 
-    if Core.map.pom == 2 or canSeeAllPlayers() then
-        -- show all
-        for _, player in pairs(Core.players or {}) do
-            Core.map.drawPlayerOnMap(self, player, false);
-        end
-
-    elseif Core.map.pom == 3 then
-        -- show only if faction match
-        local f = Faction.getPlayerFaction(getPlayer())
-
-        for _, player in pairs(Core.players or {}) do
-            if player.me or f and player.faction == f then
-                Core.map.drawPlayerOnMap(self, player, true);
-            end
-        end
-    end
+    -- elseif Core.map.pom == 3 then
+    --     -- show only if faction match
+    --     local f = Faction.getPlayerFaction(getPlayer())
+    --     local seen = getTimestamp() - 5;
+    --     for _, player in pairs(Core.players or {}) do
+    --         if player.me or f and player.faction == f then
+    --             if (player.seen or 0) > seen then
+    --                 Core.map.drawPlayerOnMap(self, player, true);
+    --             end
+    --         end
+    --     end
+    -- end
 
     self.inner:clearStencilRect();
 end

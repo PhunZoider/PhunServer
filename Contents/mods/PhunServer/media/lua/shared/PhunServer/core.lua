@@ -92,7 +92,9 @@ function Core:setIsNight(value)
         if value then
             speed = self.getOption("NightSpeed")
         end
-
+        Core.debugLn(
+            "Setting day length from " .. tostring(getSandboxOptions():getOptionByName("DayLength"):getValue()) ..
+                " to " .. tostring(speed))
         getSandboxOptions():getOptionByName("DayLength"):setValue(speed)
         getSandboxOptions():applySettings()
     end

@@ -39,6 +39,7 @@ Events.OnPostUIDraw.Add(function()
 end);
 
 Events.EveryTenMinutes.Add(function()
+    -- Recache map options
     Core.map.pom = Core.getOption("PlayersOnMap", 1)
     Core.map.pomm = Core.getOption("PlayersOnMiniMap", 1)
 end);
