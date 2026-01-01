@@ -1,4 +1,6 @@
 version=1
+id=3630484821
 title=PhunServer Tools TEST
 description=development and testing version of [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3623897097]PhunServer Tools[/url]
-visibility=hidden
+tags=
+visibility=unlisted
