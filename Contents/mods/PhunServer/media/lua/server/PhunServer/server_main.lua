@@ -324,3 +324,15 @@ function Core.pollWorkshop(player)
 
 end
 
+local scheduleCache = nil
+function Core.getSchedule( refresh )
+    if scheduleCache == nil or refresh == true then
+        scheduleCache = Core.getSavedData()
+
+        for _, sch in pairs(Core.data.schedules or {}) do
+            scheduleCache[sch.name] = sch
+        end
+    end
+    return scheduleCache
+
+end
