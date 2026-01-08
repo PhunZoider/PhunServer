@@ -1,3 +1,7 @@
+if not isServer() then
+    return
+end
+
 local Core = PhunServer
 local PL = PhunLib
 
@@ -10,15 +14,15 @@ function Core.getSavedData()
 
     -- this is a server or local game
     -- load the modified data from ./lua/PhunServer.lua
-    -- local filename = Core.name .. ".lua"
-    -- local d = fileTools.loadTable(filename)
-    -- if d == nil then
-    --     print("PhunServer: missing ./lua/" .. Core.name .. ", this is normal if you haven't defined any schedules")
-    --     return {}
-    -- else
-    --     print("PhunServer: loaded customisations from ./lua/" .. Core.name .. ".lua")
-    --     return d or {}
-    -- end
+    local filename = Core.name .. ".lua"
+    local d = fileTools.loadTable(filename)
+    if d == nil then
+        print("PhunServer: missing ./lua/" .. Core.name .. ", this is normal if you haven't defined any schedules")
+        return {}
+    else
+        print("PhunServer: loaded customisations from ./lua/" .. Core.name .. ".lua")
+        return d or {}
+    end
 
 end
 

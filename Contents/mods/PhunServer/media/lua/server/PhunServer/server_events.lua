@@ -21,6 +21,9 @@ Events.OnCharacterDeath.Add(function(player)
     if instanceof(player, "IsoPlayer") then
         -- a player died
         local username = player:getUsername()
+        if not username or username == "" then
+            return
+        end
         Core.debugLn("Player " .. username .. " died.")
         if Core.getOption("EnableWipeMap") and Core.getOption("WipePerCharacter", false) then
             Core.debugLn("Player " .. username .. " died, wiping their wipe key.")
