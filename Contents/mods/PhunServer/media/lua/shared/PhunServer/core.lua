@@ -80,6 +80,11 @@ function Core.getOption(name, default)
     return val
 end
 
+local lengthText = {"15 minutes", "30 minutes", "1 hour", "1.5 hours", "2 hours", "3 hours", "4 hours", "5 hours",
+                    "6 hours", "7 hours", "8 hours", "9 hours", "10 hours", "11 hours", "12 hours", "13 hours",
+                    "14 hours", "15 hours", "16 hours", "17 hours", "18 hours", "19 hours", "20 hours", "21 hours",
+                    "22 hours", "23 hours"}
+
 function Core:setIsNight(value)
 
     if self.isNight == value then
@@ -88,23 +93,22 @@ function Core:setIsNight(value)
     self.isNight = value
 
     if self.getOption("EnableDayNightChange") == true then
+
         local speed = self.getOption("DaySpeed")
         if value then
             speed = self.getOption("NightSpeed")
         end
-        Core.debugLn(
-            "Setting day length from " .. tostring(getSandboxOptions():getOptionByName("DayLength"):getValue()) ..
-                " to " .. tostring(speed))
-        getSandboxOptions():getOptionByName("DayLength"):setValue(speed)
-        getSandboxOptions():applySettings()
+        local currentLength = getSandboxOptions():getOptionByName("DayLength"):getValue()
+        if currentLength ~= speed then
+            Core.debugLn(getText("It is now %1, setting DayLength from %2 to %3", (value and "Night" or "Day"),
+                lengthText[getSandboxOptions():getOptionByName("DayLength"):getValue()], lengthText[speed]))
+            getSandboxOptions():getOptionByName("DayLength"):setValue(speed)
+            getSandboxOptions():applySettings()
+        end
     end
 
     PL:setIsNight(value)
 
-    -- if isServer() then
-    --     sendServerCommand(self.name, value and self.commands.onDusk or self.commands.onDawn, {})
-    -- end
-    -- triggerEvent(value and self.events.OnDusk or self.events.OnDawn)
 end
 
 function Core:testNight()

@@ -4,7 +4,7 @@ end
 require "PhunServer/core"
 local Commands = require "PhunServer/server_commands"
 local Core = PhunServer
-
+local PL = PhunLib
 Events.OnInitGlobalModData.Add(function()
 
     Core.data = ModData.getOrCreate(Core.name)
@@ -46,7 +46,8 @@ Events.OnDisconnect.Add(function()
     end
 end)
 
-local nextPoll
+local nextPoll = 0
+local lastPoll = 0
 local nextPlayerCheck = getTimestamp()
 
 Events.OnTickEvenPaused.Add(function()
@@ -77,15 +78,19 @@ Events.OnTickEvenPaused.Add(function()
     end
 
     local timestamp = getTimestamp()
-    if timestamp >= (nextPoll or 0) then
+
+    if timestamp >= nextPoll then
+
         nextPoll = timestamp + (Core.getOption("WorkshopPollingIntervalMinutes", 15) * 60)
-        -- print("[" .. Core.name .. "] Next workshop poll scheduled for " .. tostring(nextPoll))
-        Core.debugLn("Polling workshop for updates (scheduled) for " .. tostring(nextPoll))
+
+        Core.debugLn("Checking workshop for mod updates. Last check was " ..
+                         (lastPoll > 0 and (PL.string.absDifference(timestamp, lastPoll) .. " ago") or
+                             "never (first check since server start)") .. ".")
+
         if Core.getOption("EnableModWatch") == true then
             return Core.pollWorkshop()
         end
-    else
-        -- print("[" .. Core.name .. "] Next workshop poll scheduled for " .. tostring(nextPoll))
+        lastPoll = timestamp
     end
 end)
 
