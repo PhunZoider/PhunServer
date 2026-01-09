@@ -24,9 +24,12 @@ Events.OnCharacterDeath.Add(function(player)
         if not username or username == "" then
             return
         end
-        Core.debugLn("Player " .. username .. " died.")
+        if not Core.data.online[username] then
+            return
+        end
+        Core.debugLn("Player " .. tostring(username) .. " died.")
         if Core.getOption("EnableWipeMap") and Core.getOption("WipePerCharacter", false) then
-            Core.debugLn("Player " .. username .. " died, wiping their wipe key.")
+            Core.debugLn("Player " .. tostring(username) .. " died, wiping their wipe key.")
             Core.data.online[username].wipeKey = tostring(getTimestamp())
             Core.wipeKeyCheck(username)
         end
