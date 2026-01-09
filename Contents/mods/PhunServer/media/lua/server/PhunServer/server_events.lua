@@ -85,9 +85,9 @@ Events.OnTickEvenPaused.Add(function()
 
         nextPoll = timestamp + (Core.getOption("WorkshopPollingIntervalMinutes", 15) * 60)
 
-        Core.debugLn("Checking workshop for mod updates. Last check was " ..
-                         (lastPoll > 0 and (PL.string.absDifference(timestamp, lastPoll) .. " ago") or
-                             "never (first check since server start)") .. ".")
+        Core.debugLn("Checking workshop for mod updates" ..
+                         (lastPoll > 0 and ". Last check was " ..
+                             (PL.string.absDifference(timestamp, lastPoll) .. " ago") or "") .. ".")
 
         if Core.getOption("EnableModWatch") == true then
             return Core.pollWorkshop()
