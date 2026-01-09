@@ -54,11 +54,11 @@ Sandbox_EN = {
     Sandbox_PhunServer_PlayersUpdateMs = "Update frequency",
     Sandbox_PhunServer_PlayersUpdateMs_tooltip = "Frequency in which to scan online players. 1000 = every second and should be a decent default",    
     
-    Sandbox_PhunServer_PlayersOnMap = "Players on Map",
-    Sandbox_PhunServer_PlayersOnMap_tooltip = "Show markers of player positions on map. Requires client restart. If using this in B42+, you should set MapRemotePlayerVisibility to 1 in your server ini",
+    Sandbox_PhunServer_PlayersOnMap = "Players on Map (deprecated)",
+    Sandbox_PhunServer_PlayersOnMap_tooltip = "Show markers of player positions on map. Requires client restart. If you want this feature in B42+, you should disabled this and set MapRemotePlayerVisibility to 1 in your server ini",
 
-    Sandbox_PhunServer_PlayersOnMiniMap = "Players on Mini Map",
-    Sandbox_PhunServer_PlayersOnMiniMap_tooltip = "Show player positions on mini map. Requires client restart. If using this in B42+, you should set MapRemotePlayerVisibility to 1 in your server ini",
+    Sandbox_PhunServer_PlayersOnMiniMap = "Players on Mini Map (deprecated)",
+    Sandbox_PhunServer_PlayersOnMiniMap_tooltip = "Show player positions on mini map. Requires client restart. If you want this feature in B42+, you should disable this and set MapRemotePlayerVisibility to 1 in your server ini",
 
     Sandbox_PlayersOnMap_option1 = "Disable",
     Sandbox_PlayersOnMap_option2 = "All",
@@ -94,8 +94,11 @@ Sandbox_EN = {
     Sandbox_PhunServer_Debug = "Debug"
     Sandbox_PhunServer_Debug_tooltip = "Tick this to get more verbose debug info in your logs"
 
-    Sandbox_PhunServer_SetHours = "/setsurvivedhours",
-    Sandbox_PhunServer_SetHours_tooltip = "When ticked, allows admin to set players hours survived using the format /setsurvivedhours playername x ",
+    Sandbox_PhunServer_SetHours = "/SetHours",
+    Sandbox_PhunServer_SetHours_tooltip = "When ticked, allows admins or mods to set players hours survived using the format /sethours playername x. Note that player must be online. Playername is optional, if omitted it targets self",
+
+    Sandbox_PhunServer_GetHours = "/Hours",
+    Sandbox_PhunServer_GetHours_tooltip = "When ticked, allows players to view hours survived using the format /hours. Admins or mods can use /hours username (though the player needs to be online)",
 
 }
 

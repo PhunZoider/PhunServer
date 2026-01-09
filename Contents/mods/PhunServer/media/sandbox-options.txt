@@ -26,6 +26,15 @@ option PhunServer.SetHours
 
 }
 
+option PhunServer.GetHours
+{
+    type = boolean,
+    default = true,
+    page = PhunServer_Other,
+    translation = PhunServer_GetHours,
+
+}
+
 option PhunServer.Debug
 {
     type = boolean, 

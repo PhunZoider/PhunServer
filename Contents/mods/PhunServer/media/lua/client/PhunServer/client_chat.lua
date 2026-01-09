@@ -233,42 +233,45 @@ end
 local original_command = ISChat["onCommandEntered"]
 
 Core.hasAccess = function(command)
-    return isAdmin() or getAccessLevel() == "moderator" or getAccessLevel() == "admin"
+    return PL.isAdmin()
 end
 
 Core.cmds = {
     [Core.commands.checkworkshop] = function(args)
-        if not Core.hasAccess() then
+        if not PL.isAdmin() then
             return getText("IGUI_PhunServer_NoAccess")
         else
             sendClientCommand(Core.name, "check", args)
         end
     end,
     [Core.commands.restart] = function(args)
-        if not Core.hasAccess() then
+        if not PL.isAdmin() then
             return getText("IGUI_PhunServer_NoAccess")
         else
             sendClientCommand(Core.name, "restart", args)
         end
     end,
     [Core.commands.players] = function(args)
-        if Core.getOption("Players") == false and not Core.hasAccess() then
+        if Core.getOption("Players") == false and not PL.isAdmin() then
             return getText("IGUI_PhunServer_NoAccess")
         else
             sendClientCommand(Core.name, Core.commands.players, args)
         end
     end,
     [Core.commands.setHoursSurvived] = function(args)
-        if Core.getOption("SetHours") == false and not Core.hasAccess() then
+        if Core.getOption("SetHours") == false or not PL.isAdmin() then
             return getText("IGUI_PhunServer_NoAccess")
         else
             sendClientCommand(Core.name, Core.commands.setHoursSurvived, args)
         end
     end,
     [Core.commands.getHoursSurvived] = function(args)
-        if Core.getOption("SetHours") == false and not Core.hasAccess() then
+        if Core.getOption("GetHours") == false and not PL.isAdmin() then
             return getText("IGUI_PhunServer_NoAccess")
         else
+            if not PL.isAdmin() then
+                args = {}
+            end
             sendClientCommand(Core.name, Core.commands.getHoursSurvived, args)
         end
     end
