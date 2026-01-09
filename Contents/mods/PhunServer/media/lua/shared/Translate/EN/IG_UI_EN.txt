@@ -70,5 +70,7 @@ IGUI_EN = {
     IGUI_PhunServer_ItIsNighttime = "It is nightime",
 
     IGUI_PhunServer_ItIsNowXChangingDayLength = "It is now %1, setting DayLength from %2 to %3",
+    
+    IGUI_PhunServer_PlayerHasSurvivedFor = "%1 has survived for %2",
 
 }

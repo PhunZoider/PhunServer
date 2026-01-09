@@ -35,7 +35,7 @@ end)
 
 Events.OnClientCommand.Add(function(module, command, playerObj, arguments)
     if module == Core.name and Commands[command] then
-        Core.debug(command, arguments)
+        Core.debug("@@@@" .. command, arguments, "----")
         Commands[command](playerObj, arguments)
     end
 end)

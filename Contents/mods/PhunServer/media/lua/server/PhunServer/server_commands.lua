@@ -67,4 +67,86 @@ Commands[Core.commands.players] = function(player, args)
 
 end
 
+Commands[Core.commands.setHoursSurvived] = function(player, args)
+    args = args or {}
+
+    -- Support:
+    --   /setsurvivedhours <playername> <hours>
+    --   /setsurvivedhours <hours>            (applies to the caller)
+    local a1 = args[1]
+    local a2 = args[2]
+
+    local hours
+    local name
+
+    -- If only one argument and it's numeric => hours for the caller
+    if a2 == nil then
+        hours = tonumber(a1)
+        if hours ~= nil then
+            name = player and player:getUsername() or nil
+        else
+            name = a1 and tostring(a1):lower() or nil
+            hours = nil
+        end
+    else
+        name = a1 and tostring(a1):lower() or nil
+        hours = tonumber(a2)
+    end
+
+    Core.debugLn(
+        "setHours command called by " .. tostring(player and player:getUsername() or "nil") .. " for player " ..
+            tostring(name) .. " to " .. tostring(hours))
+
+    if not name or name == "" or hours == nil then
+        sendServerCommand(player, Core.name, Core.commands.message, {
+            username = player:getUsername(),
+            text = "Invalid arguments. Usage: /setsurvivedhours playername hours  OR  /setsurvivedhours hours",
+            args = {}
+        })
+        return
+    end
+
+    local p = PL.getPlayerByUsername(name)
+    if p then
+        Core.debugLn("Setting hours survived for player " .. p:getUsername() .. " to " .. tostring(hours))
+        p:setHoursSurvived(hours)
+
+        sendServerCommand(player, Core.name, Core.commands.getHoursSurvived, {
+            username = player:getUsername(),
+            player = p:getUsername(),
+            hours = p:getHoursSurvived()
+        })
+        return
+    end
+
+    sendServerCommand(player, Core.name, Core.commands.message, {
+        username = player:getUsername(),
+        text = "Could not find an online player with name " .. tostring(name) .. ".",
+        args = {}
+    })
+end
+
+Commands[Core.commands.getHoursSurvived] = function(player, args)
+
+    local name = tostring((args and type(args) == "table" and args[1]) or player:getUsername()):lower()
+
+    Core.debugLn("getHoursSurvived command called by " .. player:getUsername() .. " for player " .. name)
+
+    local p = PL.getPlayerByUsername(name)
+    if p then
+        sendServerCommand(player, Core.name, Core.commands.getHoursSurvived, {
+            username = player:getUsername(),
+            player = p:getUsername(),
+            hours = p:getHoursSurvived()
+        })
+    else
+        sendServerCommand(player, Core.name, Core.commands.message, {
+            username = player:getUsername(),
+            text = "Could not find an online player with name " .. name .. ".",
+            args = {}
+        })
+    end
+
+end
+
 return Commands

@@ -17,7 +17,14 @@ option PhunServer.PlayersOffline24
     translation = PhunServer_PlayersOffline24,
 }
 
+option PhunServer.SetHours
+{
+    type = boolean,
+    default = true,
+    page = PhunServer_Other,
+    translation = PhunServer_SetHours,
 
+}
 
 option PhunServer.Debug
 {
@@ -138,7 +145,7 @@ option PhunServer.PlayersOnMap
 { 
     type = enum,
     numValues = 3,
-    default = 2, 
+    default = 1, 
     page = PhunServer_Map, 
     translation = PhunServer_PlayersOnMap,
     valueTranslation = PlayersOnMap,
@@ -148,7 +155,7 @@ option PhunServer.PlayersOnMiniMap
 { 
     type = enum,
     numValues = 3,
-    default = 2, 
+    default = 1, 
     page = PhunServer_Map, 
     translation = PhunServer_PlayersOnMiniMap,
     valueTranslation = PlayersOnMap,

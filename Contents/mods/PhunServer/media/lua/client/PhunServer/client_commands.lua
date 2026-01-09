@@ -24,6 +24,19 @@ Commands[Core.commands.message] = function(args)
     end
 end
 
+Commands[Core.commands.getHoursSurvived] = function(args)
+    local player = PL.getPlayerByUsername(args.username)
+    if player then
+        local hours = args.hours
+        local seconds = hours * 3600
+        local text = PL.string.secondsToText(seconds, {
+            maxParts = 4,
+            zeroText = "UI_PhunLib_LessThanMinute"
+        })
+        Core.message(getText("IGUI_PhunServer_PlayerHasSurvivedFor", args.player, text))
+    end
+end
+
 Commands[Core.commands.welcomeFirstTime] = function(args)
     Core.welcomeFirstTime(args[1])
 end

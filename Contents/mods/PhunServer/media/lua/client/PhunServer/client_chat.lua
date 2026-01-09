@@ -257,6 +257,20 @@ Core.cmds = {
         else
             sendClientCommand(Core.name, Core.commands.players, args)
         end
+    end,
+    [Core.commands.setHoursSurvived] = function(args)
+        if Core.getOption("SetHours") == false and not Core.hasAccess() then
+            return getText("IGUI_PhunServer_NoAccess")
+        else
+            sendClientCommand(Core.name, Core.commands.setHoursSurvived, args)
+        end
+    end,
+    [Core.commands.getHoursSurvived] = function(args)
+        if Core.getOption("SetHours") == false and not Core.hasAccess() then
+            return getText("IGUI_PhunServer_NoAccess")
+        else
+            sendClientCommand(Core.name, Core.commands.getHoursSurvived, args)
+        end
     end
 }
 
@@ -293,7 +307,7 @@ ISChat["onCommandEntered"] = function(self)
                 end
             end
         end
-        local command = Core.cmds[enteredCommand]
+        local command = Core.cmds[enteredCommand:lower()]
         if command ~= nil and command ~= false then
             local result = command(args)
             if result and result ~= "" then

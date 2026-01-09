@@ -94,6 +94,8 @@ Sandbox_EN = {
     Sandbox_PhunServer_Debug = "Debug"
     Sandbox_PhunServer_Debug_tooltip = "Tick this to get more verbose debug info in your logs"
 
+    Sandbox_PhunServer_SetHours = "/setsurvivedhours",
+    Sandbox_PhunServer_SetHours_tooltip = "When ticked, allows admin to set players hours survived using the format /setsurvivedhours playername x ",
 
 }
 
