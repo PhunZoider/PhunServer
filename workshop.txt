@@ -91,7 +91,8 @@ description=[tr][td][b]Day Speed[/b][/td][td]Time it takes for a day to pass[/td
 description=[tr][td][b]Dawn Offset[/b][/td][td]Adjust dawn start time (+/- hours). Example: 1 starts dawn one hour later[/td][/tr]
 description=[/table]
 description=
-
+description=PTBR Transalations by [url=https://steamcommunity.com/id/SIMBAproduz]SIMBAproduz[/url], ES by Gestr
+description=
 description=[h2]More Phun Stuff[/h2]
 description=[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3388867450][img]https://i.ibb.co/x8H5KRhs/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3606988132][img]https://i.ibb.co/ZtQtmJd/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3532685233][img]https://i.ibb.co/k6cQ4h7d/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3628843367][img]https://i.ibb.co/wrZbknjt/preview.png[/img][/url]
 description=
