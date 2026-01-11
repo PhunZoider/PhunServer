@@ -90,10 +90,10 @@ Events.OnTickEvenPaused.Add(function()
                       (lastPoll > 0 and ". Last check was " .. (PL.string.absDifference(timestamp, lastPoll) .. " ago") or
                           "") .. ".")
             Core.pollWorkshop()
-
+            lastPoll = timestamp
+        else
+            nextPoll = timestamp + (60 * 15) -- check again in 15 minutes in case option changed
         end
-
-        lastPoll = timestamp
 
     end
 end)
