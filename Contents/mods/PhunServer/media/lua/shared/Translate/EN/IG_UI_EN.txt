@@ -10,8 +10,8 @@ IGUI_EN = {
     IGUI_PhunServer_Welcome2 = "%1 has returned",
     IGUI_PhunServer_Welcome3 = "%1 is back for more",
 
-    IGUI_PhunServer_WelcomeFirstTime = "%1 has just joined the apocolypse!",
-    IGUI_PhunServer_WelcomeMyFirstTime = "Welcome to the apocolypse %1",
+    IGUI_PhunServer_WelcomeFirstTime = "%1 has just joined the apocalypse!",
+    IGUI_PhunServer_WelcomeMyFirstTime = "Welcome to the apocalypse %1",
 
     IGUI_PhunServer_Goodbye0 = "%1 has left",
     IGUI_PhunServer_Goodbye1 = "%1 has bailed",

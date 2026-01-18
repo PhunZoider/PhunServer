@@ -5,10 +5,9 @@ end
 local Core = PhunServer
 local PL = PhunLib
 
-
 function Core.getSchedule(refresh)
     if Core.data == nil or refresh == true then
-        
+
         local config = Core.getSavedData()
         local cache = {}
         if config and config.schedules then
@@ -27,7 +26,6 @@ end
 
 local function examples()
 
-
     -- Scheduled restart
     local restartSchedule = {
         name = "restarts",
@@ -35,7 +33,7 @@ local function examples()
         type = "restart",
         times = {"03:00", "15:00"}, -- 24-hour format or cron expression
         message = "Server will restart in 5 minutes!",
-        warningTimes = {300, 60, 30, 10, 5},
+        warningTimes = {300, 60, 30, 10, 5}
     }
 
     local a = {
@@ -43,10 +41,13 @@ local function examples()
         startTime = "02:00",
         reoccurEvery = 1,
         repeatUnit = "days", -- days, weeks, months, hours, minutes
-        announcements = {
-            {timeBefore = 300, message = "Server will restart in 5 minutes!"},
-            {timeBefore = 60, message = "Server will restart in 1 minute!"},
-        }
+        announcements = {{
+            timeBefore = 300,
+            message = "Server will restart in 5 minutes!"
+        }, {
+            timeBefore = 60,
+            message = "Server will restart in 1 minute!"
+        }}
     }
 
     local b = {
@@ -55,9 +56,8 @@ local function examples()
         endTime = nil, -- optional. If nil, will run indefinitely
         reoccurEvery = 15,
         repeatUnit = "minutes", -- days, weeks, months, hours, minutes
-        announcements = {}  
+        announcements = {}
     }
 
 end
-
 
