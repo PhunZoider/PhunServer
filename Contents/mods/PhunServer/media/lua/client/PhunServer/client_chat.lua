@@ -83,11 +83,14 @@ end
 
 function Core.welcomeFirstTime(username)
     if Core.getOption("WelcomeAnnounce", false) then
-
+        local txt = Core.getOption("WelcomeAnnounceText", false)
+        if txt == "" then
+            txt = false
+        end
         if username == getPlayer():getUsername() then
-            Core.usernameMessage("IGUI_PhunServer_WelcomeMyFirstTime", username, "<RGB:0,255,0>")
+            Core.usernameMessage(txt or "IGUI_PhunServer_WelcomeMyFirstTime", username, "<RGB:0,255,0>")
         else
-            Core.usernameMessage("IGUI_PhunServer_WelcomeFirstTime", username)
+            Core.usernameMessage(txt or "IGUI_PhunServer_WelcomeFirstTime", username)
         end
 
     end
@@ -97,11 +100,15 @@ end
 function Core.welcomeBack(username)
 
     if Core.getOption("WelcomeAnnounce", false) then
+        local txt = Core.getOption("WelcomeAnnounceText", false)
+        if txt == "" then
+            txt = false
+        end
         if username == getPlayer():getUsername() then
-            Core.usernameMessage("IGUI_PhunServer_WelcomeBack", username, "<RGB:0,255,0>")
+            Core.usernameMessage(txt or "IGUI_PhunServer_WelcomeBack", username, "<RGB:0,255,0>")
         else
             local rnd = ZombRand(4)
-            Core.usernameMessage("IGUI_PhunServer_Welcome" .. tostring(rnd), username)
+            Core.usernameMessage(txt or "IGUI_PhunServer_Welcome" .. tostring(rnd), username)
         end
     end
 end
@@ -112,8 +119,12 @@ function Core.goodbye(username)
         if username == getPlayer():getUsername() then
             return
         end
+        local txt = Core.getOption("GoodbyeAnnounceText", false)
+        if txt == "" then
+            txt = false
+        end
         local rnd = ZombRand(4)
-        Core.usernameMessage("IGUI_PhunServer_Goodbye" .. tostring(rnd), username, "<RGB:255,255,0>")
+        Core.usernameMessage(txt or "IGUI_PhunServer_Goodbye" .. tostring(rnd), username, "<RGB:255,255,0>")
     end
 end
 
@@ -243,6 +254,8 @@ Core.cmds = {
         else
             sendClientCommand(Core.name, "check", args)
         end
+        -- indicate that the command was handled
+        return true
     end,
     [Core.commands.restart] = function(args)
         if not PL.isAdmin() then
@@ -250,13 +263,19 @@ Core.cmds = {
         else
             sendClientCommand(Core.name, "restart", args)
         end
+        -- indicate that the command was handled
+        return true
     end,
     [Core.commands.players] = function(args)
-        if Core.getOption("Players") == false and not PL.isAdmin() then
+        if Core.getOption("PlayersCommand") == 1 then
+            -- return that this command wasn't handled
+            return false
+        elseif Core.getOption("PlayersCommand") == 2 and not PL.isAdmin() then
             return getText("IGUI_PhunServer_NoAccess")
-        else
-            sendClientCommand(Core.name, Core.commands.players, args)
         end
+        sendClientCommand(Core.name, Core.commands.players, args)
+        -- indicate that the command was handled
+        return true
     end,
     [Core.commands.setHoursSurvived] = function(args)
         if Core.getOption("SetHours") == false or not PL.isAdmin() then
@@ -264,6 +283,8 @@ Core.cmds = {
         else
             sendClientCommand(Core.name, Core.commands.setHoursSurvived, args)
         end
+        -- indicate that the command was handled
+        return true
     end,
     [Core.commands.getHoursSurvived] = function(args)
         if Core.getOption("GetHours") == false and not PL.isAdmin() then
@@ -274,6 +295,8 @@ Core.cmds = {
             end
             sendClientCommand(Core.name, Core.commands.getHoursSurvived, args)
         end
+        -- indicate that the command was handled
+        return true
     end
 }
 
@@ -313,11 +336,14 @@ ISChat["onCommandEntered"] = function(self)
         local command = Core.cmds[enteredCommand:lower()]
         if command ~= nil and command ~= false then
             local result = command(args)
-            if result and result ~= "" then
+            if result and type(result) == "string" and result ~= "" then
                 Core.FakeMessage(result, "<RGB:255,255,0>")
             end
-            ISChat.instance.textEntry:setText("")
-            return
+            if result ~= nil and result ~= false then
+                -- command was handled, clear the chat input and exit
+                ISChat.instance.textEntry:setText("")
+                return
+            end
         elseif command == false then
             sendClientCommand(Core.name, enteredCommand, args)
             return
@@ -346,12 +372,16 @@ local function highlightRawText(raw, lookup, restoreTag)
     end
 
     local highlightTag = "<RGB:1.0,1.0,1.0>" -- white in Zomboid's float RGB
-
+    local highlightColor = "255,255,255"
+    local color = Core.getOption("ColorUsernameText", false)
+    if color and color ~= "" then
+        highlightColor = color
+    end
     -- IMPORTANT: only return the string (gsub returns 2 values)
     local s = raw:gsub("([%w_%.%-]+)", function(token)
         local key = string.lower(token)
         if lookup[key] then
-            return "<PUSHRGB:255,255,255><SPACE> " .. token .. " <SPACE><POPRGB>"
+            return "<PUSHRGB:" .. highlightColor .. "><SPACE> " .. token .. " <SPACE><POPRGB>"
         end
         return token
     end)

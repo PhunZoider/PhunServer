@@ -1,12 +1,13 @@
 VERSION = 1,
 
-
-option PhunServer.Players
+option PhunServer.PlayersCommand 
 {
-    type = boolean,
-    default = true,
-    page = PhunServer_Other,
+    type = enum,
+    numValues = 3,
+    default = 3, 
+    page = PhunServer_Other, 
     translation = PhunServer_Players,
+    valueTranslation = PlayersCommand,
 }
 
 option PhunServer.PlayersOffline24
@@ -54,6 +55,14 @@ option PhunServer.WelcomeAnnounce
     translation = PhunServer_WelcomeAnnounce,
 }
 
+option PhunServer.WelcomeAnnounceText
+{
+    type = string,
+    default =,
+    page = PhunServer_Announcements,
+    translation = PhunServer_WelcomeAnnounceText,
+}
+
 option PhunServer.GoodbyeAnnouncements
 {
     type = boolean,
@@ -62,12 +71,28 @@ option PhunServer.GoodbyeAnnouncements
     translation = PhunServer_GoodbyeAnnouncements,
 }
 
+option PhunServer.GoodbyeAnnounceText
+{
+    type = string,
+    default =,
+    page = PhunServer_Announcements,
+    translation = PhunServer_GoodbyeAnnouncementText,
+}
+
 option PhunServer.ColorUsernames
 {
     type = boolean,
     default = true,
     page = PhunServer_Announcements,
     translation = PhunServer_ColorUsernames,
+}
+
+option PhunServer.ColorUsernameText
+{
+    type = string,
+    default =,
+    page = PhunServer_Announcements,
+    translation = PhunServer_ColorUsernameText,
 }
 
 option PhunServer.ReplaceMusic

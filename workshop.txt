@@ -17,7 +17,7 @@ description=Various commands and server-side quality-of-life settings.
 description=
 description=Related commands:
 description=[list]
-description=[*][b]/players[/b] – Shows all online players. Can optionally include players who have been online in the last 24 hours.
+description=[*][b]/players[/b] – Shows all online players. Can optionally include players who have been online in the last 24 hours by ticking the [b]Include Recent[/b] option.
 description=[*][b]/hours <username?>[/b] – Returns hours survived. If no username is supplied (or the user is not an admin/mod), the issuing player is used. Target player must be online.
 description=[*][b]/sethours <username?> <number>[/b] – Sets a player’s hours survived. Admins and moderators only. Target player must be online.
 description=[/list]
@@ -37,8 +37,11 @@ description=
 description=[table]
 description=[tr][th]Setting[/th][th]Description[/th][/tr]
 description=[tr][td][b]Welcome Players[/b][/td][td]Send a notice to all players when someone joins or returns[/td][/tr]
+description=[tr][td][b]Custom Welcome[/b][/td][td]Use a custom string to announce a player joining or returning. You can use %1 as the placeholder for the player. eg "%1 has joined". Leave blank for the default[/td][/tr]
 description=[tr][td][b]Player Goodbye[/b][/td][td]Send a notice to all players when someone logs off[/td][/tr]
-description=[tr][td][b]Replace img[/b][/td][td]Replace [image=music] tags in chat text with a music note icon. It’s prettier and cleaner. If you prefer uglier and dirtier, untick this[/td][/tr]
+description=[tr][td][b]Custom Goodbye[/b][/td][td]Use a custom string to announce a player has left. You can use %1 as the placeholder for the player. eg "%1 has left". Leave blank for the default[/td][/tr]description=[tr][td][b]Replace img[/b][/td][td]Replace [image=music] tags in chat text with a music note icon. It’s prettier and cleaner. If you prefer uglier and dirtier, untick this[/td][/tr]
+description=[tr][td][b]Color Usernames[/b][/td][td]Highlight known usernames in text[/td][/tr]
+description=[tr][td][b]Custom Color[/b][/td][td]The RGB values to use instead of the default 255,255,255 leave blank for default[/td][/tr]
 description=[tr][td][b]Replace Radio[/b][/td][td]Replace the prefix Radio(station#): with a speaker icon. This looks cleaner but removes the station source info[/td][/tr]
 description=[/table]
 description=

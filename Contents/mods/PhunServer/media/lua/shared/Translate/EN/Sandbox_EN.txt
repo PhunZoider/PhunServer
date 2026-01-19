@@ -29,11 +29,22 @@ Sandbox_EN = {
     Sandbox_PhunServer_WelcomeAnnounce= "Welcome Players",
     Sandbox_PhunServer_WelcomeAnnounce_tooltip = "Announce when players join",
 
+    Sandbox_PhunServer_WelcomeAnnounceText= "Custom Welcome",
+    Sandbox_PhunServer_WelcomeAnnounceText_tooltip = "If there is a value specified, PhunServer will use this text instead of the default welcome. Use %1 as a placeholder for the players name. eg Welcome to the server %1",
+
     Sandbox_PhunServer_GoodbyeAnnouncements = "Player Goodbye",
     Sandbox_PhunServer_GoodbyeAnnouncements_tooltip = "Announce when players leave",
 
+    Sandbox_PhunServer_GoodbyeAnnouncementText= "Custom Goodbye",
+    Sandbox_PhunServer_GoodbyeAnnouncementText_tooltip = "If there is a value specified, PhunServer will use this text instead of the default goodbye. Use %1 as a placeholder for the players name. eg Goodbye %1",
+
+
     Sandbox_PhunServer_ColorUsernames = "Color Username",
     Sandbox_PhunServer_ColorUsernames_tooltip = "Highlight known usernames in chat",    
+
+    Sandbox_PhunServer_ColorUsernameText = "Custom Color",
+    Sandbox_PhunServer_ColorUsernameText_tooltip = "The RGB values to use instead of the default 255,255,255 leave blank for default",
+
 
     Sandbox_PhunServer_ReplaceMusic = "Replace img",
     Sandbox_PhunServer_ReplaceMusic_tooltip = "Replace [image=music] clutter in text with a little cute music note",
@@ -47,6 +58,10 @@ Sandbox_EN = {
 
     Sandbox_PhunServer_Players = "/Players",
     Sandbox_PhunServer_Players_tooltip = "Allow players to see who is online by typing /players into chat",
+
+    Sandbox_PlayersCommand_option1 = "Disable",
+    Sandbox_PlayersCommand_option2 = "Allow admin",
+    Sandbox_PlayersCommand_option3 = "Allow all",
 
     Sandbox_PhunServer_PlayersOffline24 = "Include recent",
     Sandbox_PhunServer_PlayersOffline24_tooltip = "Include the list of players that have been online in the last 24 hours",
