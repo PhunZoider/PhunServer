@@ -115,5 +115,8 @@ Sandbox_EN = {
     Sandbox_PhunServer_GetHours = "/Hours",
     Sandbox_PhunServer_GetHours_tooltip = "When ticked, allows players to view hours survived using the format /hours. Admins or mods can use /hours username (though the player needs to be online)",
 
+    Sandbox_PhunServer_RefreshSettingsOnStartup = "Fix Settings Cache Bug",
+    Sandbox_PhunServer_GetHours_RefreshSettingsOnStartup = "When ticked, we will refresh your settings with those found in your Sandbox_Vars.lua file. This is to workaround a bug in the current build where your settings get cached and subsequent changes ignored.",
+
 }
 

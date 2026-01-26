@@ -5,6 +5,7 @@ require "PhunServer/core"
 local Commands = require "PhunServer/server_commands"
 local Core = PhunServer
 local PL = PhunLib
+
 Events.OnInitGlobalModData.Add(function()
 
     Core.data = ModData.getOrCreate(Core.name)
@@ -99,6 +100,18 @@ Events.OnTickEvenPaused.Add(function()
 end)
 
 Events.OnServerStarted.Add(function()
+
+    if Core.getOption("RefreshSettingsOnStartup", false) then
+        local was = Core.getOption("DayOffset", false)
+        print("[" .. Core.name .. "] Refreshing sandbox options from server lua file... " ..
+                  (was and " (previous DayOffset: " .. tostring(was) .. ")" or ""))
+        getSandboxOptions():loadServerLuaFile(getServerName())
+        getSandboxOptions():applySettings()
+        local now = Core.getOption("DayOffset", false)
+        print("[" .. Core.name .. "] Sandbox options refreshed from server lua file." ..
+                  (now and " (current DayOffset: " .. tostring(now) .. ")" or ""))
+    end
+
     Core:ini()
     Core:testNight()
 end)

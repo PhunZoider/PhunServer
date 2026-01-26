@@ -105,6 +105,9 @@ function Core:setIsNight(value)
             Core.debugLn(getText("It is now %1, setting DayLength from %2 to %3", (value and "Night" or "Day"),
                 lengthText[getSandboxOptions():getOptionByName("DayLength"):getValue()], lengthText[speed]))
             getSandboxOptions():getOptionByName("DayLength"):setValue(speed)
+            print("==========================")
+            print("SAVING SANDBOX OPTIONS")
+            print("==========================")
             getSandboxOptions():applySettings()
         end
     end

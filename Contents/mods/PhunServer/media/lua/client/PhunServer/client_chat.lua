@@ -298,6 +298,15 @@ Core.cmds = {
         -- indicate that the command was handled
         return true
     end
+    -- ["test"] = function(args)
+    --     local rnd = ZombRand(1, 3)
+    --     getSandboxOptions():getOptionByName("DayLength"):setValue(rnd)
+    --     print("==========================")
+    --     print("SAVING SANDBOX OPTIONS")
+    --     print("==========================")
+    --     getSandboxOptions():applySettings()
+    --     return true
+    -- end
 }
 
 local function splitString(s, sep)

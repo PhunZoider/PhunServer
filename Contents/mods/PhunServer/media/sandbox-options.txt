@@ -36,6 +36,14 @@ option PhunServer.GetHours
 
 }
 
+option PhunServer.RefreshSettingsOnStartup
+{
+    type = boolean, 
+    default = true,
+    page=PhunServer_Other,
+    translation = PhunServer_RefreshSettingsOnStartup,
+}
+
 option PhunServer.Debug
 {
     type = boolean, 
