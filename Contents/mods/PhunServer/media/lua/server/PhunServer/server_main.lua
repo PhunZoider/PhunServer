@@ -157,7 +157,7 @@ function Core.scheduleServerRestart(timestamp)
             }
             table.insert(t.args, tostring(val))
             sendServerCommand(Core.name, Core.commands.notify, t)
-            print(getText(t.text, tostring(val)))
+            -- print(getText(t.text, tostring(val)))
         end
 
         Core.restartingIn = secondsLeft
@@ -177,28 +177,44 @@ function Core.rebootServer()
     end
     Core.rebooting = true
 
+    -- Tell clients / other systems you’re quitting (your existing pattern)
     sendServerCommand(Core.name, Core.commands.quit, {})
 
-    Events.OnSave.Add(function()
-        local delaySeconds = Core.getOption("QuitDelaySeconds", 15)
+    local delaySeconds = Core.getOption("QuitDelaySeconds", 15)
+
+    local tickHandler
+    local saveHandler
+
+    saveHandler = function()
+        -- One-shot: remove the save hook immediately
+        Events.OnSave.Remove(saveHandler)
+
         local delayTimestamp = getTimestamp() + delaySeconds
         local lastSecondLogged = delaySeconds + 1
-        Events.OnTickEvenPaused.Add(function()
+
+        tickHandler = function()
             local secondsLeft = delayTimestamp - getTimestamp()
+
             if secondsLeft <= 0 then
+                Events.OnTickEvenPaused.Remove(tickHandler)
                 print("[" .. Core.name .. "] Quitting...")
                 getCore():quit()
-            else
-                if lastSecondLogged > secondsLeft then
-                    print("[" .. Core.name .. "] Quitting in " .. secondsLeft .. " seconds!")
-                    lastSecondLogged = secondsLeft
-                end
+                return
             end
-        end)
-    end)
+
+            if lastSecondLogged > secondsLeft then
+                print("[" .. Core.name .. "] Quitting in " .. secondsLeft .. " seconds!")
+                lastSecondLogged = secondsLeft
+            end
+        end
+
+        Events.OnTickEvenPaused.Add(tickHandler)
+    end
+
+    Events.OnSave.Add(saveHandler)
 
     Core.debugLn("[" .. Core.name .. "] Saving...")
-    saveGame()
+    save(false)
 end
 
 local function rebootWhenEmpty()
