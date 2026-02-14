@@ -10,6 +10,9 @@ local Commands = {}
 Commands[Core.commands.playerSetup] = function(player, args)
     Core.debugLn("Setting up player " .. player:getUsername())
     Core.wipeKeyCheck(player:getUsername())
+    if Core.settings.PlayersOnMap > 1 or Core.settings.PlayersOnMiniMap > 1 then
+        sendServerCommand(player, Core.name, Core.commands.updateAllLocations, Core.playerLocations or {})
+    end
 end
 
 Commands[Core.commands.checkworkshop] = function(player, args)

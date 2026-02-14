@@ -65,7 +65,7 @@ local function canSeeAllPlayers()
                             p:getRole():hasCapability(Capability.CanSeeAll))
     end
     return canSeeAll
-    
+
 end
 
 local function getFactionNameForPlayer(player)
@@ -80,25 +80,60 @@ local function getFactionNameForPlayer(player)
     return factionNames[player:getPlayerNum()]
 end
 
+local getFactionName = function(player)
+    local faction = Faction.getPlayerFaction(player)
+    return faction and faction.getName and faction:getName() or nil
+end
+
+local myFaction = nil
 Events.EveryOneMinute.Add(function()
     Core.canSeeAllPlayers(true)
+    myFaction = getFactionName(getPlayer())
 end)
 
 local function doDrawPlayers(self, mini)
-    local players = Core.getPlayers()
+    local players = Core.playerLocations or {}
+    local mf = myFaction
+    local seenMe = false
     if Core.map.pom == 2 or Core.canSeeAllPlayers() then
         -- show all
-        for _, player in pairs(players or {}) do
-            Core.map.drawPlayerOnMap(self, player, mini);
+        for username, vals in pairs(players) do
+            -- if Core.playerLocations[player.username] then
+            if username == getPlayer():getUsername() then
+                seenMe = true
+            end
+            Core.map.drawPlayerOnMap(self, {
+                username = username,
+                x = vals[2],
+                y = vals[3]
+            }, mini);
+            -- end
+
         end
 
     elseif Core.map.pom == 3 then
         -- show only if faction match
-        for _, player in pairs(players or {}) do
-            if player.myFaction then
-                Core.map.drawPlayerOnMap(self, player, mini);
+        for username, vals in pairs(players) do
+            if myFaction and vals[1] and myFaction == vals[1] then
+                if username == getPlayer():getUsername() then
+                    seenMe = true
+                end
+                Core.map.drawPlayerOnMap(self, {
+                    username = username,
+                    x = vals[2],
+                    y = vals[3]
+                }, mini);
+
             end
         end
+    end
+
+    if not seenMe then
+        Core.map.drawPlayerOnMap(self, {
+            username = getPlayer():getUsername(),
+            x = getPlayer():getX(),
+            y = getPlayer():getY()
+        }, mini);
     end
 end
 

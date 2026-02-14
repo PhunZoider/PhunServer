@@ -14,11 +14,20 @@ function Core.getPlayerCount()
 end
 
 local onliners = {}
+local lastLocations = {}
+
+local getFactionName = function(player)
+    local faction = Faction.getPlayerFaction(player)
+    return faction and faction.getName and faction:getName() or nil
+end
 
 function Core.checkPlayers()
 
     -- players online 
     local online = PL.onlinePlayers()
+    local doXY = Core.settings.PlayersOnMap > 1 or Core.settings.PlayersOnMiniMap > 1
+    local hasLocations = false
+    local locations = doXY and {} or nil
 
     local now = getTimestamp()
     for i = 0, online:size() - 1 do
@@ -43,6 +52,17 @@ function Core.checkPlayers()
         end
         Core.data.online[username].lastSeen = now
         Core.data.online[username].online = true
+        if doXY then
+            local x = math.floor(p:getX() + 0.5)
+            local y = math.floor(p:getY() + 0.5)
+            local k = tostring(x) .. "," .. tostring(y)
+            Core.playerLocations[username] = {getFactionName(p), x, y}
+            if lastLocations[username] ~= k then
+                hasLocations = true
+                lastLocations[username] = k
+                locations[username] = Core.playerLocations[username]
+            end
+        end
     end
     for name, data in pairs(onliners) do
         if Core.data.online[name].online then
@@ -59,14 +79,17 @@ function Core.checkPlayers()
                     }
                 }
                 table.insert(t.args, name)
-                if Core.getOption("GoodbyeAnnouncements", false) then
-                    sendServerCommand(Core.name, Core.commands.goodbye, {name})
-                end
+                Core.playerLocations[name] = nil
+                sendServerCommand(Core.name, Core.commands.goodbye, {name})
 
                 Core.data.online[name].online = false
                 onliners[name] = nil
             end
         end
+    end
+
+    if hasLocations then
+        sendServerCommand(Core.name, Core.commands.updateLocations, locations)
     end
 
 end

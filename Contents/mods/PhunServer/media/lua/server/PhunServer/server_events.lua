@@ -12,10 +12,6 @@ Events.OnInitGlobalModData.Add(function()
     if not Core.data.online then
         Core.data.online = {}
     end
-    -- if not Core.data.wipeKeys then
-    --     Core.data.wipeKeys = {}
-    -- end
-
 end)
 
 Events.OnCharacterDeath.Add(function(player)
@@ -123,6 +119,8 @@ end)
 Events.EveryTenMinutes.Add(function()
     -- refresh periodically so we aren't constantly reading from function
     Core.settings.Debug = Core.getOption("Debug", false)
+    Core.settings.PlayersOnMap = Core.getOption("PlayersOnMap", 1)
+    Core.settings.PlayersOnMiniMap = Core.getOption("PlayersOnMiniMap", 1)
 end)
 
 -- print('- -- -- EVENTS! --  - ')

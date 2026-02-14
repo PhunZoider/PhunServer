@@ -20,13 +20,16 @@ PhunServer = {
         message = "message",
         onDusk = "onDusk",
         onDawn = "onDawn",
-        wipeMap = "wipeMap"
+        wipeMap = "wipeMap",
+        updateLocations = "updateLocations",
+        updateAllLocations = "updateAllLocations"
     },
     events = {
         OnReady = "PhunServerOnReady"
     },
     settings = {},
     ui = {},
+    playerLocations = {},
     map = {
         pom = 1,
         pomm = 1

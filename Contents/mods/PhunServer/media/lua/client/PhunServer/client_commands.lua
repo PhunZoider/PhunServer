@@ -24,6 +24,18 @@ Commands[Core.commands.message] = function(args)
     end
 end
 
+Commands[Core.commands.updateLocations] = function(args)
+    local playerLocations = Core.playerLocations
+    for k, v in pairs(args or {}) do
+        playerLocations[k] = {v[1] or false, v[2], v[3]}
+    end
+
+end
+
+Commands[Core.commands.updateAllLocations] = function(args)
+    Core.playerLocations = args or {}
+end
+
 Commands[Core.commands.getHoursSurvived] = function(args)
     local player = PL.getPlayerByUsername(args.username)
     if player then
@@ -46,7 +58,10 @@ Commands[Core.commands.welcome] = function(args)
 end
 
 Commands[Core.commands.goodbye] = function(args)
-    Core.goodbye(args[1])
+    Core.playerLocations[args[1]] = nil
+    if Core.getOption("GoodbyeAnnouncements", false) then
+        Core.goodbye(args[1])
+    end
 end
 
 Commands[Core.commands.players] = function(args)
