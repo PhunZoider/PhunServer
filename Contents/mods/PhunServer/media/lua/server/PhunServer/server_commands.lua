@@ -51,15 +51,15 @@ Commands[Core.commands.players] = function(player, args)
         end
     end
 
-    table.sort(players.online, function(a, b)
+    table.sort(players.online or {}, function(a, b)
         return a:lower() < b:lower()
     end)
-    table.sort(players.offline, function(a, b)
+    table.sort(players.offline or {}, function(a, b)
         return a:lower() < b:lower()
     end)
 
     Core.debugLn("Online players: " .. table.concat(players.online, ", "))
-    if #players.offline > 0 then
+    if players.offline and #players.offline > 0 then
         Core.debugLn("Offline players (last 24h): " .. table.concat(players.offline, ", "))
     end
 
