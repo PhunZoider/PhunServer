@@ -91,7 +91,10 @@ function Core.wipeKeyCheck(username)
     end
 end
 
-function Core.scheduleServerRestart(timestamp)
+-- countdowns: optional array of {secs=N, text="..."} from a schedule.
+-- When provided, these replace the global NotificationCountdown option.
+-- text may be a literal string or a translation key (client resolves via getTextOrNull).
+function Core.scheduleServerRestart(timestamp, countdowns)
 
     Core.restartingAt = timestamp
     Core.restartingIn = timestamp - getTimestamp()
@@ -99,67 +102,90 @@ function Core.scheduleServerRestart(timestamp)
     Core.debugLn("Scheduling server restart at timestamp " .. tostring(Core.restartingAt) .. " (in " ..
                      tostring(Core.restartingIn) .. " seconds).")
 
-    local nextNotified = 0
-    local lastNotified = 9999999
-    local lastNotifiedIndex = -1
-    local values = luautils.split(Core.getOption("NotificationCountdown", "300;120;60;30;10;9;8;7;6;5;3;2;1"), ";")
+    local tickFn
 
-    local tickFn = function()
-        if Core.restartingAt == nil then
-            return
+    if countdowns and #countdowns > 0 then
+        -- Per-schedule custom countdown messages
+        local sorted = {}
+        for _, c in ipairs(countdowns) do
+            local s = tonumber(c.secs)
+            if s then table.insert(sorted, {secs = s, text = c.text or ""}) end
         end
+        table.sort(sorted, function(a, b) return a.secs > b.secs end)
 
-        local secondsLeft = Core.restartingAt - getTimestamp()
-        -- print("secondsLeft:", secondsLeft)
-        local doNotify = false
-        for i, v in ipairs(values) do
-            if i > lastNotifiedIndex then
-                if tonumber(v) < lastNotified then
-                    if secondsLeft <= tonumber(v) then
-                        lastNotifiedIndex = i
-                        doNotify = true
-                        lastNotified = tonumber(v)
+        local firedSet = {}
+        tickFn = function()
+            if Core.restartingAt == nil then return end
+            local secondsLeft = Core.restartingAt - getTimestamp()
+            for _, entry in ipairs(sorted) do
+                local key = tostring(entry.secs)
+                if not firedSet[key] and secondsLeft <= entry.secs then
+                    firedSet[key] = true
+                    sendServerCommand(Core.name, Core.commands.notify, {
+                        soundName = Core.getOption("NotificationChime") == true and "restartNotice" or "",
+                        text      = entry.text,
+                        args      = {},
+                        types     = {halo = true, chat = true},
+                    })
+                end
+            end
+            Core.restartingIn = secondsLeft
+            if secondsLeft <= 0 then
+                Events.OnTickEvenPaused.Remove(tickFn)
+            end
+        end
+    else
+        -- Global NotificationCountdown option (original behaviour)
+        local lastNotified      = 9999999
+        local lastNotifiedIndex = -1
+        local values = luautils.split(Core.getOption("NotificationCountdown", "300;120;60;30;10;9;8;7;6;5;3;2;1"), ";")
+
+        tickFn = function()
+            if Core.restartingAt == nil then return end
+
+            local secondsLeft = Core.restartingAt - getTimestamp()
+            local doNotify = false
+            for i, v in ipairs(values) do
+                if i > lastNotifiedIndex then
+                    if tonumber(v) < lastNotified then
+                        if secondsLeft <= tonumber(v) then
+                            lastNotifiedIndex = i
+                            doNotify = true
+                            lastNotified = tonumber(v)
+                        end
                     end
                 end
             end
-        end
 
-        if doNotify then
-
-            local val = lastNotified
-            -- is this a second, seconds, minute or minutes?
-            local suffix = "Second"
-            if lastNotified <= 1 then
-                suffix = "Second"
-            elseif lastNotified < 60 then
-                suffix = "Seconds"
-            elseif lastNotified == 60 then
-                suffix = "One"
-                val = 1
-            else
-                suffix = "Left"
-                val = Core.tools.formatWholeNumber(lastNotified / 60)
+            if doNotify then
+                local val    = lastNotified
+                local suffix = "Second"
+                if lastNotified <= 1 then
+                    suffix = "Second"
+                elseif lastNotified < 60 then
+                    suffix = "Seconds"
+                elseif lastNotified == 60 then
+                    suffix = "One"
+                    val = 1
+                else
+                    suffix = "Left"
+                    val = Core.tools.formatWholeNumber(lastNotified / 60)
+                end
+                local t = {
+                    soundName = Core.getOption("NotificationChime") == true and "restartNotice" or "",
+                    text      = "IGUI_PhunServer_" .. suffix,
+                    args      = {},
+                    types     = {halo = true, chat = true},
+                }
+                table.insert(t.args, tostring(val))
+                sendServerCommand(Core.name, Core.commands.notify, t)
             end
 
-            local t = {
-                soundName = Core.getOption("NotificationChime") == true and "restartNotice" or "",
-                text = "IGUI_PhunServer_" .. suffix,
-                args = {},
-                types = {
-                    halo = true,
-                    chat = true
-                }
-            }
-            table.insert(t.args, tostring(val))
-            sendServerCommand(Core.name, Core.commands.notify, t)
-            -- print(getText(t.text, tostring(val)))
-        end
-
-        Core.restartingIn = secondsLeft
-
-        if secondsLeft <= 0 then
-            Events.OnTickEvenPaused.Remove(tickFn)
-            return
+            Core.restartingIn = secondsLeft
+            if secondsLeft <= 0 then
+                Events.OnTickEvenPaused.Remove(tickFn)
+                return
+            end
         end
     end
 
@@ -232,11 +258,16 @@ function Core.outdatedWorkshop()
         return true
     end
 
+    -- Prefer a workshop-trigger schedule (uses its own countdown messages)
+    if Core.fireWorkshopSchedules() then
+        return true
+    end
+
+    -- Fallback: original global-option behaviour (no workshop schedule enabled)
     local restartDelay = Core.getOption("RestartDelayMinutes", 5)
-    local delaySeconds = Core.getOption("QuitDelaySeconds", 15)
 
     if restartDelay > 0 then
-        local restartSeconds = restartDelay * 60;
+        local restartSeconds = restartDelay * 60
         print("[" .. Core.name .. "] Detected outdated workshop item - restarting server in " ..
                   Core.tools.formatWholeNumber(restartSeconds) .. "!")
         Core.scheduleServerRestart(getTimestamp() + restartSeconds)

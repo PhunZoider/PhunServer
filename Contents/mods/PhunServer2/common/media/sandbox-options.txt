@@ -169,9 +169,19 @@ option PhunServer.QuitDelaySeconds
     type = integer,
     default = 15,
     min=1,
-    max=100,    
+    max=100,
     page = PhunServer_ModWatch,
     translation = PhunServer_QuitDelaySeconds,
+}
+
+option PhunServer.ScheduleMinUptimeMinutes
+{
+    type = integer,
+    default = 30,
+    min = 0,
+    max = 1440,
+    page = PhunServer_ModWatch,
+    translation = PhunServer_ScheduleMinUptimeMinutes,
 }
 
 

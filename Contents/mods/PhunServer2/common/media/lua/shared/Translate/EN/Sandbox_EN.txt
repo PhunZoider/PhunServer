@@ -23,6 +23,9 @@ Sandbox_EN = {
     Sandbox_PhunServer_QuitDelaySeconds = "Quit Delay",
     Sandbox_PhunServer_QuitDelaySeconds_tooltip = "Number of seconds after the final save to wait before quitting server",
 
+    Sandbox_PhunServer_ScheduleMinUptimeMinutes = "Schedule Min Uptime",
+    Sandbox_PhunServer_ScheduleMinUptimeMinutes_tooltip = "Number of minutes the server must have been running before scheduled restarts can fire. Prevents an automatic restart immediately after a mod-update reboot. Set to 0 to disable the guard.",
+
     Sandbox_PhunServer_WorkshopPollingIntervalMinutes = "Check for updates",
     Sandbox_PhunServer_WorkshopPollingIntervalMinutes_tooltip = "Number of minutes between checking for changes to workshop",
 

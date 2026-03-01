@@ -82,4 +82,10 @@ Commands[Core.commands.onDusk] = function(args)
     Core:setIsNight(true)
 end
 
+Commands[Core.commands.scheduleData] = function(args)
+    if Core.ui.schedulePanel then
+        Core.ui.schedulePanel:onDataReceived(args.schedules or {}, args.saved)
+    end
+end
+
 return Commands

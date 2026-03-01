@@ -296,6 +296,13 @@ Core.cmds = {
         end
         -- indicate that the command was handled
         return true
+    end,
+    [Core.commands.schedule] = function(args)
+        if not Core.tools.isAdmin() then
+            return getText("IGUI_PhunServer_NoAccess")
+        end
+        Core.openSchedulePanel()
+        return true
     end
     -- ["test"] = function(args)
     --     local rnd = ZombRand(1, 3)

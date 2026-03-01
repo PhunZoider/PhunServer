@@ -101,4 +101,6 @@ IGUI_EN = {
     UI_PhunServer_LessThanHour = "Less than an hour",
     UI_PhunServer_LessThanMinute = "Less than a minute",
 
+    IGUI_PhunServer_ScheduleNoAccess = "You must be an admin to manage schedules",
+
 }

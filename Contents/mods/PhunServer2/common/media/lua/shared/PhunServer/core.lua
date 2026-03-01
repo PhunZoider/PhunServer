@@ -22,11 +22,16 @@ PhunServer = {
         onDawn = "onDawn",
         wipeMap = "wipeMap",
         updateLocations = "updateLocations",
-        updateAllLocations = "updateAllLocations"
+        updateAllLocations = "updateAllLocations",
+        schedule = "schedule",
+        getSchedules = "getSchedules",
+        saveSchedules = "saveSchedules",
+        scheduleData = "scheduleData"
     },
     tools = require "PhunServer/tools",
     events = {
-        OnReady = "PhunServerOnReady"
+        OnReady = "PhunServerOnReady",
+        OnSchedule = "PhunServerOnSchedule"
     },
     settings = {},
     ui = {},

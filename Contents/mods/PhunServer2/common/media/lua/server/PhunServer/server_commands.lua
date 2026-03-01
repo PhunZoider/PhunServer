@@ -148,4 +148,20 @@ Commands[Core.commands.getHoursSurvived] = function(player, args)
 
 end
 
+Commands[Core.commands.getSchedules] = function(player, args)
+    if not Core.tools.isAdmin(player) then return end
+    sendServerCommand(player, Core.name, Core.commands.scheduleData, {
+        schedules = Core.getSchedule()
+    })
+end
+
+Commands[Core.commands.saveSchedules] = function(player, args)
+    if not Core.tools.isAdmin(player) then return end
+    Core.saveSchedules(args.schedules or {})
+    sendServerCommand(player, Core.name, Core.commands.scheduleData, {
+        schedules = Core.getSchedule(),
+        saved = true
+    })
+end
+
 return Commands
