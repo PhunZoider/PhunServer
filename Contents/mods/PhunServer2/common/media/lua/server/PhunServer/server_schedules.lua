@@ -106,7 +106,14 @@ function Core.fireSchedule(schedule)
         triggerEvent(schedule.eventName, schedule)
 
     elseif schedule.type == "announcement" then
-        Core.fireAnnouncements(schedule.countdowns)
+        local msgs = {}
+        if schedule.announcementText and schedule.announcementText ~= "" then
+            table.insert(msgs, {secs = 0, text = schedule.announcementText})
+        end
+        for _, c in ipairs(schedule.countdowns or {}) do
+            table.insert(msgs, c)
+        end
+        Core.fireAnnouncements(msgs)
     end
 end
 

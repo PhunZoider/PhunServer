@@ -3,21 +3,22 @@ if isServer() then
 end
 
 local Core = PhunServer
-
+local tools = require("PhunServer/ui/tools")
 -- ---------------------------------------------------------------------------
 -- ISPhunSchedulePanel
 -- Admin-only panel for viewing and editing server schedules.
 -- Opened via /schedule chat command or the PhunServer admin button.
 -- Left pane: schedule list.  Right pane: editor for the selected schedule.
 -- ---------------------------------------------------------------------------
-
-ISPhunSchedulePanel = ISPanel:derive("ISPhunSchedulePanel")
+local profileName = "PhunServerUISchedules"
+ISPhunSchedulePanel = ISCollapsableWindowJoypad:derive(profileName)
+local UI = ISPhunSchedulePanel
 
 local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
 local FONT_HGT_MEDIUM = getTextManager():getFontHeight(UIFont.Medium)
 local FONT_SCALE = FONT_HGT_SMALL / 14
 
-local W, H = math.floor(620 * FONT_SCALE), math.floor(660 * FONT_SCALE)
+local W, H = math.floor(620 * FONT_SCALE), math.floor(740 * FONT_SCALE)
 local PAD = math.floor(10 * FONT_SCALE)
 local LIST_W = math.floor(190 * FONT_SCALE)
 local EDIT_X = LIST_W + PAD * 2
@@ -26,54 +27,126 @@ local ROW_H = FONT_HGT_SMALL + 4
 local BTN_H = FONT_HGT_SMALL + 6
 local BTN_W = math.floor(90 * FONT_SCALE)
 
--- day labels for weekly display; index matches os.date wday (1=Sun…7=Sat)
+-- day labels; index matches os.date wday (1=Sun…7=Sat)
 local DAY_LABELS = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}
 
 local TYPE_OPTIONS = {"restart", "event", "announcement"}
 local TRIGGER_OPTIONS = {"cron", "workshop"}
+
+-- ---------------------------------------------------------------------------
+-- Colour palette (B42-ish dark theme)
+-- ---------------------------------------------------------------------------
+local C = {
+    bg = {
+        r = 0.08,
+        g = 0.08,
+        b = 0.10,
+        a = 0.97
+    },
+    panel = {
+        r = 0.11,
+        g = 0.11,
+        b = 0.14,
+        a = 1.0
+    },
+    border = {
+        r = 0.25,
+        g = 0.25,
+        b = 0.30,
+        a = 1.0
+    },
+    accent = {
+        r = 0.90,
+        g = 0.55,
+        b = 0.10,
+        a = 1.0
+    },
+    accentDim = {
+        r = 0.55,
+        g = 0.33,
+        b = 0.06,
+        a = 1.0
+    },
+    danger = {
+        r = 0.80,
+        g = 0.15,
+        b = 0.15,
+        a = 1.0
+    },
+    text = {
+        r = 0.90,
+        g = 0.90,
+        b = 0.90,
+        a = 1.0
+    },
+    textDim = {
+        r = 0.50,
+        g = 0.50,
+        b = 0.55,
+        a = 1.0
+    },
+    textInherit = {
+        r = 0.45,
+        g = 0.55,
+        b = 0.65,
+        a = 1.0
+    }
+}
 
 local function clamp(v, lo, hi)
     return math.max(lo, math.min(hi, v))
 end
 
 -- ---------------------------------------------------------------------------
+-- Open (called from chat command or admin panel)
+-- ---------------------------------------------------------------------------
+function Core.openSchedulePanel()
+    if Core.ui.schedulePanel and Core.ui.schedulePanel:isVisible() then
+        return
+    end
+    local sw = getCore():getScreenWidth()
+    local sh = getCore():getScreenHeight()
+    local panel = ISPhunSchedulePanel:new(math.floor((sw - W) / 2), math.floor((sh - H) / 2), getPlayer())
+    panel:initialise()
+    panel:addToUIManager()
+    Core.ui.schedulePanel = panel
+    sendClientCommand(Core.name, Core.commands.getSchedules, {})
+end
+
+-- ---------------------------------------------------------------------------
 -- Constructor
 -- ---------------------------------------------------------------------------
-function ISPhunSchedulePanel:new(x, y)
-    local o = ISPanel.new(self, x, y, W, H)
+function UI:new(x, y, player)
+    local o = ISCollapsableWindowJoypad.new(self, x, y, W, H, player)
+    o.viewer = player
+    o.player = player
+    o.playerIndex = player:getPlayerNum()
     o.schedules = {}
     o.selected = nil
+    o.warnEditIdx = nil
     o.statusMsg = nil
     o.statusTimer = 0
+    o.backgroundColor = {
+        r = C.bg.r,
+        g = C.bg.g,
+        b = C.bg.b,
+        a = 1.0
+    }
+    o:setTitle("PhunServer - Schedules")
     return o
 end
 
--- ---------------------------------------------------------------------------
--- Build UI
--- ---------------------------------------------------------------------------
-function ISPhunSchedulePanel:initialise()
-    ISPanel.initialise(self)
-    self:createChildren()
-end
+function UI:createChildren()
 
-function ISPhunSchedulePanel:createChildren()
-    local self = self
-
-    -- Title bar
-    self.titleLabel = ISLabel:new(PAD, PAD, ROW_H, "PhunServer - Schedules", 1, 1, 1, 1, UIFont.Medium)
-    self.titleLabel:initialise()
-    self:addChild(self.titleLabel)
-
-    -- Close button (top-right)
-    local closeBtn = ISButton:new(W - BTN_W - PAD, PAD, BTN_W, BTN_H, "Close", self, self.close)
-    closeBtn:initialise()
-    self:addChild(closeBtn)
+    ISCollapsableWindowJoypad.createChildren(self)
 
     local listTop = ROW_H + PAD * 2
 
     -- ---- LEFT PANE: schedule list ----------------------------------------
 
     local listH = H - listTop - BTN_H - PAD * 3
+    local listBtnY = listTop + listH + PAD
+
     self.listBox = ISScrollingListBox:new(PAD, listTop, LIST_W, listH)
     self.listBox.font = UIFont.Small
     self.listBox.itemheight = ROW_H
@@ -82,14 +155,15 @@ function ISPhunSchedulePanel:createChildren()
     self.listBox:initialise()
     self:addChild(self.listBox)
 
-    local listBtnY = listTop + listH + PAD
     self.addBtn = ISButton:new(PAD, listBtnY, math.floor(60 * FONT_SCALE), BTN_H, "+ Add", self, self.onAddSchedule)
     self.addBtn:initialise()
+    self.addBtn:setTooltip("Add a new schedule")
     self:addChild(self.addBtn)
 
     self.delBtn = ISButton:new(PAD + math.floor(66 * FONT_SCALE), listBtnY, math.floor(70 * FONT_SCALE), BTN_H,
         "- Delete", self, self.onDeleteSchedule)
     self.delBtn:initialise()
+    self.delBtn:setTooltip("Delete the selected schedule")
     self:addChild(self.delBtn)
 
     -- ---- RIGHT PANE: editor ----------------------------------------------
@@ -102,21 +176,23 @@ function ISPhunSchedulePanel:createChildren()
     self.enabledTick = ISTickBox:new(ex, ey, eow, ROW_H, "", nil)
     self.enabledTick:initialise()
     self.enabledTick:addOption("Enabled")
+    self.enabledTick.tooltip = "Enable or disable this schedule"
     self:addChild(self.enabledTick)
     ey = ey + ROW_H + PAD
 
     -- Name
-    self.nameLabel = ISLabel:new(ex, ey, ROW_H, "Name:", 1, 1, 1, 1, UIFont.Small)
+    self.nameLabel = ISLabel:new(ex, ey, ROW_H, "Name", 1, 1, 1, 1, UIFont.Small, true)
     self.nameLabel:initialise()
     self:addChild(self.nameLabel)
     ey = ey + ROW_H
     self.nameEntry = ISTextEntryBox:new("", ex, ey, eow, ROW_H)
     self.nameEntry:initialise()
+    self.nameEntry:setTooltip("Unique name for this schedule")
     self:addChild(self.nameEntry)
     ey = ey + ROW_H + PAD
 
-    -- Trigger  (Scheduled / Workshop)
-    self.triggerLabel = ISLabel:new(ex, ey, ROW_H, "Trigger:", 1, 1, 1, 1, UIFont.Small)
+    -- Trigger (Scheduled / Workshop update)
+    self.triggerLabel = ISLabel:new(ex, ey, ROW_H, "Trigger", 1, 1, 1, 1, UIFont.Small, true)
     self.triggerLabel:initialise()
     self:addChild(self.triggerLabel)
     ey = ey + ROW_H
@@ -124,11 +200,12 @@ function ISPhunSchedulePanel:createChildren()
     self.triggerCombo:initialise()
     self.triggerCombo:addOption("Scheduled")
     self.triggerCombo:addOption("Workshop update")
+    self.triggerCombo.tooltip = "Scheduled: fires at set times.\nWorkshop update: fires when a mod update is detected"
     self:addChild(self.triggerCombo)
     ey = ey + ROW_H + PAD
 
     -- Repeat (cron only)
-    self.repeatLabel = ISLabel:new(ex, ey, ROW_H, "Repeat:", 1, 1, 1, 1, UIFont.Small)
+    self.repeatLabel = ISLabel:new(ex, ey, ROW_H, "Repeat", 1, 1, 1, 1, UIFont.Small, true)
     self.repeatLabel:initialise()
     self:addChild(self.repeatLabel)
     ey = ey + ROW_H
@@ -136,11 +213,12 @@ function ISPhunSchedulePanel:createChildren()
     self.recurCombo:initialise()
     self.recurCombo:addOption("daily")
     self.recurCombo:addOption("weekly")
+    self.recurCombo.tooltip = "daily: fires every day.\nweekly: fires on selected days of the week"
     self:addChild(self.recurCombo)
     ey = ey + ROW_H + PAD
 
     -- Day selector (weekly + cron only)
-    self.daysLabel = ISLabel:new(ex, ey, ROW_H, "Days:", 1, 1, 1, 1, UIFont.Small)
+    self.daysLabel = ISLabel:new(ex, ey, ROW_H, "Days", 1, 1, 1, 1, UIFont.Small, true)
     self.daysLabel:initialise()
     self:addChild(self.daysLabel)
     ey = ey + ROW_H
@@ -158,7 +236,7 @@ function ISPhunSchedulePanel:createChildren()
     ey = ey + BTN_H + PAD
 
     -- Times list (cron only)
-    self.timesLabel = ISLabel:new(ex, ey, ROW_H, "Times (HH:MM):", 1, 1, 1, 1, UIFont.Small)
+    self.timesLabel = ISLabel:new(ex, ey, ROW_H, "Times (HH:MM)", 1, 1, 1, 1, UIFont.Small, true)
     self.timesLabel:initialise()
     self:addChild(self.timesLabel)
     ey = ey + ROW_H
@@ -170,24 +248,27 @@ function ISPhunSchedulePanel:createChildren()
     self:addChild(self.timesList)
     ey = ey + timesListH + PAD
 
-    -- Time add row (cron only)
+    -- Time input row (cron only)
     self.timeEntry = ISTextEntryBox:new("", ex, ey, math.floor(80 * FONT_SCALE), ROW_H)
     self.timeEntry:initialise()
+    self.timeEntry:setTooltip("Enter time in HH:MM 24-hour format")
     self:addChild(self.timeEntry)
 
     self.addTimeBtn = ISButton:new(ex + math.floor(86 * FONT_SCALE), ey, math.floor(60 * FONT_SCALE), BTN_H, "Add",
         self, self.onAddTime)
     self.addTimeBtn:initialise()
+    self.addTimeBtn:setTooltip("Add this time to the schedule")
     self:addChild(self.addTimeBtn)
 
     self.removeTimeBtn = ISButton:new(ex + math.floor(152 * FONT_SCALE), ey, math.floor(70 * FONT_SCALE), BTN_H,
         "Remove", self, self.onRemoveTime)
     self.removeTimeBtn:initialise()
+    self.removeTimeBtn:setTooltip("Remove the selected time entry")
     self:addChild(self.removeTimeBtn)
     ey = ey + BTN_H + PAD
 
     -- Outcome / Type
-    self.typeLabel = ISLabel:new(ex, ey, ROW_H, "Outcome:", 1, 1, 1, 1, UIFont.Small)
+    self.typeLabel = ISLabel:new(ex, ey, ROW_H, "Outcome", 1, 1, 1, 1, UIFont.Small, true)
     self.typeLabel:initialise()
     self:addChild(self.typeLabel)
     ey = ey + ROW_H
@@ -196,66 +277,89 @@ function ISPhunSchedulePanel:createChildren()
     self.typeCombo:addOption("restart")
     self.typeCombo:addOption("event")
     self.typeCombo:addOption("announcement")
+    self.typeCombo.tooltip = "restart: schedules a server restart with countdown.\n" ..
+                                 "event: triggers a named Lua event.\n" ..
+                                 "announcement: broadcasts messages to all players"
     self:addChild(self.typeCombo)
     ey = ey + ROW_H + PAD
 
-    -- Event name (type=event only)
-    self.eventNameLabel = ISLabel:new(ex, ey, ROW_H, "Event name:", 1, 1, 1, 1, UIFont.Small)
-    self.eventNameLabel:initialise()
-    self:addChild(self.eventNameLabel)
+    -- Extra field: adapts label/tooltip based on outcome type.
+    -- type=event       → "Event name"    (stores sch.eventName)
+    -- type=announcement → "Message"      (stores sch.announcementText)
+    -- type=restart      → hidden
+    self.extraFieldLabel = ISLabel:new(ex, ey, ROW_H, "Event name", 1, 1, 1, 1, UIFont.Small, true)
+    self.extraFieldLabel:initialise()
+    self:addChild(self.extraFieldLabel)
     ey = ey + ROW_H
-    self.eventNameEntry = ISTextEntryBox:new("", ex, ey, eow, ROW_H)
-    self.eventNameEntry:initialise()
-    self:addChild(self.eventNameEntry)
+    self.extraFieldEntry = ISTextEntryBox:new("", ex, ey, eow, ROW_H)
+    self.extraFieldEntry:initialise()
+    self:addChild(self.extraFieldEntry)
     ey = ey + ROW_H + PAD
 
     -- Warnings / countdown messages
     -- restart/event: each entry fires N secs BEFORE the action.
     -- announcement:  each entry fires N secs AFTER the schedule fires (0 = immediate).
-    self.warnLabel = ISLabel:new(ex, ey, ROW_H, "Warnings:", 1, 1, 1, 1, UIFont.Small)
+    self.warnLabel = ISLabel:new(ex, ey, ROW_H, "Warnings", 1, 1, 1, 1, UIFont.Small, true)
     self.warnLabel:initialise()
     self:addChild(self.warnLabel)
     ey = ey + ROW_H
-    local warnListH = 2 * ROW_H + 4
+    local warnListH = 6 * ROW_H + 4
     self.warnList = ISScrollingListBox:new(ex, ey, eow, warnListH)
     self.warnList.font = UIFont.Small
     self.warnList.itemheight = ROW_H
+    self.warnList.onmousedown = self.onWarnSelect
+    self.warnList.target = self
     self.warnList:initialise()
     self:addChild(self.warnList)
     ey = ey + warnListH + PAD
 
-    -- Warn input row: [secs][text][Add][Del]
+    -- Warning input hint labels
     local wSecsW = math.floor(50 * FONT_SCALE)
     local wBtnW = math.floor(50 * FONT_SCALE)
     local wTxtW = eow - wSecsW - wBtnW * 2 - PAD * 3
 
+    self.warnSecsHint = ISLabel:new(ex, ey, ROW_H, "Secs", C.textDim.r, C.textDim.g, C.textDim.b, C.textDim.a,
+        UIFont.Small, true)
+    self.warnSecsHint:initialise()
+    self:addChild(self.warnSecsHint)
+
+    self.warnMsgHint = ISLabel:new(ex + wSecsW + PAD, ey, ROW_H, "Message or translation key", C.textDim.r, C.textDim.g,
+        C.textDim.b, C.textDim.a, UIFont.Small, true)
+    self.warnMsgHint:initialise()
+    self:addChild(self.warnMsgHint)
+    ey = ey + ROW_H
+
+    -- Warning input row: [secs] [text] [Add/Update] [Del]
     self.warnSecsEntry = ISTextEntryBox:new("", ex, ey, wSecsW, ROW_H)
     self.warnSecsEntry:initialise()
+    self.warnSecsEntry:setTooltip(
+        "Seconds before action (restart/event) or delay after firing (announcement).\n0 = immediate")
     self:addChild(self.warnSecsEntry)
 
     self.warnTextEntry = ISTextEntryBox:new("", ex + wSecsW + PAD, ey, wTxtW, ROW_H)
     self.warnTextEntry:initialise()
+    self.warnTextEntry:setTooltip("Message text or translation key (e.g. IGUI_PhunServer_Left)")
     self:addChild(self.warnTextEntry)
 
     local wAddX = ex + wSecsW + PAD + wTxtW + PAD
     self.addWarnBtn = ISButton:new(wAddX, ey, wBtnW, BTN_H, "Add", self, self.onAddWarning)
     self.addWarnBtn:initialise()
+    self.addWarnBtn:setTooltip("Add a new warning or save edits to the selected entry")
     self:addChild(self.addWarnBtn)
 
     self.removeWarnBtn = ISButton:new(wAddX + wBtnW + PAD, ey, wBtnW, BTN_H, "Del", self, self.onRemoveWarning)
     self.removeWarnBtn:initialise()
+    self.removeWarnBtn:setTooltip("Remove the selected warning entry")
     self:addChild(self.removeWarnBtn)
-    ey = ey + BTN_H + PAD
 
-    -- Status message
-    self.statusLabel = ISLabel:new(ex, ey, ROW_H, "", 1, 1, 1, 1, UIFont.Small)
+    -- ---- FOOTER: status label + save button (aligned with list ± buttons) ----
+    self.statusLabel = ISLabel:new(ex, listBtnY, ROW_H, "", 1, 1, 1, 1, UIFont.Small)
     self.statusLabel:initialise()
     self:addChild(self.statusLabel)
 
-    -- Save button (bottom-anchored)
-    local saveY = H - BTN_H - PAD
-    self.saveBtn = ISButton:new(ex, saveY, BTN_W, BTN_H, "Save", self, self.onSave)
+    self.saveBtn = ISButton:new(ex + EDIT_W - BTN_W, listBtnY, BTN_W, BTN_H, "Save", self, self.onSave)
     self.saveBtn:initialise()
+    self.saveBtn:setTooltip("Save this schedule and send to server")
     self:addChild(self.saveBtn)
 
     self:setEditVisible(false)
@@ -265,12 +369,13 @@ end
 -- ---------------------------------------------------------------------------
 -- Show / hide the edit pane
 -- ---------------------------------------------------------------------------
-function ISPhunSchedulePanel:setEditVisible(visible)
+function UI:setEditVisible(visible)
     local items = {self.enabledTick, self.nameLabel, self.nameEntry, self.triggerLabel, self.triggerCombo,
                    self.repeatLabel, self.recurCombo, self.daysLabel, self.timesLabel, self.timesList, self.timeEntry,
-                   self.addTimeBtn, self.removeTimeBtn, self.typeLabel, self.typeCombo, self.eventNameLabel,
-                   self.eventNameEntry, self.warnLabel, self.warnList, self.warnSecsEntry, self.warnTextEntry,
-                   self.addWarnBtn, self.removeWarnBtn, self.saveBtn, self.statusLabel}
+                   self.addTimeBtn, self.removeTimeBtn, self.typeLabel, self.typeCombo, self.extraFieldLabel,
+                   self.extraFieldEntry, self.warnLabel, self.warnList, self.warnSecsHint, self.warnMsgHint,
+                   self.warnSecsEntry, self.warnTextEntry, self.addWarnBtn, self.removeWarnBtn, self.saveBtn,
+                   self.statusLabel}
     for _, w in ipairs(items) do
         if w then
             w:setVisible(visible)
@@ -284,7 +389,7 @@ end
 -- ---------------------------------------------------------------------------
 -- List population
 -- ---------------------------------------------------------------------------
-function ISPhunSchedulePanel:refreshList()
+function UI:refreshList()
     self.listBox:clear()
     for i, sch in ipairs(self.schedules) do
         local prefix = sch.enabled and "[ON] " or "[OFF] "
@@ -302,12 +407,18 @@ end
 -- ---------------------------------------------------------------------------
 -- Load a schedule into the form
 -- ---------------------------------------------------------------------------
-function ISPhunSchedulePanel:loadScheduleIntoForm(idx)
+function UI:loadScheduleIntoForm(idx)
     local sch = self.schedules[idx]
     if not sch then
         return
     end
     self.selected = idx
+
+    -- Reset warning edit state whenever a different schedule is loaded
+    self.warnEditIdx = nil
+    self.addWarnBtn:setTitle("Add")
+    self.warnSecsEntry:setText("")
+    self.warnTextEntry:setText("")
 
     self.enabledTick:setSelected(1, sch.enabled == true)
     self.nameEntry:setText(sch.name or "")
@@ -341,8 +452,14 @@ function ISPhunSchedulePanel:loadScheduleIntoForm(idx)
     }
     self.typeCombo.selected = typeMap[sch.type] or 1
 
-    -- event name
-    self.eventNameEntry:setText(sch.eventName or "")
+    -- extra field (event name or announcement message)
+    if sch.type == "event" then
+        self.extraFieldEntry:setText(sch.eventName or "")
+    elseif sch.type == "announcement" then
+        self.extraFieldEntry:setText(sch.announcementText or "")
+    else
+        self.extraFieldEntry:setText("")
+    end
 
     -- warnings / countdowns
     self.warnList:clear()
@@ -364,7 +481,7 @@ end
 -- ---------------------------------------------------------------------------
 -- Visibility helpers
 -- ---------------------------------------------------------------------------
-function ISPhunSchedulePanel:refreshTriggerVisibility()
+function UI:refreshTriggerVisibility()
     local isCron = self.triggerCombo.selected ~= 2
     self.repeatLabel:setVisible(isCron)
     self.recurCombo:setVisible(isCron)
@@ -383,13 +500,23 @@ function ISPhunSchedulePanel:refreshTriggerVisibility()
     end
 end
 
-function ISPhunSchedulePanel:refreshTypeVisibility()
-    local isEvent = self.typeCombo.selected == 2
-    self.eventNameLabel:setVisible(isEvent)
-    self.eventNameEntry:setVisible(isEvent)
+function UI:refreshTypeVisibility()
+    local t = self.typeCombo.selected
+    local isEvent = t == 2
+    local isAnnounce = t == 3
+    local showExtra = isEvent or isAnnounce
+    self.extraFieldLabel:setVisible(showExtra)
+    self.extraFieldEntry:setVisible(showExtra)
+    if isEvent then
+        self.extraFieldLabel:setName("Event name")
+        self.extraFieldEntry:setTooltip("Name of the Lua event to trigger (e.g. OnPhunServerRestart)")
+    elseif isAnnounce then
+        self.extraFieldLabel:setName("Message")
+        self.extraFieldEntry:setTooltip("Text or translation key to broadcast when this schedule fires")
+    end
 end
 
-function ISPhunSchedulePanel:refreshDayButtons()
+function UI:refreshDayButtons()
     local isCron = self.recurCombo and self.triggerCombo.selected ~= 2
     local isWeekly = isCron and self.recurCombo and self.recurCombo.selected == 2
     self.daysLabel:setVisible(isWeekly == true)
@@ -412,7 +539,7 @@ end
 -- ---------------------------------------------------------------------------
 -- Callbacks — list
 -- ---------------------------------------------------------------------------
-function ISPhunSchedulePanel:onListSelect(item, _)
+function UI:onListSelect(item, _)
     if item and item.item then
         self:loadScheduleIntoForm(item.item)
     end
@@ -421,19 +548,19 @@ end
 -- ---------------------------------------------------------------------------
 -- Callbacks — trigger / type / recur
 -- ---------------------------------------------------------------------------
-function ISPhunSchedulePanel:onTriggerChanged()
+function UI:onTriggerChanged()
     self:refreshTriggerVisibility()
 end
 
-function ISPhunSchedulePanel:onTypeChanged()
+function UI:onTypeChanged()
     self:refreshTypeVisibility()
 end
 
-function ISPhunSchedulePanel:onRecurChanged()
+function UI:onRecurChanged()
     self:refreshDayButtons()
 end
 
-function ISPhunSchedulePanel:onDayToggle(wdayIdx)
+function UI:onDayToggle(wdayIdx)
     local btn = self.dayTicks[wdayIdx]
     if btn then
         btn.selected = not btn.selected
@@ -444,7 +571,7 @@ end
 -- ---------------------------------------------------------------------------
 -- Callbacks — schedule list management
 -- ---------------------------------------------------------------------------
-function ISPhunSchedulePanel:onAddSchedule()
+function UI:onAddSchedule()
     table.insert(self.schedules, {
         name = "New Schedule",
         enabled = false,
@@ -457,7 +584,7 @@ function ISPhunSchedulePanel:onAddSchedule()
     self:loadScheduleIntoForm(#self.schedules)
 end
 
-function ISPhunSchedulePanel:onDeleteSchedule()
+function UI:onDeleteSchedule()
     if not self.selected then
         return
     end
@@ -476,7 +603,7 @@ end
 -- ---------------------------------------------------------------------------
 -- Callbacks — times
 -- ---------------------------------------------------------------------------
-function ISPhunSchedulePanel:onAddTime()
+function UI:onAddTime()
     local t = self.timeEntry:getText():match("^%s*(%d%d?:%d%d)%s*$")
     if not t then
         self:setStatus("Invalid time — use HH:MM", true)
@@ -499,7 +626,7 @@ function ISPhunSchedulePanel:onAddTime()
     self.timeEntry:setText("")
 end
 
-function ISPhunSchedulePanel:onRemoveTime()
+function UI:onRemoveTime()
     local sel = self.timesList.selected
     if sel and sel > 0 then
         self.timesList:removeItemByIndex(sel)
@@ -509,7 +636,19 @@ end
 -- ---------------------------------------------------------------------------
 -- Callbacks — warnings
 -- ---------------------------------------------------------------------------
-function ISPhunSchedulePanel:onAddWarning()
+
+-- Clicking a warning in the list populates the input fields for editing.
+function UI:onWarnSelect(item, _)
+    if item and item.item then
+        local d = item.item
+        self.warnEditIdx = self.warnList.selected
+        self.warnSecsEntry:setText(tostring(d.secs))
+        self.warnTextEntry:setText(d.text)
+        self.addWarnBtn:setTitle("Update")
+    end
+end
+
+function UI:onAddWarning()
     local secsStr = self.warnSecsEntry:getText():match("^%s*(%d+)%s*$")
     if not secsStr then
         self:setStatus("Seconds must be a whole number (0 or greater)", true)
@@ -521,25 +660,46 @@ function ISPhunSchedulePanel:onAddWarning()
         self:setStatus("Warning text cannot be empty", true)
         return
     end
-    self.warnList:addItem(string.format("%ds — %s", secs, text), {
+    local display = string.format("%ds — %s", secs, text)
+    local data = {
         secs = secs,
         text = text
-    })
+    }
+
+    if self.warnEditIdx and self.warnEditIdx <= #self.warnList.items then
+        -- Update the entry in place
+        self.warnList.items[self.warnEditIdx] = {
+            text = display,
+            item = data,
+            height = ROW_H
+        }
+        self.warnEditIdx = nil
+        self.addWarnBtn:setTitle("Add")
+    else
+        self.warnList:addItem(display, data)
+    end
     self.warnSecsEntry:setText("")
     self.warnTextEntry:setText("")
 end
 
-function ISPhunSchedulePanel:onRemoveWarning()
+function UI:onRemoveWarning()
     local sel = self.warnList.selected
     if sel and sel > 0 then
         self.warnList:removeItemByIndex(sel)
+        -- Clear edit state if we just removed the entry being edited
+        if self.warnEditIdx then
+            self.warnEditIdx = nil
+            self.warnSecsEntry:setText("")
+            self.warnTextEntry:setText("")
+            self.addWarnBtn:setTitle("Add")
+        end
     end
 end
 
 -- ---------------------------------------------------------------------------
 -- Save
 -- ---------------------------------------------------------------------------
-function ISPhunSchedulePanel:onSave()
+function UI:onSave()
     if not self.selected then
         return
     end
@@ -599,11 +759,18 @@ function ISPhunSchedulePanel:onSave()
         sch.times = nil
     end
 
+    -- Extra field: event name or announcement message
     if sch.type == "event" then
-        local en = self.eventNameEntry:getText():match("^%s*(.-)%s*$")
+        local en = self.extraFieldEntry:getText():match("^%s*(.-)%s*$")
         sch.eventName = (en ~= "") and en or nil
+        sch.announcementText = nil
+    elseif sch.type == "announcement" then
+        local at = self.extraFieldEntry:getText():match("^%s*(.-)%s*$")
+        sch.announcementText = (at ~= "") and at or nil
+        sch.eventName = nil
     else
         sch.eventName = nil
+        sch.announcementText = nil
     end
 
     -- Warnings / countdowns
@@ -632,7 +799,7 @@ end
 -- ---------------------------------------------------------------------------
 -- Server response
 -- ---------------------------------------------------------------------------
-function ISPhunSchedulePanel:onDataReceived(schedules, saved)
+function UI:onDataReceived(schedules, saved)
     self.schedules = schedules or {}
     self:refreshList()
     if saved then
@@ -651,7 +818,7 @@ end
 -- ---------------------------------------------------------------------------
 -- Status message (auto-clears after 4 seconds)
 -- ---------------------------------------------------------------------------
-function ISPhunSchedulePanel:setStatus(msg, isError)
+function UI:setStatus(msg, isError)
     self.statusMsg = msg
     self.statusTimer = getTimestampMs() + 4000
     if isError then
@@ -662,8 +829,8 @@ function ISPhunSchedulePanel:setStatus(msg, isError)
     self.statusLabel:setName(msg)
 end
 
-function ISPhunSchedulePanel:update()
-    ISPanel.update(self)
+function UI:update()
+    ISCollapsableWindowJoypad.update(self)
     if self.statusMsg and getTimestampMs() > self.statusTimer then
         self.statusMsg = nil
         self.statusLabel:setName("")
@@ -673,24 +840,8 @@ end
 -- ---------------------------------------------------------------------------
 -- Close
 -- ---------------------------------------------------------------------------
-function ISPhunSchedulePanel:close()
+function UI:close()
     self:setVisible(false)
     self:removeFromUIManager()
     Core.ui.schedulePanel = nil
-end
-
--- ---------------------------------------------------------------------------
--- Open (called from chat command or admin panel)
--- ---------------------------------------------------------------------------
-function Core.openSchedulePanel()
-    if Core.ui.schedulePanel and Core.ui.schedulePanel:isVisible() then
-        return
-    end
-    local sw = getCore():getScreenWidth()
-    local sh = getCore():getScreenHeight()
-    local panel = ISPhunSchedulePanel:new(math.floor((sw - W) / 2), math.floor((sh - H) / 2))
-    panel:initialise()
-    panel:addToUIManager()
-    Core.ui.schedulePanel = panel
-    sendClientCommand(Core.name, Core.commands.getSchedules, {})
 end
