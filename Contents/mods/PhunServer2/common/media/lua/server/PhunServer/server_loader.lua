@@ -3,10 +3,6 @@ if not isServer() then
 end
 
 local Core = PhunServer
-local PL = PhunLib
-
-local fileTools = PL.file
-local tableTools = PL.table
 
 function Core.getSavedData()
 
@@ -15,7 +11,7 @@ function Core.getSavedData()
     -- this is a server or local game
     -- load the modified data from ./lua/PhunServer.lua
     local filename = Core.name .. ".lua"
-    local d = fileTools.loadTable(filename)
+    local d = Core.tools.loadTable(filename)
     if d == nil then
         print("PhunServer: missing ./lua/" .. Core.name .. ", this is normal if you haven't defined any schedules")
         return {}
@@ -29,7 +25,7 @@ end
 function Core.saveData(data)
 
     local filename = Core.name .. ".lua"
-    fileTools.saveTable(data, filename)
+    Core.tools.saveTable(filename, data)
     print("PhunServer: saved data to ./lua/" .. Core.name .. ".lua")
 
 end

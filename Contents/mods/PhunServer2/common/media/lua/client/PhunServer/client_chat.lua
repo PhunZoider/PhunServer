@@ -3,7 +3,6 @@ if isServer() then
 end
 
 local Core = PhunServer
-local PL = PhunLib
 
 local isAdmin = isAdmin
 local getAccessLevel = getAccessLevel
@@ -152,7 +151,7 @@ function Core.message(text, args, options)
 end
 
 function Core.notifyAll(soundName, types, text, args)
-    local players = PL.onlinePlayers()
+    local players = Core.tools.onlinePlayers()
     for i = 0, players:size() - 1 do
         local p = players:get(i)
         if p:isLocalPlayer() then
@@ -244,12 +243,12 @@ end
 local original_command = ISChat["onCommandEntered"]
 
 Core.hasAccess = function(command)
-    return PL.isAdmin()
+    return Core.tools.isAdmin()
 end
 
 Core.cmds = {
     [Core.commands.checkworkshop] = function(args)
-        if not PL.isAdmin() then
+        if not Core.tools.isAdmin() then
             return getText("IGUI_PhunServer_NoAccess")
         else
             sendClientCommand(Core.name, "check", args)
@@ -258,7 +257,7 @@ Core.cmds = {
         return true
     end,
     [Core.commands.restart] = function(args)
-        if not PL.isAdmin() then
+        if not Core.tools.isAdmin() then
             return getText("IGUI_PhunServer_NoAccess")
         else
             sendClientCommand(Core.name, "restart", args)
@@ -270,7 +269,7 @@ Core.cmds = {
         if Core.getOption("PlayersCommand") == 1 then
             -- return that this command wasn't handled
             return false
-        elseif Core.getOption("PlayersCommand") == 2 and not PL.isAdmin() then
+        elseif Core.getOption("PlayersCommand") == 2 and not Core.tools.isAdmin() then
             return getText("IGUI_PhunServer_NoAccess")
         end
         sendClientCommand(Core.name, Core.commands.players, args)
@@ -278,7 +277,7 @@ Core.cmds = {
         return true
     end,
     [Core.commands.setHoursSurvived] = function(args)
-        if Core.getOption("SetHours") == false or not PL.isAdmin() then
+        if Core.getOption("SetHours") == false or not Core.tools.isAdmin() then
             return getText("IGUI_PhunServer_NoAccess")
         else
             sendClientCommand(Core.name, Core.commands.setHoursSurvived, args)
@@ -287,10 +286,10 @@ Core.cmds = {
         return true
     end,
     [Core.commands.getHoursSurvived] = function(args)
-        if Core.getOption("GetHours") == false and not PL.isAdmin() then
+        if Core.getOption("GetHours") == false and not Core.tools.isAdmin() then
             return getText("IGUI_PhunServer_NoAccess")
         else
-            if not PL.isAdmin() then
+            if not Core.tools.isAdmin() then
                 args = {}
             end
             sendClientCommand(Core.name, Core.commands.getHoursSurvived, args)
@@ -360,13 +359,6 @@ ISChat["onCommandEntered"] = function(self)
     end
 
     original_command(self)
-end
-
-local original_addLIneInChat = ISChat["addLineInChat"]
-local lastLineChecked = 0
-
-local function newGetTextWithPrefix(message)
-    return message:getTextWithPrefix()
 end
 
 -- return the first <RGB:...> tag exactly as-is (Zomboid often uses 0..1 floats)

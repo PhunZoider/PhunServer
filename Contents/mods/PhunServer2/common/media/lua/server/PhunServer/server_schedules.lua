@@ -3,7 +3,6 @@ if not isServer() then
 end
 
 local Core = PhunServer
-local PL = PhunLib
 
 function Core.getSchedule(refresh)
     if Core.data == nil or refresh == true then

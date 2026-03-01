@@ -1,6 +1,5 @@
 version=1
-id=3623897097
-title=PhunServer Tools
+title=PhunServer 2
 description=PhunServer is an essential lightweight mod for multiplayer Project Zomboid servers.
 description=Designed for admins who want automation, safety, and quality-of-life without babysitting their server.
 description=[h2]TL;DR[/h2]

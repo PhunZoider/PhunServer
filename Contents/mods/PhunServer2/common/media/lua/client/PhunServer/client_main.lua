@@ -3,7 +3,6 @@ if isServer() then
 end
 
 local Core = PhunServer
-local PL = PhunLib
 
 local getFactionName = function(player)
     local faction = Faction.getPlayerFaction(player)
@@ -24,7 +23,7 @@ function Core.canSeeAllPlayers(refresh)
 
     if canSeeAll == nil or refresh then
         local p = getPlayer()
-        canSeeAll = PL.isAdmin(p) or
+        canSeeAll = Core.tools.isAdmin(p) or
                         (p and p.getRole and p:getRole().hasCapability and
                             p:getRole():hasCapability(Capability.CanSeeAll))
     end

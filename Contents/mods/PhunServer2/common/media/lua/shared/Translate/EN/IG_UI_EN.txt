@@ -73,4 +73,32 @@ IGUI_EN = {
     
     IGUI_PhunServer_PlayerHasSurvivedFor = "%1 has survived for %2",
 
+    UI_PhunServer_Hour = "Hour",
+    UI_PhunServer_HoursAgo = "%1 Hours ago"
+    UI_PhunServer_Hours = "Hours",
+    UI_PhunServer_Day = "Day",
+    UI_PhunServer_Days = "Days",
+    UI_PhunServer_DaysAgo = "%1 Days",
+    UI_PhunServer_Minutes = "Minutes",
+    UI_PhunServer_Minute = "Minute",
+    
+    UI_PhunServer_JustNow = "Just now",
+    UI_PhunServer_X_ago = "%1 ago",
+
+    UI_PhunServer_X_Second = "%1 second",
+    UI_PhunServer_X_Seconds = "%1 seconds",
+    UI_PhunServer_X_Minute = "%1 minute",
+    UI_PhunServer_X_Minutes = "%1 minutes",  
+    UI_PhunServer_X_Hour = "%1 hour",
+    UI_PhunServer_X_Hours = "%1 hours",
+    UI_PhunServer_X_Day = "%1 day",
+    UI_PhunServer_X_Days = "%1 days",    
+    UI_PhunServer_X_Month = "%1 month",
+    UI_PhunServer_X_Months = "%1 months",
+    UI_PhunServer_X_Year = "%1 year",
+    UI_PhunServer_X_Years = "%1 years",
+    UI_PhunServer_DaysAndHours = "%1 %2, %3 %4",
+    UI_PhunServer_LessThanHour = "Less than an hour",
+    UI_PhunServer_LessThanMinute = "Less than a minute",
+
 }

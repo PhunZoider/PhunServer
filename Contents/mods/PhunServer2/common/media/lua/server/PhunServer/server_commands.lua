@@ -3,16 +3,12 @@ if isClient() then
 end
 require "PhunServer/core"
 local Core = PhunServer
-local PL = PhunLib
 local getTimestamp = getTimestamp
 local Commands = {}
 
 Commands[Core.commands.playerSetup] = function(player, args)
     Core.debugLn("Setting up player " .. player:getUsername())
     Core.wipeKeyCheck(player:getUsername())
-    if Core.settings.PlayersOnMap > 1 or Core.settings.PlayersOnMiniMap > 1 then
-        sendServerCommand(player, Core.name, Core.commands.updateAllLocations, Core.playerLocations or {})
-    end
 end
 
 Commands[Core.commands.checkworkshop] = function(player, args)
@@ -109,7 +105,7 @@ Commands[Core.commands.setHoursSurvived] = function(player, args)
         return
     end
 
-    local p = PL.getPlayerByUsername(name)
+    local p = Core.tools.getPlayerByUsername(name)
     if p then
         Core.debugLn("Setting hours survived for player " .. p:getUsername() .. " to " .. tostring(hours))
         p:setHoursSurvived(hours)
@@ -135,7 +131,7 @@ Commands[Core.commands.getHoursSurvived] = function(player, args)
 
     Core.debugLn("getHoursSurvived command called by " .. player:getUsername() .. " for player " .. name)
 
-    local p = PL.getPlayerByUsername(name)
+    local p = Core.tools.getPlayerByUsername(name)
     if p then
         sendServerCommand(player, Core.name, Core.commands.getHoursSurvived, {
             username = player:getUsername(),

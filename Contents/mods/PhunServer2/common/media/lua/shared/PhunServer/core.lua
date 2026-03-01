@@ -24,6 +24,7 @@ PhunServer = {
         updateLocations = "updateLocations",
         updateAllLocations = "updateAllLocations"
     },
+    tools = require "PhunServer/tools",
     events = {
         OnReady = "PhunServerOnReady"
     },
@@ -38,7 +39,7 @@ PhunServer = {
 local climateManager = nil
 local gt = nil
 local Core = PhunServer
-local PL = PhunLib
+
 Core.isLocal = not isClient() and not isServer() and not isCoopHost()
 Core.settings = SandboxVars[Core.name] or {}
 for _, event in pairs(Core.events) do
@@ -72,7 +73,7 @@ end
 
 function Core.debug(...)
     if Core.settings.Debug then
-        PL.debug(Core.name, ...)
+        Core.tools.debug(Core.name, ...)
     end
 end
 
@@ -115,8 +116,6 @@ function Core:setIsNight(value)
         end
     end
 
-    PL:setIsNight(value)
-
 end
 
 function Core:testNight()
@@ -134,13 +133,13 @@ function Core:testNight()
         local season = climateManager:getSeason()
         if season and season.getDawn then
             local time = gt:getTimeOfDay()
-            PL.dawnTime = season:getDawn() + (enabled and self.getOption("DayOffset") or 0)
-            PL.duskTime = season:getDusk() + (enabled and self.getOption("NightOffset") or 0)
+            Core.dawnTime = season:getDawn() + (enabled and self.getOption("DayOffset") or 0)
+            Core.duskTime = season:getDusk() + (enabled and self.getOption("NightOffset") or 0)
         end
     end
-    if PL.duskTime and PL.dawnTime then
+    if Core.duskTime and Core.dawnTime then
         local currentTime = gt:getTimeOfDay()
-        local night = currentTime > PL.duskTime or currentTime < PL.dawnTime
+        local night = currentTime > Core.duskTime or currentTime < Core.dawnTime
         if night ~= self.isNight then
             self:setIsNight(night)
         end

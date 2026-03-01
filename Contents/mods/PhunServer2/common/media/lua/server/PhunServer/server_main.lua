@@ -2,7 +2,6 @@ if isClient() then
     return
 end
 local Core = PhunServer
-local PL = PhunLib
 local luautils = luautils
 
 function Core.isServerEmpty()
@@ -14,7 +13,6 @@ function Core.getPlayerCount()
 end
 
 local onliners = {}
-local lastLocations = {}
 
 local getFactionName = function(player)
     local faction = Faction.getPlayerFaction(player)
@@ -24,10 +22,7 @@ end
 function Core.checkPlayers()
 
     -- players online 
-    local online = PL.onlinePlayers()
-    local doXY = Core.settings.PlayersOnMap > 1 or Core.settings.PlayersOnMiniMap > 1
-    local hasLocations = false
-    local locations = doXY and {} or nil
+    local online = Core.tools.onlinePlayers()
 
     local now = getTimestamp()
     for i = 0, online:size() - 1 do
@@ -52,33 +47,14 @@ function Core.checkPlayers()
         end
         Core.data.online[username].lastSeen = now
         Core.data.online[username].online = true
-        if doXY then
-            local x = math.floor(p:getX() + 0.5)
-            local y = math.floor(p:getY() + 0.5)
-            local k = tostring(x) .. "," .. tostring(y)
-            Core.playerLocations[username] = {getFactionName(p), x, y}
-            if lastLocations[username] ~= k then
-                hasLocations = true
-                lastLocations[username] = k
-                locations[username] = Core.playerLocations[username]
-            end
-        end
+
     end
     for name, data in pairs(onliners) do
         if Core.data.online[name].online then
             if now - Core.data.online[name].lastSeen > 1 then
                 -- player left
                 Core.debugLn("Player disconnected: " .. name)
-                local suffix = ZombRand(4)
-                local t = {
-                    soundName = "",
-                    text = "IGUI_PhunServer_Goodbye" .. tostring(suffix),
-                    args = {},
-                    types = {
-                        chat = true
-                    }
-                }
-                table.insert(t.args, name)
+
                 Core.playerLocations[name] = nil
                 sendServerCommand(Core.name, Core.commands.goodbye, {name})
 
@@ -86,10 +62,6 @@ function Core.checkPlayers()
                 onliners[name] = nil
             end
         end
-    end
-
-    if hasLocations then
-        sendServerCommand(Core.name, Core.commands.updateLocations, locations)
     end
 
 end
@@ -132,7 +104,7 @@ function Core.scheduleServerRestart(timestamp)
     local lastNotifiedIndex = -1
     local values = luautils.split(Core.getOption("NotificationCountdown", "300;120;60;30;10;9;8;7;6;5;3;2;1"), ";")
 
-    Events.OnTickEvenPaused.Add(function()
+    local tickFn = function()
         if Core.restartingAt == nil then
             return
         end
@@ -166,7 +138,7 @@ function Core.scheduleServerRestart(timestamp)
                 val = 1
             else
                 suffix = "Left"
-                val = PL.string.formatWholeNumber(lastNotified / 60)
+                val = Core.tools.formatWholeNumber(lastNotified / 60)
             end
 
             local t = {
@@ -186,11 +158,12 @@ function Core.scheduleServerRestart(timestamp)
         Core.restartingIn = secondsLeft
 
         if secondsLeft <= 0 then
-            Events.OnTickEvenPaused.Remove(self)
+            Events.OnTickEvenPaused.Remove(tickFn)
             return
         end
+    end
 
-    end)
+    Events.OnTickEvenPaused.Add(tickFn)
 
 end
 
@@ -265,7 +238,7 @@ function Core.outdatedWorkshop()
     if restartDelay > 0 then
         local restartSeconds = restartDelay * 60;
         print("[" .. Core.name .. "] Detected outdated workshop item - restarting server in " ..
-                  PL.string.formatWholeNumber(restartSeconds) .. "!")
+                  Core.tools.formatWholeNumber(restartSeconds) .. "!")
         Core.scheduleServerRestart(getTimestamp() + restartSeconds)
     else
         print("[" .. Core.name ..

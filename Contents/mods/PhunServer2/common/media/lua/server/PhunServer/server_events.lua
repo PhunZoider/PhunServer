@@ -4,7 +4,6 @@ end
 require "PhunServer/core"
 local Commands = require "PhunServer/server_commands"
 local Core = PhunServer
-local PL = PhunLib
 
 Events.OnInitGlobalModData.Add(function()
 
@@ -84,7 +83,7 @@ Events.OnTickEvenPaused.Add(function()
 
         if Core.getOption("EnableModWatch") == true then
             print("[" .. Core.name .. "] ModWatch checking workshop for updates" ..
-                      (lastPoll > 0 and ". Last check was " .. (PL.string.absDifference(timestamp, lastPoll) .. " ago") or
+                      (lastPoll > 0 and ". Last check was " .. (Core.tools.absDifference(timestamp, lastPoll) .. " ago") or
                           "") .. ".")
             Core.pollWorkshop()
             lastPoll = timestamp
@@ -115,21 +114,3 @@ end)
 Events.EveryOneMinute.Add(function()
     Core:testNight()
 end)
-
-Events.EveryTenMinutes.Add(function()
-    -- refresh periodically so we aren't constantly reading from function
-    Core.settings.Debug = Core.getOption("Debug", false)
-    Core.settings.PlayersOnMap = Core.getOption("PlayersOnMap", 1)
-    Core.settings.PlayersOnMiniMap = Core.getOption("PlayersOnMiniMap", 1)
-end)
-
--- print('- -- -- EVENTS! --  - ')
--- local e = {}
--- for k, v in pairs(Events) do
---     table.insert(e, k)
--- end
--- table.sort(e, function(a, b)
---     return a < b
--- end)
--- PhunLib.printTable(e)
--- print(" /-------")

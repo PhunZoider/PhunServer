@@ -3,11 +3,10 @@ if isServer() then
 end
 
 local Core = PhunServer
-local PL = PhunLib
 local Commands = {}
 
 Commands[Core.commands.wipeMap] = function(args)
-    local player = PL.getPlayerByUsername(args.username)
+    local player = Core.tools.getPlayerByUsername(args.username)
     if player then
         Core.map.wipeMap(player, (args or {}).args or {})
     end
@@ -18,7 +17,7 @@ Commands[Core.commands.notify] = function(args)
 end
 
 Commands[Core.commands.message] = function(args)
-    local player = PL.getPlayerByUsername(args.username)
+    local player = Core.tools.getPlayerByUsername(args.username)
     if player then
         Core.message(args.text, args.args)
     end
@@ -37,13 +36,13 @@ Commands[Core.commands.updateAllLocations] = function(args)
 end
 
 Commands[Core.commands.getHoursSurvived] = function(args)
-    local player = PL.getPlayerByUsername(args.username)
+    local player = Core.tools.getPlayerByUsername(args.username)
     if player then
         local hours = args.hours
         local seconds = hours * 3600
-        local text = PL.string.secondsToText(seconds, {
+        local text = Core.tools.secondsToText(seconds, {
             maxParts = 4,
-            zeroText = "UI_PhunLib_LessThanMinute"
+            zeroText = "UI_PhunServer_LessThanMinute"
         })
         Core.message(getText("IGUI_PhunServer_PlayerHasSurvivedFor", args.player, text))
     end
@@ -65,8 +64,7 @@ Commands[Core.commands.goodbye] = function(args)
 end
 
 Commands[Core.commands.players] = function(args)
-    local player = PL.getPlayerByUsername(args.username)
-    local finalText = ""
+    local player = Core.tools.getPlayerByUsername(args.username)
     if player then
         Core.playersList(args.players)
     end

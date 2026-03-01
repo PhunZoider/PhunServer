@@ -67,17 +67,7 @@ Sandbox_EN = {
     Sandbox_PhunServer_PlayersOffline24_tooltip = "Include the list of players that have been online in the last 24 hours",
 
     Sandbox_PhunServer_PlayersUpdateMs = "Update frequency",
-    Sandbox_PhunServer_PlayersUpdateMs_tooltip = "Frequency in which to scan online players. 1000 = every second and should be a decent default",    
-    
-    Sandbox_PhunServer_PlayersOnMap = "Players on Map (deprecated)",
-    Sandbox_PhunServer_PlayersOnMap_tooltip = "Show markers of player positions on map. Requires client restart. If you want this feature in B42+, you should disabled this and set MapRemotePlayerVisibility to 1 in your server ini",
-
-    Sandbox_PhunServer_PlayersOnMiniMap = "Players on Mini Map (deprecated)",
-    Sandbox_PhunServer_PlayersOnMiniMap_tooltip = "Show player positions on mini map. Requires client restart. If you want this feature in B42+, you should disable this and set MapRemotePlayerVisibility to 1 in your server ini",
-
-    Sandbox_PlayersOnMap_option1 = "Disable",
-    Sandbox_PlayersOnMap_option2 = "All",
-    Sandbox_PlayersOnMap_option3 = "Faction",
+    Sandbox_PhunServer_PlayersUpdateMs_tooltip = "Frequency in which to scan online players. 1000 = every second and should be a decent default", 
     
     Sandbox_PhunServer_DaySpeed = "Day Speed",
     Sandbox_PhunServer_DaySpeed_tooltip = "The speed at which daytime passes",
