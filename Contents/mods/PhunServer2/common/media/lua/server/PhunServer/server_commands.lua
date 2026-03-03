@@ -186,12 +186,12 @@ end
 
 Commands[Core.commands.stopSchedule] = function(player, args)
     if not Core.tools.isAdmin(player) then return end
-    if Core.restartingAt then
-        Core.restartingAt = nil
-        Core.runningScheduleName = nil
-        print("[" .. Core.name .. "] Pending restart cancelled by " .. player:getUsername())
+    if Core.runningScheduleName then
+        print("[" .. Core.name .. "] Schedule '" .. Core.runningScheduleName .. "' cancelled by " .. player:getUsername())
     end
-    sendServerCommand(player, Core.name, Core.commands.scheduleData, {
+    Core.restartingAt = nil
+    Core.runningScheduleName = nil
+    sendServerCommand(Core.name, Core.commands.scheduleData, {
         schedules = Core.getSchedule(),
         runningScheduleName = Core.runningScheduleName
     })

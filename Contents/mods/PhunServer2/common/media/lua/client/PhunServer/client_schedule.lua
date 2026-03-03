@@ -160,7 +160,7 @@ function UI:createChildren()
     local controls = {}
     self.controls = controls
 
-    local listTop = ROW_H + PAD * 2
+    local listTop = ROW_H * 2 + PAD * 3
 
     -- ---- LEFT PANE: schedule list ----------------------------------------
 
@@ -261,30 +261,40 @@ function UI:createChildren()
     controls.listBox = listBox
     leftPanel:addChild(controls.listBox)
 
-    local addBtn = ISButton:new(listBox.x, listBox.y + listBox.height + PAD, listBox.width / 2 - PAD / 2, BTN_H,
-        "+ Add", self, self.onAddSchedule)
+    local btn3W = math.floor((listBox.width - PAD * 2) / 3)
+    local addBtn = ISButton:new(listBox.x, listBox.y + listBox.height + PAD, btn3W, BTN_H, "+ Add", self,
+        self.onAddSchedule)
     addBtn:initialise()
     addBtn:setTooltip("Add a new schedule")
-
     controls.addBtn = addBtn
     leftPanel:addChild(addBtn)
 
-    local delBtn = ISButton:new(listBox.x + listBox.width / 2 + PAD / 2, addBtn.y, addBtn.width, BTN_H, "- Delete",
-        self, self.onDeleteSchedule)
+    local copyBtn = ISButton:new(listBox.x + btn3W + PAD, addBtn.y, btn3W, BTN_H, "Copy", self, self.onCopySchedule)
+    copyBtn:initialise()
+    copyBtn:setTooltip("Duplicate the selected schedule")
+    controls.copyBtn = copyBtn
+    leftPanel:addChild(copyBtn)
+
+    local delBtn = ISButton:new(listBox.x + btn3W * 2 + PAD * 2, addBtn.y, btn3W, BTN_H, "- Delete", self,
+        self.onDeleteSchedule)
     delBtn:initialise()
     delBtn:setTooltip("Delete the selected schedule")
-
     controls.delBtn = delBtn
     leftPanel:addChild(delBtn)
 
     leftPanel.prerender = function(self)
         ISPanel.prerender(self)
-        addBtn:setWidth(listBox.width / 2 - PAD / 2)
+        local w3 = math.floor((listBox.width - PAD * 2) / 3)
+        addBtn:setWidth(w3)
         addBtn:setX(listBox.x)
         addBtn:setY(listBox.y + listBox.height + PAD)
 
-        delBtn:setWidth(addBtn.width)
-        delBtn:setX(addBtn.x + addBtn.width + PAD)
+        copyBtn:setWidth(w3)
+        copyBtn:setX(addBtn.x + addBtn.width + PAD)
+        copyBtn:setY(addBtn.y)
+
+        delBtn:setWidth(w3)
+        delBtn:setX(copyBtn.x + copyBtn.width + PAD)
         delBtn:setY(addBtn.y)
     end
 
@@ -306,12 +316,19 @@ function UI:createChildren()
     controls.rightTopPanel = rightTopPanel
     self:addChild(controls.rightTopPanel)
 
-    -- Name
+    -- Status bar: full-width, centered above both panels
+    local statusLabel = ISLabel:new(0, ROW_H + PAD * 2, ROW_H, "", C.textDim.r, C.textDim.g, C.textDim.b, C.textDim.a, UIFont.Small)
+    statusLabel.center = true
+    statusLabel:initialise()
+    self:addChild(statusLabel)
+    controls.statusLabel = statusLabel
+
     ex = PAD
     ey = PAD
     eow = eow - PAD * 2
     local ex2 = eow - 200 + PAD
 
+    -- Name
     local nameLabel = ISLabel:new(ex, ey, ROW_H, "Name", C.textDim.r, C.textDim.g, C.textDim.b, C.textDim.a,
         UIFont.Small, true)
     nameLabel:initialise()
@@ -332,7 +349,6 @@ function UI:createChildren()
 
     self.controls.nameEntry = nameEntry
 
-    -- ey = ey + ROW_H
     local triggerCombo = ISComboBox:new(ex2, nameEntry.y, 200, ROW_H, self, self.onTriggerChanged)
     triggerCombo:initialise()
     triggerCombo:addOption("Scheduled")
@@ -342,7 +358,6 @@ function UI:createChildren()
         "Scheduled: fires at set times.\nWorkshop update: fires when a mod update is detected.\nManual: only fires when an admin clicks Trigger."
     controls.triggerCombo = triggerCombo
     rightTopPanel:addChild(triggerCombo)
-    -- ey = ey + ROW_H + PAD
 
     ey = ey + ROW_H + PAD
 
@@ -501,6 +516,12 @@ function UI:createChildren()
     rightOutcomePanel:addChild(extraFieldLabel)
     controls.extraFieldLabel = extraFieldLabel
 
+    local announcementSoundLabel = ISLabel:new(ex + eow - SOUND_W, ey, ROW_H, "Sound", C.textDim.r, C.textDim.g,
+        C.textDim.b, C.textDim.a, UIFont.Small, true)
+    announcementSoundLabel:initialise()
+    rightOutcomePanel:addChild(announcementSoundLabel)
+    controls.announcementSoundLabel = announcementSoundLabel
+
     ey = ey + ROW_H
     local extraFieldEntry = ISTextEntryBox:new("", ex, ey, eow - SOUND_W - PAD, ROW_H)
     extraFieldEntry:initialise()
@@ -510,7 +531,7 @@ function UI:createChildren()
     local announcementSoundCombo = ISComboBox:new(ex + eow - SOUND_W, ey, SOUND_W, ROW_H, self, nil)
     announcementSoundCombo:initialise()
     announcementSoundCombo:addOption("")
-    announcementSoundCombo:addOption("ding")
+    announcementSoundCombo:addOption("chimes")
     announcementSoundCombo.tooltip = "Sound to play with this announcement"
     rightOutcomePanel:addChild(announcementSoundCombo)
     controls.announcementSoundCombo = announcementSoundCombo
@@ -599,7 +620,7 @@ function UI:createChildren()
     local warnSoundCombo = ISComboBox:new(warnSoundX, ey, SOUND_W, ROW_H, self, nil)
     warnSoundCombo:initialise()
     warnSoundCombo:addOption("")
-    warnSoundCombo:addOption("ding")
+    warnSoundCombo:addOption("chimes")
     warnSoundCombo.tooltip = "Sound to play with this warning"
     rightWarningPanel:addChild(warnSoundCombo)
     controls.warnSoundCombo = warnSoundCombo
@@ -647,13 +668,6 @@ function UI:createChildren()
     controls.enabledTick = enabledTick
     bottomPanel:addChild(enabledTick)
 
-    -- ---- FOOTER: status label + save button (aligned with list ± buttons) ----
-    local statusLabel = ISLabel:new(enabledTick.x + enabledTick.width + PAD, PAD, ROW_H, "", C.textDim.r, C.textDim.g,
-        C.textDim.b, C.textDim.a, UIFont.Small)
-    statusLabel:initialise()
-    bottomPanel:addChild(statusLabel)
-    controls.statusLabel = statusLabel
-
     local saveBtn = ISButton:new(ex + EDIT_W - BTN_W, PAD, BTN_W, BTN_H, "Save", self, self.onSave)
     saveBtn:initialise()
     saveBtn:setTooltip("Save this schedule and send to server")
@@ -678,9 +692,7 @@ function UI:prerender()
     controls.listBox:setHeight(lbH)
     controls.addBtn.y = controls.listBox.y + controls.listBox.height + PAD
     controls.delBtn.y = controls.addBtn.y
-    if self.height < targetH then
-        self:setHeight(targetH)
-    end
+    self:setHeight(targetH)
 
     local rpx = controls.leftPanel.x + controls.leftPanel.width + PAD
     controls.rightTopPanel:setX(rpx)
@@ -694,7 +706,7 @@ function UI:prerender()
     controls.bottomPanel:setX(rpx)
     controls.bottomPanel:setWidth(controls.rightTopPanel.width)
     controls.saveBtn:setX(controls.bottomPanel.width - controls.saveBtn.width - PAD)
-    controls.statusLabel:setX(controls.enabledTick.x + controls.enabledTick.width + PAD)
+    controls.statusLabel:setWidth(self.width)
 
 end
 
@@ -707,12 +719,11 @@ function UI:setEditVisible(visible)
                    self.controls.recurCombo, self.controls.daysLabel, self.controls.timesLabel, self.controls.timesList,
                    self.controls.timeEntry, self.controls.addTimeBtn, self.controls.removeTimeBtn,
                    self.controls.typeLabel, self.controls.typeCombo, self.controls.extraFieldLabel,
-                   self.controls.extraFieldEntry, self.controls.announcementSoundCombo,
-                   self.controls.warnLabel, self.controls.warnList,
+                   self.controls.announcementSoundLabel, self.controls.extraFieldEntry,
+                   self.controls.announcementSoundCombo, self.controls.warnLabel, self.controls.warnList,
                    self.controls.warnSecsHint, self.controls.warnMsgHint, self.controls.warnSoundHint,
                    self.controls.warnSecsEntry, self.controls.warnTextEntry, self.controls.warnSoundCombo,
-                   self.controls.addWarnBtn, self.controls.removeWarnBtn,
-                   self.controls.saveBtn, self.controls.statusLabel}
+                   self.controls.addWarnBtn, self.controls.removeWarnBtn, self.controls.saveBtn}
     for _, w in ipairs(items) do
         if w then
             w:setVisible(visible)
@@ -796,7 +807,7 @@ function UI:loadScheduleIntoForm(idx)
         self.controls.announcementSoundCombo.selected = 1
     elseif sch.type == "announcement" then
         self.controls.extraFieldEntry:setText(sch.announcementText or "")
-        self.controls.announcementSoundCombo.selected = (sch.announcementSound == "ding") and 2 or 1
+        self.controls.announcementSoundCombo.selected = (sch.announcementSound == "chimes") and 2 or 1
     else
         self.controls.extraFieldEntry:setText("")
         self.controls.announcementSoundCombo.selected = 1
@@ -854,6 +865,7 @@ function UI:refreshTypeVisibility()
     local isAnnounce = t == 3
     local showExtra = isEvent or isAnnounce
     self.controls.extraFieldLabel:setVisible(showExtra)
+    self.controls.announcementSoundLabel:setVisible(isAnnounce)
     self.controls.extraFieldEntry:setVisible(showExtra)
     self.controls.announcementSoundCombo:setVisible(isAnnounce)
     if isEvent then
@@ -923,12 +935,13 @@ end
 function UI:onAddSchedule()
     table.insert(self.schedules, {
         name = "New Schedule",
-        enabled = false,
+        enabled = true,
         trigger = "cron",
         type = "restart",
         recur = "daily",
         times = {},
-        countdowns = {}
+        countdowns = {},
+        workshopFrequency = 5
     })
     self:refreshList()
     self:loadScheduleIntoForm(#self.schedules)
@@ -948,6 +961,31 @@ function UI:onDeleteSchedule()
     if self.selected then
         self:loadScheduleIntoForm(self.selected)
     end
+end
+
+function UI:onCopySchedule()
+    if not self.selected then
+        return
+    end
+    local orig = self.schedules[self.selected]
+    if not orig then
+        return
+    end
+    local function deepCopy(t)
+        if type(t) ~= "table" then
+            return t
+        end
+        local c = {}
+        for k, v in pairs(t) do
+            c[k] = deepCopy(v)
+        end
+        return c
+    end
+    local copy = deepCopy(orig)
+    copy.name = orig.name .. " (copy)"
+    table.insert(self.schedules, copy)
+    self:refreshList()
+    self:loadScheduleIntoForm(#self.schedules)
 end
 
 -- ---------------------------------------------------------------------------
@@ -994,7 +1032,7 @@ function UI:onWarnSelect(item, _)
         self.warnEditIdx = self.controls.warnList.selected
         self.controls.warnSecsEntry:setText(tostring(d.secs))
         self.controls.warnTextEntry:setText(d.text)
-        self.controls.warnSoundCombo.selected = (d.sound == "ding") and 2 or 1
+        self.controls.warnSoundCombo.selected = (d.sound == "chimes") and 2 or 1
         self.controls.addWarnBtn:setTitle("Update")
     end
 end
@@ -1011,7 +1049,7 @@ function UI:onAddWarning()
         self:setStatus("Warning text cannot be empty", true)
         return
     end
-    local sound = self.controls.warnSoundCombo.selected == 2 and "ding" or nil
+    local sound = self.controls.warnSoundCombo.selected == 2 and "chimes" or nil
     local display = string.format("%ds — %s%s", secs, getText(text), sound and " [" .. sound .. "]" or "")
     local data = {
         secs = secs,
@@ -1194,7 +1232,7 @@ function UI:onSave()
     elseif sch.type == "announcement" then
         local at = self.controls.extraFieldEntry:getText():match("^%s*(.-)%s*$")
         sch.announcementText = (at ~= "") and at or nil
-        sch.announcementSound = self.controls.announcementSoundCombo.selected == 2 and "ding" or nil
+        sch.announcementSound = self.controls.announcementSoundCombo.selected == 2 and "chimes" or nil
         sch.eventName = nil
     else
         sch.eventName = nil

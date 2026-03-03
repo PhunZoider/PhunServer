@@ -13,9 +13,10 @@ local scheduleCache = nil
 -- The admin must enable it via the panel before it will fire.
 local DEFAULT_WORKSHOP_SCHEDULE = {
     name = "Workshop Restart",
-    enabled = false,
+    enabled = true,
     trigger = "workshop",
     type = "restart",
+    workshopFrequency = 5,
     countdowns = {{
         secs = 300,
         text = "IGUI_PhunServer_Left"
@@ -129,15 +130,11 @@ function Core.runCountdown(schedule)
         for _, entry in ipairs(sorted) do
             if not firedSet[entry.secs] and secondsLeft <= entry.secs then
                 firedSet[entry.secs] = true
-                local entrySnd
-                if entry.sound and entry.sound ~= "" then
-                    entrySnd = "restartNotice"
-                else
-                    entrySnd = useChime and "restartNotice" or ""
-                end
+                local entrySnd = entry.sound and entry.sound ~= "" and entry.sound or nil
                 sendServerCommand(Core.name, Core.commands.notify, {
                     soundName = entrySnd,
                     text = entry.text,
+                    entry = entry,
                     secs = secondsLeft,
                     args = {secondsLeft},
                     types = msgTypes
@@ -168,16 +165,22 @@ function Core.executeScheduleAction(schedule)
     elseif schedule.type == "announcement" then
         if schedule.announcementText and schedule.announcementText ~= "" then
             sendServerCommand(Core.name, Core.commands.notify, {
-                soundName = schedule.announcementSound == "ding" and "restartNotice" or "",
+                soundName = schedule.announcementSound or nil,
                 text = schedule.announcementText,
                 args = {},
                 types = {
-                    chat = true
+                    chat = true,
+                    announce = true
                 }
             })
         end
     end
     Core.runningScheduleName = nil
+    -- Notify all connected admins so the running indicator clears immediately.
+    sendServerCommand(Core.name, Core.commands.scheduleData, {
+        schedules = Core.getSchedule(),
+        runningScheduleName = Core.runningScheduleName
+    })
 end
 
 -- ---------------------------------------------------------------------------
