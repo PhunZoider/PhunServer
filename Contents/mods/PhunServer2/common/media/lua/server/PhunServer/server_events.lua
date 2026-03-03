@@ -79,7 +79,16 @@ Events.OnTickEvenPaused.Add(function()
 
     if timestamp >= nextPoll then
 
-        nextPoll = timestamp + (Core.getOption("WorkshopPollingIntervalMinutes", 15) * 60)
+        local pollIntervalMins = Core.getOption("WorkshopPollingIntervalMinutes", 15)
+        if Core.getSchedule then
+            for _, s in ipairs(Core.getSchedule()) do
+                if s.enabled and s.trigger == "workshop" and s.workshopFrequency and s.workshopFrequency > 0 then
+                    pollIntervalMins = s.workshopFrequency
+                    break
+                end
+            end
+        end
+        nextPoll = timestamp + (pollIntervalMins * 60)
 
         if Core.getOption("EnableModWatch") == true then
             print("[" .. Core.name .. "] ModWatch checking workshop for updates" ..

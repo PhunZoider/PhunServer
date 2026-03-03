@@ -21,7 +21,7 @@ Commands[Core.commands.restart] = function(player, args)
         restartSeconds = 1
     end
     print("[" .. Core.name .. "] Scheduling restart in " .. restartSeconds .. " seconds.")
-    Core.scheduleServerRestart(getTimestamp() + restartSeconds)
+    Core.scheduleRestart(getTimestamp() + restartSeconds)
 end
 
 Commands[Core.commands.players] = function(player, args)

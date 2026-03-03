@@ -26,6 +26,7 @@ local EDIT_W = W - EDIT_X - PAD
 local ROW_H = FONT_HGT_SMALL + 4
 local BTN_H = FONT_HGT_SMALL + 6
 local BTN_W = math.floor(90 * FONT_SCALE)
+local SOUND_W = math.floor(60 * FONT_SCALE)
 
 -- day labels; index matches os.date wday (1=Sun…7=Sat)
 local DAY_LABELS = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}
@@ -501,10 +502,19 @@ function UI:createChildren()
     controls.extraFieldLabel = extraFieldLabel
 
     ey = ey + ROW_H
-    local extraFieldEntry = ISTextEntryBox:new("", ex, ey, eow, ROW_H)
+    local extraFieldEntry = ISTextEntryBox:new("", ex, ey, eow - SOUND_W - PAD, ROW_H)
     extraFieldEntry:initialise()
     rightOutcomePanel:addChild(extraFieldEntry)
     controls.extraFieldEntry = extraFieldEntry
+
+    local announcementSoundCombo = ISComboBox:new(ex + eow - SOUND_W, ey, SOUND_W, ROW_H, self, nil)
+    announcementSoundCombo:initialise()
+    announcementSoundCombo:addOption("")
+    announcementSoundCombo:addOption("ding")
+    announcementSoundCombo.tooltip = "Sound to play with this announcement"
+    rightOutcomePanel:addChild(announcementSoundCombo)
+    controls.announcementSoundCombo = announcementSoundCombo
+
     ey = ey + ROW_H + PAD
 
     rightOutcomePanel:setHeight(ey)
@@ -549,7 +559,7 @@ function UI:createChildren()
     -- Warning input hint labels
     local wSecsW = math.floor(50 * FONT_SCALE)
     local wBtnW = math.floor(50 * FONT_SCALE)
-    local wTxtW = eow - wSecsW - wBtnW * 2 - PAD * 3
+    local wTxtW = eow - wSecsW - SOUND_W - wBtnW * 2 - PAD * 4
 
     local warnSecsHint = ISLabel:new(ex, ey, ROW_H, "Secs", C.textDim.r, C.textDim.g, C.textDim.b, C.textDim.a,
         UIFont.Small, true)
@@ -562,9 +572,16 @@ function UI:createChildren()
     warnMsgHint:initialise()
     rightWarningPanel:addChild(warnMsgHint)
     controls.warnMsgHint = warnMsgHint
+
+    local warnSoundHint = ISLabel:new(ex + wSecsW + PAD + wTxtW + PAD, ey, ROW_H, "Sound", C.textDim.r, C.textDim.g,
+        C.textDim.b, C.textDim.a, UIFont.Small, true)
+    warnSoundHint:initialise()
+    rightWarningPanel:addChild(warnSoundHint)
+    controls.warnSoundHint = warnSoundHint
+
     ey = ey + ROW_H
 
-    -- Warning input row: [secs] [text] [Add/Update] [Del]
+    -- Warning input row: [secs] [text] [sound] [Add/Update] [Del]
     local warnSecsEntry = ISTextEntryBox:new("", ex, ey, wSecsW, ROW_H)
     warnSecsEntry:initialise()
     warnSecsEntry:setTooltip(
@@ -578,7 +595,16 @@ function UI:createChildren()
     rightWarningPanel:addChild(warnTextEntry)
     controls.warnTextEntry = warnTextEntry
 
-    local wAddX = ex + wSecsW + PAD + wTxtW + PAD
+    local warnSoundX = ex + wSecsW + PAD + wTxtW + PAD
+    local warnSoundCombo = ISComboBox:new(warnSoundX, ey, SOUND_W, ROW_H, self, nil)
+    warnSoundCombo:initialise()
+    warnSoundCombo:addOption("")
+    warnSoundCombo:addOption("ding")
+    warnSoundCombo.tooltip = "Sound to play with this warning"
+    rightWarningPanel:addChild(warnSoundCombo)
+    controls.warnSoundCombo = warnSoundCombo
+
+    local wAddX = warnSoundX + SOUND_W + PAD
     local addWarnBtn = ISButton:new(wAddX, ey, wBtnW, BTN_H, "Add", self, self.onAddWarning)
     addWarnBtn:initialise()
     addWarnBtn:setTooltip("Add a new warning or save edits to the selected entry")
@@ -681,9 +707,11 @@ function UI:setEditVisible(visible)
                    self.controls.recurCombo, self.controls.daysLabel, self.controls.timesLabel, self.controls.timesList,
                    self.controls.timeEntry, self.controls.addTimeBtn, self.controls.removeTimeBtn,
                    self.controls.typeLabel, self.controls.typeCombo, self.controls.extraFieldLabel,
-                   self.controls.extraFieldEntry, self.controls.warnLabel, self.controls.warnList,
-                   self.controls.warnSecsHint, self.controls.warnMsgHint, self.controls.warnSecsEntry,
-                   self.controls.warnTextEntry, self.controls.addWarnBtn, self.controls.removeWarnBtn,
+                   self.controls.extraFieldEntry, self.controls.announcementSoundCombo,
+                   self.controls.warnLabel, self.controls.warnList,
+                   self.controls.warnSecsHint, self.controls.warnMsgHint, self.controls.warnSoundHint,
+                   self.controls.warnSecsEntry, self.controls.warnTextEntry, self.controls.warnSoundCombo,
+                   self.controls.addWarnBtn, self.controls.removeWarnBtn,
                    self.controls.saveBtn, self.controls.statusLabel}
     for _, w in ipairs(items) do
         if w then
@@ -762,13 +790,16 @@ function UI:loadScheduleIntoForm(idx)
     }
     self.controls.typeCombo.selected = typeMap[sch.type] or 1
 
-    -- extra field (event name or announcement message)
+    -- extra field (event name or announcement message) and announcement sound
     if sch.type == "event" then
         self.controls.extraFieldEntry:setText(sch.eventName or "")
+        self.controls.announcementSoundCombo.selected = 1
     elseif sch.type == "announcement" then
         self.controls.extraFieldEntry:setText(sch.announcementText or "")
+        self.controls.announcementSoundCombo.selected = (sch.announcementSound == "ding") and 2 or 1
     else
         self.controls.extraFieldEntry:setText("")
+        self.controls.announcementSoundCombo.selected = 1
     end
 
     -- warnings / countdowns
@@ -776,9 +807,12 @@ function UI:loadScheduleIntoForm(idx)
     for _, c in ipairs(sch.countdowns or {}) do
         local secs = tonumber(c.secs) or 0
         local text = c.text or ""
-        self.controls.warnList:addItem(string.format("%ds — %s", secs, text), {
+        local sound = c.sound or ""
+        local display = string.format("%ds — %s%s", secs, text, sound ~= "" and " [" .. sound .. "]" or "")
+        self.controls.warnList:addItem(display, {
             secs = secs,
-            text = text
+            text = text,
+            sound = sound ~= "" and sound or nil
         })
     end
 
@@ -821,6 +855,7 @@ function UI:refreshTypeVisibility()
     local showExtra = isEvent or isAnnounce
     self.controls.extraFieldLabel:setVisible(showExtra)
     self.controls.extraFieldEntry:setVisible(showExtra)
+    self.controls.announcementSoundCombo:setVisible(isAnnounce)
     if isEvent then
         self.controls.extraFieldLabel:setName("Event name")
         self.controls.extraFieldEntry:setTooltip("Name of the Lua event to trigger (e.g. OnPhunServerRestart)")
@@ -959,6 +994,7 @@ function UI:onWarnSelect(item, _)
         self.warnEditIdx = self.controls.warnList.selected
         self.controls.warnSecsEntry:setText(tostring(d.secs))
         self.controls.warnTextEntry:setText(d.text)
+        self.controls.warnSoundCombo.selected = (d.sound == "ding") and 2 or 1
         self.controls.addWarnBtn:setTitle("Update")
     end
 end
@@ -975,10 +1011,12 @@ function UI:onAddWarning()
         self:setStatus("Warning text cannot be empty", true)
         return
     end
-    local display = string.format("%ds — %s", secs, getText(text))
+    local sound = self.controls.warnSoundCombo.selected == 2 and "ding" or nil
+    local display = string.format("%ds — %s%s", secs, getText(text), sound and " [" .. sound .. "]" or "")
     local data = {
         secs = secs,
-        text = text
+        text = text,
+        sound = sound
     }
 
     if self.warnEditIdx and self.warnEditIdx <= #self.controls.warnList.items then
@@ -998,6 +1036,7 @@ function UI:onAddWarning()
     end)
     self.controls.warnSecsEntry:setText("")
     self.controls.warnTextEntry:setText("")
+    self.controls.warnSoundCombo.selected = 1
 end
 
 function UI:onRemoveWarning()
@@ -1009,6 +1048,7 @@ function UI:onRemoveWarning()
             self.warnEditIdx = nil
             self.controls.warnSecsEntry:setText("")
             self.controls.warnTextEntry:setText("")
+            self.controls.warnSoundCombo.selected = 1
             self.controls.addWarnBtn:setTitle("Add")
         end
     end
@@ -1150,13 +1190,16 @@ function UI:onSave()
         local en = self.controls.extraFieldEntry:getText():match("^%s*(.-)%s*$")
         sch.eventName = (en ~= "") and en or nil
         sch.announcementText = nil
+        sch.announcementSound = nil
     elseif sch.type == "announcement" then
         local at = self.controls.extraFieldEntry:getText():match("^%s*(.-)%s*$")
         sch.announcementText = (at ~= "") and at or nil
+        sch.announcementSound = self.controls.announcementSoundCombo.selected == 2 and "ding" or nil
         sch.eventName = nil
     else
         sch.eventName = nil
         sch.announcementText = nil
+        sch.announcementSound = nil
     end
 
     -- Warnings / countdowns
@@ -1166,7 +1209,8 @@ function UI:onSave()
         if d then
             table.insert(sch.countdowns, {
                 secs = d.secs,
-                text = d.text
+                text = d.text,
+                sound = d.sound
             })
         end
     end

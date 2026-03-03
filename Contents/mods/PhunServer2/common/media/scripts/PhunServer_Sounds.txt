@@ -1,6 +1,6 @@
 module Base {
 
-    sound restartNotice
+    sound ding
     {
         category = Player, loop = false, is3D = false,
         clip { file = media/sound/restart-notice.mp3, distanceMax = 20, volume = 1, reverbFactor = 0, }
