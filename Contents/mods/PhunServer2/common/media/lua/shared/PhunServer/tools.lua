@@ -128,6 +128,39 @@ function tools.absDifference(time1, time2, opts)
     return tools.secondsToText(diff, opts)
 end
 
+-- Define time intervals in seconds
+local SECONDS_IN_MINUTE = 60
+local SECONDS_IN_HOUR = 60 * 60
+local SECONDS_IN_DAY = 24 * 60 * 60
+local SECONDS_IN_MONTH = 30 * SECONDS_IN_DAY -- approximate
+local SECONDS_IN_YEAR = 365 * SECONDS_IN_DAY -- approximate
+
+-- Convert a seconds duration into components (largest -> smallest).
+-- Returns years, months, days, hours, minutes, seconds (all >= 0).
+function tools.secondsToComponents(totalSeconds)
+    local diff = math.floor(tonumber(totalSeconds) or 0)
+    if diff <= 0 then
+        return 0, 0, 0, 0, 0, 0
+    end
+
+    local years = math.floor(diff / SECONDS_IN_YEAR)
+    diff = diff % SECONDS_IN_YEAR
+
+    local months = math.floor(diff / SECONDS_IN_MONTH)
+    diff = diff % SECONDS_IN_MONTH
+
+    local days = math.floor(diff / SECONDS_IN_DAY)
+    diff = diff % SECONDS_IN_DAY
+
+    local hours = math.floor(diff / SECONDS_IN_HOUR)
+    diff = diff % SECONDS_IN_HOUR
+
+    local minutes = math.floor(diff / SECONDS_IN_MINUTE)
+    local seconds = diff % SECONDS_IN_MINUTE
+
+    return years, months, days, hours, minutes, seconds
+end
+
 function tools.secondsToText(totalSeconds, opts)
     opts = opts or {}
     local maxParts = tonumber(opts.maxParts) or 1
@@ -148,7 +181,8 @@ function tools.secondsToText(totalSeconds, opts)
 
     local function addPart(value, singularKey, pluralKey)
         if value > 0 and #parts < maxParts then
-            table.insert(parts, tSingPlural(singularKey, pluralKey, value))
+            local key = value == 1 and singularKey or pluralKey
+            table.insert(parts, getText(key, value))
         end
     end
 

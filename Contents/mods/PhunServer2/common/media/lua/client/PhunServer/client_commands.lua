@@ -85,7 +85,7 @@ end
 Commands[Core.commands.scheduleData] = function(args)
     if Core.ui.schedulePanel then
         local c = Core.ui.schedulePanel
-        c:onDataReceived(args.schedules or {}, args.saved)
+        c:onDataReceived(args.schedules or {}, args.saved, args.runningScheduleName)
     end
 end
 

@@ -151,7 +151,8 @@ end
 Commands[Core.commands.getSchedules] = function(player, args)
     if not Core.tools.isAdmin(player) then return end
     sendServerCommand(player, Core.name, Core.commands.scheduleData, {
-        schedules = Core.getSchedule()
+        schedules = Core.getSchedule(),
+        runningScheduleName = Core.runningScheduleName
     })
 end
 
@@ -160,7 +161,39 @@ Commands[Core.commands.saveSchedules] = function(player, args)
     Core.saveSchedules(args.schedules or {})
     sendServerCommand(player, Core.name, Core.commands.scheduleData, {
         schedules = Core.getSchedule(),
-        saved = true
+        saved = true,
+        runningScheduleName = Core.runningScheduleName
+    })
+end
+
+Commands[Core.commands.triggerSchedule] = function(player, args)
+    if not Core.tools.isAdmin(player) then return end
+    local name = args and args.name
+    if not name then return end
+    local schedules = Core.getSchedule()
+    for _, s in ipairs(schedules) do
+        if s.name == name then
+            print("[" .. Core.name .. "] Schedule '" .. name .. "' manually triggered by " .. player:getUsername())
+            Core.fireSchedule(s)
+            break
+        end
+    end
+    sendServerCommand(player, Core.name, Core.commands.scheduleData, {
+        schedules = Core.getSchedule(),
+        runningScheduleName = Core.runningScheduleName
+    })
+end
+
+Commands[Core.commands.stopSchedule] = function(player, args)
+    if not Core.tools.isAdmin(player) then return end
+    if Core.restartingAt then
+        Core.restartingAt = nil
+        Core.runningScheduleName = nil
+        print("[" .. Core.name .. "] Pending restart cancelled by " .. player:getUsername())
+    end
+    sendServerCommand(player, Core.name, Core.commands.scheduleData, {
+        schedules = Core.getSchedule(),
+        runningScheduleName = Core.runningScheduleName
     })
 end
 

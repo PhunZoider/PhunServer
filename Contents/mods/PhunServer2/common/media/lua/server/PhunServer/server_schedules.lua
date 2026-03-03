@@ -98,6 +98,7 @@ function Core.fireSchedule(schedule)
     triggerEvent(Core.events.OnSchedule, schedule)
 
     if schedule.type == "restart" then
+        Core.runningScheduleName = schedule.name
         local delaySecs = Core.getOption("RestartDelayMinutes", 5) * 60
         if delaySecs < 1 then delaySecs = 1 end
         Core.scheduleServerRestart(getTimestamp() + delaySecs, schedule.countdowns)
@@ -164,7 +165,7 @@ function Core.checkSchedules()
     local now = os.date("*t")
 
     for _, schedule in ipairs(schedules) do
-        if schedule.enabled and schedule.trigger ~= "workshop" then
+        if schedule.enabled and schedule.trigger == "cron" then
 
             local dayMatch = true
             if schedule.recur == "weekly" then

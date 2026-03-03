@@ -26,7 +26,9 @@ PhunServer = {
         schedule = "schedule",
         getSchedules = "getSchedules",
         saveSchedules = "saveSchedules",
-        scheduleData = "scheduleData"
+        scheduleData = "scheduleData",
+        triggerSchedule = "triggerSchedule",
+        stopSchedule = "stopSchedule"
     },
     tools = require "PhunServer/tools",
     events = {
