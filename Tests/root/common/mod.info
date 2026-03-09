@@ -3,5 +3,5 @@ id=phunservertest
 author=UburGeek
 description=Restart and announce on mod updates
 poster=poster.png
-require=\phunlib
+require=phunlib
 icon=icon.png
