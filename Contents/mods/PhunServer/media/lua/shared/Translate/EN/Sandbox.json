@@ -1,0 +1,115 @@
+{
+    "Sandbox_PhunServer_Other": "PhunServer: Misc",
+    "Sandbox_PhunServer_ModWatch": "PhunServer: ModWatch",
+    "Sandbox_PhunServer_Announcements": "PhunServer: Announcements",
+    "Sandbox_PhunServer_Cycles": "PhunServer: Cycles",
+
+    "Sandbox_PhunServer_Map": "PhunServer: Maps",
+
+    "Sandbox_PhunServer_NotificationCountdown": "Countdown",
+    "Sandbox_PhunServer_NotificationCountdown_tooltip": "A semi comma separated string of seconds between notification to clients",
+
+    "Sandbox_PhunServer_EnableModWatch": "Enable",
+    "Sandbox_PhunServer_EnableModWatch_tooltip": "When ticked, will poll Steam for updates to your servers mods and insigate a reboot if any are found. Untick to disable",
+
+    "Sandbox_PhunServer_EnableDayNightChange": "Enable",
+    "Sandbox_PhunServer_EnableDayNightChange_tooltip": "When ticked, the below options will change the speed of your day and/or night cycles. Untick to disable these changes",
+
+    "Sandbox_PhunServer_RestartDelayMinutes": "Mod Update Notice",
+    "Sandbox_PhunServer_RestartDelayMinutes_tooltip": "Default number of mins to give players notice of restart",
+
+    "Sandbox_PhunServer_QuitDelaySeconds": "Quit Delay",
+    "Sandbox_PhunServer_QuitDelaySeconds_tooltip": "Number of seconds after the final save to wait before quitting server",
+
+    "Sandbox_PhunServer_WorkshopPollingIntervalMinutes": "Check for updates",
+    "Sandbox_PhunServer_WorkshopPollingIntervalMinutes_tooltip": "Number of minutes between checking for changes to workshop",
+
+    "Sandbox_PhunServer_WelcomeAnnounce": "Welcome Players",
+    "Sandbox_PhunServer_WelcomeAnnounce_tooltip": "Announce when players join",
+
+    "Sandbox_PhunServer_WelcomeAnnounceText": "Custom Welcome",
+    "Sandbox_PhunServer_WelcomeAnnounceText_tooltip": "If there is a value specified, PhunServer will use this text instead of the default welcome. Use %1 as a placeholder for the players name. eg Welcome to the server %1",
+
+    "Sandbox_PhunServer_GoodbyeAnnouncements": "Player Goodbye",
+    "Sandbox_PhunServer_GoodbyeAnnouncements_tooltip": "Announce when players leave",
+
+    "Sandbox_PhunServer_GoodbyeAnnouncementText": "Custom Goodbye",
+    "Sandbox_PhunServer_GoodbyeAnnouncementText_tooltip": "If there is a value specified, PhunServer will use this text instead of the default goodbye. Use %1 as a placeholder for the players name. eg Goodbye %1",
+
+    "Sandbox_PhunServer_ColorUsernames": "Color Username",
+    "Sandbox_PhunServer_ColorUsernames_tooltip": "Highlight known usernames in chat",
+
+    "Sandbox_PhunServer_ColorUsernameText": "Custom Color",
+    "Sandbox_PhunServer_ColorUsernameText_tooltip": "The RGB values to use instead of the default 255,255,255 leave blank for default",
+
+    "Sandbox_PhunServer_ReplaceMusic": "Replace img",
+    "Sandbox_PhunServer_ReplaceMusic_tooltip": "Replace [image=music] clutter in text with a little cute music note",
+
+    "Sandbox_PhunServer_ReplaceRadio": "Replace radio",
+    "Sandbox_PhunServer_ReplaceRadio_tooltip": "Replace radio prefix with symbol to declutter chat",
+
+    "Sandbox_PhunServer_NotificationChime": "Chime",
+    "Sandbox_PhunServer_NotificationChime_tooltip": "Play a chime when notifying user of impending restart",
+
+    "Sandbox_PhunServer_Players": "/Players",
+    "Sandbox_PhunServer_Players_tooltip": "Allow players to see who is online by typing /players into chat",
+
+    "Sandbox_PlayersCommand_option1": "Disable",
+    "Sandbox_PlayersCommand_option2": "Allow admin",
+    "Sandbox_PlayersCommand_option3": "Allow all",
+
+    "Sandbox_PhunServer_PlayersOffline24": "Include recent",
+    "Sandbox_PhunServer_PlayersOffline24_tooltip": "Include the list of players that have been online in the last 24 hours",
+
+    "Sandbox_PhunServer_PlayersUpdateMs": "Update frequency",
+    "Sandbox_PhunServer_PlayersUpdateMs_tooltip": "Frequency in which to scan online players. 1000 = every second and should be a decent default",
+
+    "Sandbox_PhunServer_PlayersOnMap": "Players on Map (deprecated)",
+    "Sandbox_PhunServer_PlayersOnMap_tooltip": "Show markers of player positions on map. Requires client restart. If you want this feature in B42+, you should disabled this and set MapRemotePlayerVisibility to 1 in your server ini",
+
+    "Sandbox_PhunServer_PlayersOnMiniMap": "Players on Mini Map (deprecated)",
+    "Sandbox_PhunServer_PlayersOnMiniMap_tooltip": "Show player positions on mini map. Requires client restart. If you want this feature in B42+, you should disable this and set MapRemotePlayerVisibility to 1 in your server ini",
+
+    "Sandbox_PlayersOnMap_option1": "Disable",
+    "Sandbox_PlayersOnMap_option2": "All",
+    "Sandbox_PlayersOnMap_option3": "Faction",
+
+    "Sandbox_PhunServer_DaySpeed": "Day Speed",
+    "Sandbox_PhunServer_DaySpeed_tooltip": "The speed at which daytime passes",
+
+    "Sandbox_PhunServer_DayOffset": "Dawn offset",
+    "Sandbox_PhunServer_DayOffset_tooltip": "+/- hours from dawn in which to trigger Day Speed",
+
+    "Sandbox_PhunServer_NightSpeed": "Night Speed",
+    "Sandbox_PhunServer_NightSpeed_tooltip": "The speed at which night passes",
+
+    "Sandbox_PhunServer_NightOffset": "Dusk offset",
+    "Sandbox_PhunServer_NightOffset_tooltip": "+/- hours from dusk in which to trigger Night Speed",
+
+    "Sandbox_PhunServer_WipeKey": "Wipe Key",
+    "Sandbox_PhunServer_WipeKey_tooltip": "Changing this value (as long as it isn't empty) will cause players to rewipe map on next login. A good rule of thumb here is to enter the version/season number. If a player comes back to the server and the season has changed... pop... there goes their map!",
+
+    "Sandbox_PhunServer_WipePerCharacter": "Wipe Per Character",
+    "Sandbox_PhunServer_WipePerCharacter_tooltip": "Wipes the map whenever the players character dies and they create a new one. A bit hardcore if you ask me, but you didn't did you?",
+
+    "Sandbox_PhunServer_EnableWipeMap": "Enable Map Wipes",
+    "Sandbox_PhunServer_EnableWipeMap_tooltip": "Untick to disable map wipe checks",
+
+    "Sandbox_PhunServer_WipeMap": "Wipe Map",
+    "Sandbox_PhunServer_WipeMap_tooltip": "Turn to false to skip erasure of the main map, even if the key changes",
+
+    "Sandbox_PhunServer_WipeSymbols": "Wipe symbols",
+    "Sandbox_PhunServer_WipeSymbols_tooltip": "Turn this off to skip erasure of symbols even if the key changes",
+
+    "Sandbox_PhunServer_Debug": "Debug",
+    "Sandbox_PhunServer_Debug_tooltip": "Tick this to get more verbose debug info in your logs",
+
+    "Sandbox_PhunServer_SetHours": "/SetHours",
+    "Sandbox_PhunServer_SetHours_tooltip": "When ticked, allows admins or mods to set players hours survived using the format /sethours playername x. Note that player must be online. Playername is optional, if omitted it targets self",
+
+    "Sandbox_PhunServer_GetHours": "/Hours",
+    "Sandbox_PhunServer_GetHours_tooltip": "When ticked, allows players to view hours survived using the format /hours. Admins or mods can use /hours username (though the player needs to be online)",
+
+    "Sandbox_PhunServer_RefreshSettingsOnStartup": "Fix Settings Cache Bug",
+    "Sandbox_PhunServer_RefreshSettingsOnStartup_tooltip": "When ticked, we will refresh your settings with those found in your Sandbox_Vars.lua file. This is to workaround a bug in the current build where your settings get cached and subsequent changes ignored."
+}

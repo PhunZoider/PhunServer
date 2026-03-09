@@ -144,6 +144,8 @@ function Core.usernameMessage(translation, username, color)
 end
 
 function Core.message(text, args, options)
+    local a = getTextOrNull(text)
+    local b = getText(text)
     local txt = getTextOrNull(text, unpack(args or {})) or text
     options = options or {
         color = "<RGB:255,255,0>"

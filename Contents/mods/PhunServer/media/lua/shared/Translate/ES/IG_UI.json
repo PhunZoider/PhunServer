@@ -1,0 +1,40 @@
+{
+    "IGUI_PhunServer_One": "El servidor se reinicia en 1 minuto",
+    "IGUI_PhunServer_Left": "El servidor se reinicia en %1 minutos",
+    "IGUI_PhunServer_Second": "El servidor se reinicia en %1 segundo",
+    "IGUI_PhunServer_Seconds": "El servidor se reinicia en %1 segundos",
+
+    "IGUI_PhunServer_WelcomeBack": "Bienvenido de nuevo %1",
+    "IGUI_PhunServer_Welcome0": "Bienvenido de nuevo %1",
+    "IGUI_PhunServer_Welcome1": "%1 has regresado",
+    "IGUI_PhunServer_Welcome2": "%1 has regresado",
+    "IGUI_PhunServer_Welcome3": "%1 ha vuelto por mas",
+
+    "IGUI_PhunServer_WelcomeFirstTime": "%1 ha ingresado al apocalipsis!",
+    "IGUI_PhunServer_WelcomeMyFirstTime": "Bienvenido al apocalipsis %1",
+
+    "IGUI_PhunServer_Goodbye0": "%1 se ha ido",
+    "IGUI_PhunServer_Goodbye1": "%1 se ha retirado",
+    "IGUI_PhunServer_Goodbye2": "%1 ha desaparecido",
+    "IGUI_PhunServer_Goodbye3": "%1 ha salido",
+
+    "IGUI_PhunServer_NoAccess": "No tienes suficiente acceso para este comando",
+    "IGUI_PhunServer_PlayerOnline": "Estas completamente solo",
+    "IGUI_PhunServer_PlayersOnline": "%1 Jugadores en linea: %2",
+
+    "IGUI_PhunServer_NoOtherPlayerOnline": "Sos el unico jugador en linea",
+    "IGUI_PhunServer_OneOtherPlayerOnline": "Solo vos y %1 estan en linea",
+    "IGUI_PhunServer_OtherPlayersOnline": "Hay %1 en linea: %2 y vos",
+
+    "IGUI_PhunServer_NoOtherPlayerOffline24": "Nadie mas ha estado en linea recientemente",
+    "IGUI_PhunServer_OneOtherPlayerOffline24": "%1 estuvo recientemente",
+    "IGUI_PhunServer_OtherPlayersOffline24": "%%1 otros han estado conectados recientemente: %2",
+
+    "IGUI_PhunServer_PlayerToday": "Nadie mas ha estado hoy",
+    "IGUI_PhunServer_PlayersToday": "%1 jugadores han estado conectados hoy: %2",
+
+    "IGUI_PhunServer_Poll_PendingReboot": "No se puede sondear el workshop porque se esta reiniciando",
+    "IGUI_PhunServer_Poll_NoIDs": "No hay ID de workshop para consultar. Es posible que no estes conectado a Steam.",
+    "IGUI_PhunServer_Poll_UpdatedPlural": "Hay %1 mods desactualizados: %1",
+    "IGUI_PhunServer_Poll_Updated": "%1 mod est1 desactualizado"
+}
