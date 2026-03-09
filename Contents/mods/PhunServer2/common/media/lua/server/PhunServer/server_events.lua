@@ -44,6 +44,20 @@ Events.OnDisconnect.Add(function()
     end
 end)
 
+local function getWorkshopPollInterval()
+    local minInterval = nil
+    if Core.getSchedule then
+        for _, s in ipairs(Core.getSchedule()) do
+            if s.enabled and s.trigger == "workshop" and s.workshopFrequency and s.workshopFrequency > 0 then
+                if not minInterval or s.workshopFrequency < minInterval then
+                    minInterval = s.workshopFrequency
+                end
+            end
+        end
+    end
+    return minInterval or 15
+end
+
 local nextPoll = 0
 local lastPoll = 0
 local nextPlayerCheck = getTimestamp()
@@ -79,15 +93,7 @@ Events.OnTickEvenPaused.Add(function()
 
     if timestamp >= nextPoll then
 
-        local pollIntervalMins = Core.getOption("WorkshopPollingIntervalMinutes", 15)
-        if Core.getSchedule then
-            for _, s in ipairs(Core.getSchedule()) do
-                if s.enabled and s.trigger == "workshop" and s.workshopFrequency and s.workshopFrequency > 0 then
-                    pollIntervalMins = s.workshopFrequency
-                    break
-                end
-            end
-        end
+        local pollIntervalMins = getWorkshopPollInterval()
         nextPoll = timestamp + (pollIntervalMins * 60)
 
         if Core.getOption("EnableModWatch") == true then

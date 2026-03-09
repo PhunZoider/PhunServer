@@ -317,8 +317,10 @@ function UI:createChildren()
     self:addChild(controls.rightTopPanel)
 
     -- Status bar: full-width, centered above both panels
-    local statusLabel = ISLabel:new(0, ROW_H + PAD * 2, ROW_H, "", C.textDim.r, C.textDim.g, C.textDim.b, C.textDim.a, UIFont.Small)
+    local statusLabel = ISLabel:new(0, ROW_H + PAD * 2, ROW_H, "", C.textDim.r, C.textDim.g, C.textDim.b, C.textDim.a,
+        UIFont.Small)
     statusLabel.center = true
+    statusLabel.width = W
     statusLabel:initialise()
     self:addChild(statusLabel)
     controls.statusLabel = statusLabel
@@ -706,7 +708,9 @@ function UI:prerender()
     controls.bottomPanel:setX(rpx)
     controls.bottomPanel:setWidth(controls.rightTopPanel.width)
     controls.saveBtn:setX(controls.bottomPanel.width - controls.saveBtn.width - PAD)
-    controls.statusLabel:setWidth(self.width)
+    local textWidth = getTextManager():MeasureStringX(UIFont.Small, controls.statusLabel.text)
+    controls.statusLabel:setWidth(textWidth)
+    controls.statusLabel:setX(self.width / 2 - textWidth / 2)
 
 end
 
