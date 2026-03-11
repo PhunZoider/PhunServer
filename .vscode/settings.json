@@ -17,10 +17,10 @@
                 "match": ".*",
                 "cmd": "rmdir /S /Q ${env.USERPROFILE}\\Zomboid\\mods\\PhunServer\\Tests 2>nul"
             },            
-            // copy src/media/* from dest to dest/42.0.0
+            // copy src/media/* from dest to dest/common
             {
                 "match": ".*",
-                "cmd": "xcopy ${workspaceFolder}\\Contents\\mods\\PhunServer\\media ${env.USERPROFILE}\\Zomboid\\mods\\PhunServer\\42.0.0\\media /Y /I /E /F"
+                "cmd": "xcopy ${workspaceFolder}\\Contents\\mods\\PhunServer\\media ${env.USERPROFILE}\\Zomboid\\mods\\PhunServer\\common\\media /Y /I /E /F"
             },
             // copy src/common to dest/common
             {
