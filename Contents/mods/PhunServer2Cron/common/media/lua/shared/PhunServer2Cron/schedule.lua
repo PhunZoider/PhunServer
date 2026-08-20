@@ -240,8 +240,10 @@ end
 -- WHEN DOES THIS JOB NEXT COME DUE?
 -- ---------------------------------------------------------------------------
 
--- Seconds until the next 'at' occurrence, or nil if no allowed day within a
--- week (which can only happen with an empty day filter).
+-- Seconds until the next 'at' occurrence: zero when it is due this very
+-- second, otherwise positive. Looks a full week ahead so a day filter of a
+-- single weekday still resolves. nil should be unreachable, since normalise
+-- rejects both an empty 'at' list and an empty 'days' list.
 local function secondsUntilAt(job, nowSecs, nowDow)
     local best = nil
     for dayOffset = 0, 7 do
@@ -249,7 +251,8 @@ local function secondsUntilAt(job, nowSecs, nowDow)
         if schedule.dayAllowed(job, dow) then
             for _, t in ipairs(job.at) do
                 local delta = (dayOffset * 86400) + t - nowSecs
-                -- Strictly future, so a job never re-fires within its own second
+                -- Never negative: a time already past today is picked up by a
+                -- later dayOffset instead.
                 if delta >= 0 and (best == nil or delta < best) then
                     best = delta
                 end
@@ -293,7 +296,9 @@ function schedule.secondsUntilDue(job, nowSecs, nowDow, lastRun, nowEpoch)
     if delta < 0 then
         delta = 0
     end
-    if not schedule.inWindow(job, nowSecs + delta) then
+    -- Wrap into the day: an interval that carries us past midnight would
+    -- otherwise be compared against a seconds-of-day range it can't fall in.
+    if not schedule.inWindow(job, (nowSecs + delta) % 86400) then
         return nil
     end
     return delta
