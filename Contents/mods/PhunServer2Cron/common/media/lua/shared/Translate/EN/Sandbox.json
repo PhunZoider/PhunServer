@@ -1,0 +1,19 @@
+{
+  "Sandbox_PhunServer2_Cron": "PhunServer2: Cron",
+  "Sandbox_PhunServer2_ModWatch": "PhunServer2: ModWatch",
+
+  "Sandbox_PhunServer2Cron_EnableCron": "Enable",
+  "Sandbox_PhunServer2Cron_EnableCron_tooltip": "Untick to stop all scheduled jobs from running. Your job file is left alone.",
+
+  "Sandbox_PhunServer2Cron_SeedDefaults": "Create Default Jobs",
+  "Sandbox_PhunServer2Cron_SeedDefaults_tooltip": "When no job file exists, write one containing a five minute mod-update check. Untick if you would rather start from an empty schedule.",
+
+  "Sandbox_PhunServer2Cron_EnableModWatch": "Enable",
+  "Sandbox_PhunServer2Cron_EnableModWatch_tooltip": "When ticked, mod-update checks poll Steam and trigger a shutdown if any of your workshop mods have been updated. Untick to disable without removing the job.",
+
+  "Sandbox_PhunServer2Cron_RestartDelayMinutes": "Mod Update Notice",
+  "Sandbox_PhunServer2Cron_RestartDelayMinutes_tooltip": "Minutes of notice players get before the server shuts down for a mod update",
+
+  "Sandbox_PhunServer2Cron_PollOnDisconnect": "Check On Disconnect",
+  "Sandbox_PhunServer2Cron_PollOnDisconnect_tooltip": "Also check for mod updates whenever a player leaves. An empty server is the cheapest time to restart."
+}

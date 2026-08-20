@@ -1,100 +1,180 @@
 version=1
-id=3623897097
-title=PhunServer Tools
-description=PhunServer is an essential lightweight mod for multiplayer Project Zomboid servers.
-description=Designed for admins who want automation, safety, and quality-of-life without babysitting their server.
-description=[h2]TL;DR[/h2]
-description=[list]
-description=[*]Automatically monitors Workshop mods and can trigger a controlled shutdown when updates are detected
-description=[*]Provides useful admin and player commands (/players, /hours, /sethours)
-description=[*]Supports resetting the players map when seasons change or even if the player dies
-description=[*]Allows independent day/night speeds
-description=[*]Adds optional chat quality-of-life features (greetings, cleaner radio/music output)
-description=[/list]
+id=
+title=PhunServer 2
+description=PhunServer 2 is a set of lightweight, independent server tools for multiplayer Project Zomboid.
+description=Add only the pieces you actually want. Every module is its own mod id, so a server that just wants mod-update restarts never loads chat overrides or day/night code.
 description=
-description=[h2]PhunServer: Misc[/h2]
-description=Various commands and server-side quality-of-life settings.
+description=[b]This is a rewrite of [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3623897097]PhunServer Tools[/url] and replaces it.[/b] Settings are NOT carried over - the sandbox options have moved to per-module names. See the migration table at the bottom.
+description=
+description=[h2]Modules[/h2]
+description=[table]
+description=[tr][th]Mod Id[/th][th]What it does[/th][/tr]
+description=[tr][td][b]phunserver2[/b][/td][td]Required by all the others. Shared plumbing, verbose logging, player tracking and the shutdown machinery.[/td][/tr]
+description=[tr][td][b]phunserver2cron[/b][/td][td]Scheduled jobs on a real-world clock, plus ModWatch.[/td][/tr]
+description=[tr][td][b]phunserver2commands[/b][/td][td]The /players, /hours and /sethours chat commands.[/td][/tr]
+description=[tr][td][b]phunserver2chat[/b][/td][td]Join and leave announcements, username highlighting, tidier radio and music lines.[/td][/tr]
+description=[tr][td][b]phunserver2daynight[/b][/td][td]Independent day and night speeds with dawn and dusk offsets.[/td][/tr]
+description=[tr][td][b]phunserver2wiper[/b][/td][td]Map and symbol wipes on a season change or a new character.[/td][/tr]
+description=[/table]
+description=
+description=Example, mod-update restarts and nothing else:
+description=[code]Mods=phunserver2;phunserver2cron[/code]
+description=
+description=[h2]PhunServer 2: Core[/h2]
+description=Required by every other module. On its own it does nothing player-facing, but it owns the shutdown countdown that the other modules use, so its settings apply to every restart however it was triggered.
 description=
 description=Related commands:
 description=[list]
-description=[*][b]/players[/b] – Shows all online players. Can optionally include players who have been online in the last 24 hours by ticking the [b]Include Recent[/b] option.
-description=[*][b]/hours <username?>[/b] – Returns hours survived. If no username is supplied (or the user is not an admin/mod), the issuing player is used. Target player must be online.
-description=[*][b]/sethours <username?> <number>[/b] – Sets a player’s hours survived. Admins and moderators only. Target player must be online.
+description=[*][b]/restart <minutes?>[/b] - Start a restart countdown. With no argument the ModWatch notice period is used.
+description=[*][b]/cancelrestart[/b] - Cancel a pending restart.
 description=[/list]
 description=
 description=[table]
 description=[tr][th]Setting[/th][th]Description[/th][/tr]
-description=[tr][td][b]Players[/b][/td][td]Allow use of the /players command in chat to display online players[/td][/tr]
-description=[tr][td][b]Include Recent Players[/b][/td][td]When using /players, also display players who have been online in the past 24 hours[/td][/tr]
-description=[tr][td][b]Hours[/b][/td][td]Allow players to use /hours to display their own hours survived. Admins and moderators may query others[/td][/tr]
-description=[tr][td][b]Set Hours[/b][/td][td]Allow admins or moderators to update a player’s hours survived[/td][/tr]
-description=[tr][td][b]Debug[/b][/td][td]Enable more verbose debug output in the console and logs[/td][/tr]
+description=[tr][td][b]Verbose[/b][/td][td]Detailed logging for every PhunServer 2 module. One switch, not seven.[/td][/tr]
+description=[tr][td][b]Fix Settings Cache Bug[/b][/td][td]Reload sandbox settings at startup, working around a build bug where edits are ignored.[/td][/tr]
+description=[tr][td][b]Countdown[/b][/td][td]Semicolon separated seconds at which to warn players before a shutdown.[/td][/tr]
+description=[tr][td][b]Chime[/b][/td][td]Play a sound with each shutdown warning.[/td][/tr]
+description=[tr][td][b]Quit Delay[/b][/td][td]Seconds to wait after the final save before quitting.[/td][/tr]
 description=[/table]
 description=
-description=[h2]PhunServer: Chat[/h2]
-description=Ensure your players feel seen.
+description=[h2]PhunServer 2: Cron[/h2]
+description=Schedule shutdowns, announcements, mod-update checks or arbitrary Lua events against the real-world clock.
 description=
-description=[table]
-description=[tr][th]Setting[/th][th]Description[/th][/tr]
-description=[tr][td][b]Welcome Players[/b][/td][td]Send a notice to all players when someone joins or returns[/td][/tr]
-description=[tr][td][b]Custom Welcome[/b][/td][td]Use a custom string to announce a player joining or returning. You can use %1 as the placeholder for the player. eg "%1 has joined". Leave blank for the default[/td][/tr]
-description=[tr][td][b]Player Goodbye[/b][/td][td]Send a notice to all players when someone logs off[/td][/tr]
-description=[tr][td][b]Custom Goodbye[/b][/td][td]Use a custom string to announce a player has left. You can use %1 as the placeholder for the player. eg "%1 has left". Leave blank for the default[/td][/tr]description=[tr][td][b]Replace img[/b][/td][td]Replace [image=music] tags in chat text with a music note icon. It’s prettier and cleaner. If you prefer uglier and dirtier, untick this[/td][/tr]
-description=[tr][td][b]Color Usernames[/b][/td][td]Highlight known usernames in text[/td][/tr]
-description=[tr][td][b]Custom Color[/b][/td][td]The RGB values to use instead of the default 255,255,255 leave blank for default[/td][/tr]
-description=[tr][td][b]Replace Radio[/b][/td][td]Replace the prefix Radio(station#): with a speaker icon. This looks cleaner but removes the station source info[/td][/tr]
-description=[/table]
+description=Jobs are defined in [b]<Zomboid>/Lua/PhunServer2Cron.txt[/b]. If that file does not exist it is created for you with a five minute mod-update check, so a fresh install behaves like the old ModWatch did.
 description=
-description=[h2]PhunServer: ModWatch[/h2]
-description=Automatically monitor the Steam Workshop and trigger a controlled server shutdown when one or more mods have been updated.
-description=Heavily inspired by the excellent [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2844315442]Udderly Up To Date[/url], which I otherwise could not live without.
+description=[code]
+description=return {
+description=  version = 1,
+description=  data = {
+description=    ["nightly-restart"] = {
+description=      enabled = true,
+description=      action  = "shutdown",
+description=      args    = { notice = 15 },
+description=      at      = {"03:00", "15:00"},
+description=      announcements = {
+description=        { before = 1800, text = "Server restarts in half an hour" },
+description=      },
+description=    },
+description=    ["modwatch"] = {
+description=      enabled = true, action = "modcheck",
+description=      every = 5, everyUnit = "minutes",
+description=    },
+description=    ["happy-hour"] = {
+description=      enabled = true, action = "announce",
+description=      args = { text = "Loot respawn is boosted for the next hour" },
+description=      at = {"20:00"}, days = {"fri"},
+description=    },
+description=  },
+description=}
+description=[/code]
 description=
-description=[b]Important:[/b] PhunServer does not restart your server automatically. It can trigger a shutdown, but you will still need a host, cron job, or service to bring the server back online. Once restarted, Steam will automatically update mods.
+description=A job uses one of two timing modes:
+description=[list]
+description=[*][b]at[/b] - a list of HH:MM clock times, optionally filtered by [b]days[/b]
+description=[*][b]every[/b] + [b]everyUnit[/b] - an interval in minutes, hours or days, optionally confined to a [b]startTime[/b] to [b]endTime[/b] window
+description=[/list]
+description=
+description=Available actions: [b]shutdown[/b], [b]announce[/b], [b]modcheck[/b], [b]event[/b]. Other mods can register their own.
+description=
+description=Note that [b]at[/b] is the time the job's effect lands, not when it starts. A shutdown at 03:00 with 15 minutes of notice begins its countdown at 02:45 so the server is genuinely down at 03:00.
 description=
 description=Related commands:
 description=[list]
-description=[*][b]/check[/b] – Immediately checks the workshop for updated mods and triggers a restart countdown if any are found
-description=[*][b]/restart <minutes?>[/b] – Trigger a restart with an optional countdown (0 = immediate). If omitted, the configured Countdown setting is used
+description=[*][b]/check[/b] - Check the workshop for updated mods right now.
+description=[*][b]/cron reload[/b] - Re-read the job file without restarting.
+description=[/list]
+description=
+description=[b]Important:[/b] PhunServer does not restart your server. It shuts it down cleanly; bringing it back up (and thereby letting Steam apply mod updates) is your host's or a service's job.
+description=
+description=ModWatch is heavily inspired by the excellent [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2844315442]Udderly Up To Date[/url].
+description=
+description=[table]
+description=[tr][th]Setting[/th][th]Description[/th][/tr]
+description=[tr][td][b]Enable[/b][/td][td]Untick to stop all scheduled jobs running. Your job file is left alone.[/td][/tr]
+description=[tr][td][b]Create Default Jobs[/b][/td][td]Write a starter job file when none exists.[/td][/tr]
+description=[tr][td][b]Enable ModWatch[/b][/td][td]Allow mod-update checks to poll Steam and trigger a shutdown.[/td][/tr]
+description=[tr][td][b]Mod Update Notice[/b][/td][td]Minutes of notice before a mod-update shutdown.[/td][/tr]
+description=[tr][td][b]Check On Disconnect[/b][/td][td]Also check for updates when a player leaves - an empty server is the cheapest time to restart.[/td][/tr]
+description=[/table]
+description=
+description=[h2]PhunServer 2: Commands[/h2]
+description=[list]
+description=[*][b]/players[/b] - Show who is online, optionally including anyone on in the last 24 hours.
+description=[*][b]/hours <username?>[/b] - Hours survived. Admins and moderators can query another online player.
+description=[*][b]/sethours <username?> <number>[/b] - Set a player's hours survived. Admins and moderators only.
+description=[/list]
+description=
+description=[h2]PhunServer 2: Chat[/h2]
+description=Make sure your players feel seen, and clean up the noisier parts of chat.
+description=
+description=[table]
+description=[tr][th]Setting[/th][th]Description[/th][/tr]
+description=[tr][td][b]Welcome Players[/b][/td][td]Announce when someone joins or returns.[/td][/tr]
+description=[tr][td][b]Custom Welcome[/b][/td][td]Your own welcome text. Use %1 for the player's name. Blank for the defaults.[/td][/tr]
+description=[tr][td][b]Player Goodbye[/b][/td][td]Announce when someone leaves.[/td][/tr]
+description=[tr][td][b]Custom Goodbye[/b][/td][td]Your own goodbye text. Use %1 for the player's name. Blank for the defaults.[/td][/tr]
+description=[tr][td][b]Color Usernames[/b][/td][td]Highlight known usernames wherever they appear in chat.[/td][/tr]
+description=[tr][td][b]Custom Color[/b][/td][td]RGB values for the highlight. Blank for 255,255,255.[/td][/tr]
+description=[tr][td][b]Replace Music Tag[/b][/td][td]Swap [img=music] clutter for a small music note.[/td][/tr]
+description=[tr][td][b]Replace Radio Prefix[/b][/td][td]Swap the Radio (station): prefix for a speaker icon.[/td][/tr]
+description=[/table]
+description=
+description=[h2]PhunServer 2: Day/Night[/h2]
+description=Run day and night at different speeds. The server decides and tells clients, so everyone agrees on what time it is.
+description=
+description=[table]
+description=[tr][th]Setting[/th][th]Description[/th][/tr]
+description=[tr][td][b]Enable[/b][/td][td]Untick to leave DayLength alone.[/td][/tr]
+description=[tr][td][b]Day Speed[/b][/td][td]How long a day takes to pass.[/td][/tr]
+description=[tr][td][b]Dawn Offset[/b][/td][td]Shift when dawn starts, in hours. Negative values are allowed.[/td][/tr]
+description=[tr][td][b]Night Speed[/b][/td][td]How long a night takes to pass.[/td][/tr]
+description=[tr][td][b]Dusk Offset[/b][/td][td]Shift when dusk starts, in hours. Negative values are allowed.[/td][/tr]
+description=[/table]
+description=
+description=[h2]PhunServer 2: Wiper[/h2]
+description=Wipe player maps when a season rolls over, or when a player rolls a new character.
+description=
+description=[b]It will never wipe anyone by surprise.[/b] Wiping is off by default, and the first time the mod sees a player it records your current wipe key as their baseline rather than wiping them. Only a key that changes after that causes a wipe. Installing this mid-season is safe.
+description=
+description=Related commands:
+description=[list]
+description=[*][b]/wipemap <username>[/b] - Wipe one online player's map now.
+description=[*][b]/wipemap all[/b] - Wipe every online player's map now.
 description=[/list]
 description=
 description=[table]
 description=[tr][th]Setting[/th][th]Description[/th][/tr]
-description=[tr][td][b]Enable[/b][/td][td]Poll Steam for workshop updates and trigger a shutdown if any are found[/td][/tr]
-description=[tr][td][b]Mod Update Notice[/b][/td][td]Minutes of notice given to players before shutdown[/td][/tr]
-description=[tr][td][b]Quit Delay[/b][/td][td]Seconds to wait after saving before the server quits[/td][/tr]
-description=[tr][td][b]Check for Updates[/b][/td][td]Minutes between workshop update checks[/td][/tr]
-description=[tr][td][b]Countdown[/b][/td][td]Semicolon-separated seconds for announcements (e.g. 30;20;10)[/td][/tr]
-description=[tr][td][b]Chime[/b][/td][td]Play a short sound when restart notices are sent[/td][/tr]
+description=[tr][td][b]Enable[/b][/td][td]Off by default. Tick to allow map wipes at all.[/td][/tr]
+description=[tr][td][b]Wipe Key[/b][/td][td]Change this (a season or version number works well) to wipe every player's map once on their next login.[/td][/tr]
+description=[tr][td][b]Wipe Explored Map[/b][/td][td]Untick to clear only symbols.[/td][/tr]
+description=[tr][td][b]Wipe Symbols[/b][/td][td]Untick to clear only the explored map.[/td][/tr]
+description=[tr][td][b]Wipe Per Character[/b][/td][td]Wipe when a player dies and starts a new character.[/td][/tr]
 description=[/table]
 description=
-description=[h2]PhunServer: Maps[/h2]
-description=Settings that control player visibility on maps and allow controlled map wipes for resets or seasons.
+description=[h2]Coming from PhunServer 1?[/h2]
+description=Remove [b]phunserver[/b] from your Mods line and add the modules you want. PhunLib is no longer required by any of them.
+description=
+description=Settings do not carry over. The old names map like this:
 description=[table]
-description=[tr][th]Setting[/th][th]Description[/th][/tr]
-description=[tr][td][b]Enable Map Wipes[/b][/td][td]Untick to completely disable all map wiping behaviour[/td][/tr]
-description=[tr][td][b]Wipe Map[/b][/td][td]Untick if you only want to wipe symbols and annotations[/td][/tr]
-description=[tr][td][b]Wipe Symbols[/b][/td][td]Untick if you only want to wipe the map itself[/td][/tr]
-description=[tr][td][b]Wipe Per Character[/b][/td][td]Trigger a map wipe when a new character is created (e.g. on death)[/td][/tr]
-description=[tr][td][b]Wipe Key[/b][/td][td]If this value changes (e.g. Season 5 → Season 6), player maps will be wiped on next login[/td][/tr]
-description=[tr][td][b]Players on Map (Deprecated)[/b][/td][td]Allow players to see each other on the map. Deprecated as B42 includes this feature[/td][/tr]
-description=[tr][td][b]Players on Mini Map (Deprecated)[/b][/td][td]Allow players to see each other on the mini-map. Deprecated as B42 includes this feature[/td][/tr]
+description=[tr][th]PhunServer 1[/th][th]PhunServer 2[/th][/tr]
+description=[tr][td]PhunServer.Debug[/td][td]PhunServer2.Verbose[/td][/tr]
+description=[tr][td]PhunServer.RefreshSettingsOnStartup[/td][td]PhunServer2.RefreshSettingsOnStartup[/td][/tr]
+description=[tr][td]PhunServer.NotificationCountdown[/td][td]PhunServer2.NotificationCountdown[/td][/tr]
+description=[tr][td]PhunServer.NotificationChime[/td][td]PhunServer2.NotificationChime[/td][/tr]
+description=[tr][td]PhunServer.QuitDelaySeconds[/td][td]PhunServer2.QuitDelaySeconds[/td][/tr]
+description=[tr][td]PhunServer.EnableModWatch[/td][td]PhunServer2Cron.EnableModWatch[/td][/tr]
+description=[tr][td]PhunServer.RestartDelayMinutes[/td][td]PhunServer2Cron.RestartDelayMinutes[/td][/tr]
+description=[tr][td]PhunServer.WorkshopPollingIntervalMinutes[/td][td]The [i]every[/i] value on the modwatch job[/td][/tr]
+description=[tr][td]PhunServer.PlayersCommand[/td][td]PhunServer2Commands.PlayersCommand[/td][/tr]
+description=[tr][td]PhunServer.PlayersOffline24[/td][td]PhunServer2Commands.PlayersOffline24[/td][/tr]
+description=[tr][td]PhunServer.GetHours / SetHours[/td][td]PhunServer2Commands.GetHours / SetHours[/td][/tr]
+description=[tr][td]PhunServer.WelcomeAnnounce and friends[/td][td]PhunServer2Chat.*[/td][/tr]
+description=[tr][td]PhunServer.EnableDayNightChange and friends[/td][td]PhunServer2DayNight.*[/td][/tr]
+description=[tr][td]PhunServer.EnableWipeMap[/td][td]PhunServer2Wiper.EnableWipe (now defaults to off)[/td][/tr]
+description=[tr][td]PhunServer.WipeKey / WipeMap / WipeSymbols / WipePerCharacter[/td][td]PhunServer2Wiper.*[/td][/tr]
+description=[tr][td]PhunServer.PlayersOnMap / PlayersOnMiniMap / PlayersUpdateMs[/td][td]Removed. Use MapRemotePlayerVisibility in your server ini.[/td][/tr]
 description=[/table]
-description=Note that (when enabled) a players map is wiped when their wipekey differs from the one in your settings. This is evaluated at login or when a character is created (e.g. a respawn after death), 
-description=
-
-description=[h2]PhunServer: Cycles[/h2]
-description=Settings that allow you to control the start, end, and speed of day/night cycles.
-description=
-description=[table]
-description=[tr][th]Setting[/th][th]Description[/th][/tr]
-description=[tr][td][b]Enable Day/Night Changes[/b][/td][td]Untick to prevent PhunServer from modifying day/night speeds[/td][/tr]
-description=[tr][td][b]Night Speed[/b][/td][td]Time it takes for a night to pass[/td][/tr]
-description=[tr][td][b]Dusk Offset[/b][/td][td]Adjust dusk start time (+/- hours). Example: -1 starts night one hour earlier[/td][/tr]
-description=[tr][td][b]Day Speed[/b][/td][td]Time it takes for a day to pass[/td][/tr]
-description=[tr][td][b]Dawn Offset[/b][/td][td]Adjust dawn start time (+/- hours). Example: 1 starts dawn one hour later[/td][/tr]
-description=[/table]
-description=
-description=PTBR Transalations by [url=https://steamcommunity.com/id/SIMBAproduz]SIMBAproduz[/url], ES by Gestr
 description=
 description=[h2]More Phun Stuff[/h2]
 description=[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3388867450][img]https://i.ibb.co/x8H5KRhs/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3606988132][img]https://i.ibb.co/ZtQtmJd/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3532685233][img]https://i.ibb.co/k6cQ4h7d/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3628843367][img]https://i.ibb.co/wrZbknjt/preview.png[/img][/url]
@@ -102,5 +182,5 @@ description=
 description=Coded with love for our awesome [url=https://discord.gg/v2USyAtP6q]PhunZoid[/url] community.
 description=Check out the [url=https://github.com/PhunZoider/PhunServer]GitHub repo[/url] for more info.
 
-tags=Build 41;Build 42;Multiplayer
+tags=Build 42;Multiplayer
 visibility=public

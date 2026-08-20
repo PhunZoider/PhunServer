@@ -1,0 +1,14 @@
+{
+  "IGUI_PhunServer2Cron_Poll_PendingReboot": "Cannot check the workshop, a restart is already in progress",
+  "IGUI_PhunServer2Cron_Poll_NoIDs": "No workshop ids to check. You may not be connected to Steam.",
+  "IGUI_PhunServer2Cron_Poll_Updated": "%1 mod is outdated: %2",
+  "IGUI_PhunServer2Cron_Poll_UpdatedPlural": "There are %1 outdated mods: %2",
+  "IGUI_PhunServer2Cron_Poll_UpToDate": "All workshop mods are up to date",
+
+  "IGUI_PhunServer2Cron_Reloaded": "Reloaded %1 scheduled job(s)",
+  "IGUI_PhunServer2Cron_Usage": "Usage: /cron reload",
+
+  "IGUI_PhunServer2Cron_Action_ModCheck": "Check for mod updates",
+  "IGUI_PhunServer2Cron_Action_Event": "Fire a Lua event",
+  "IGUI_PhunServer2Cron_Field_Event": "Event name"
+}

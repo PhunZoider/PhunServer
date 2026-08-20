@@ -1,0 +1,43 @@
+VERSION = 1,
+
+option PhunServer2.Verbose
+{
+    type = boolean,
+    default = false,
+    page = PhunServer2_Core,
+    translation = PhunServer2_Verbose,
+}
+
+option PhunServer2.RefreshSettingsOnStartup
+{
+    type = boolean,
+    default = true,
+    page = PhunServer2_Core,
+    translation = PhunServer2_RefreshSettingsOnStartup,
+}
+
+option PhunServer2.NotificationCountdown
+{
+    type = string,
+    default = 300;120;60;30;10;9;8;7;6;5;3;2;1,
+    page = PhunServer2_Core,
+    translation = PhunServer2_NotificationCountdown,
+}
+
+option PhunServer2.NotificationChime
+{
+    type = boolean,
+    default = true,
+    page = PhunServer2_Core,
+    translation = PhunServer2_NotificationChime,
+}
+
+option PhunServer2.QuitDelaySeconds
+{
+    type = integer,
+    default = 15,
+    min = 1,
+    max = 100,
+    page = PhunServer2_Core,
+    translation = PhunServer2_QuitDelaySeconds,
+}

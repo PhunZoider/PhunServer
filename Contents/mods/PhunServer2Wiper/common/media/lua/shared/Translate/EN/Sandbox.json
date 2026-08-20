@@ -1,0 +1,18 @@
+{
+  "Sandbox_PhunServer2_Wiper": "PhunServer2: Wiper",
+
+  "Sandbox_PhunServer2Wiper_EnableWipe": "Enable",
+  "Sandbox_PhunServer2Wiper_EnableWipe_tooltip": "Off by default, because wiping a map cannot be undone. Tick this to allow map wipes at all. Even then, a player is never wiped the first time this mod sees them; their current wipe key is recorded as a baseline instead.",
+
+  "Sandbox_PhunServer2Wiper_WipeKey": "Wipe Key",
+  "Sandbox_PhunServer2Wiper_WipeKey_tooltip": "Changing this value wipes each player's map once, on their next login. A season or version number works well. Setting it for the first time does NOT wipe anyone: it becomes the baseline, and the next change is what wipes. Use /wipemap if you want a wipe right now.",
+
+  "Sandbox_PhunServer2Wiper_WipeMap": "Wipe Explored Map",
+  "Sandbox_PhunServer2Wiper_WipeMap_tooltip": "Untick if you only want to clear symbols and annotations, leaving the explored map intact",
+
+  "Sandbox_PhunServer2Wiper_WipeSymbols": "Wipe Symbols",
+  "Sandbox_PhunServer2Wiper_WipeSymbols_tooltip": "Untick if you only want to clear the explored map, leaving symbols and annotations intact",
+
+  "Sandbox_PhunServer2Wiper_WipePerCharacter": "Wipe Per Character",
+  "Sandbox_PhunServer2Wiper_WipePerCharacter_tooltip": "Wipe a player's map whenever their character dies and they start a new one. Hardcore."
+}

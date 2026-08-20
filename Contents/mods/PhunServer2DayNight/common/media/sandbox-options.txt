@@ -1,0 +1,49 @@
+VERSION = 1,
+
+option PhunServer2DayNight.EnableDayNightChange
+{
+    type = boolean,
+    default = true,
+    page = PhunServer2_DayNight,
+    translation = PhunServer2DayNight_EnableDayNightChange,
+}
+
+option PhunServer2DayNight.DaySpeed
+{
+    type = enum,
+    numValues = 26,
+    default = 3,
+    page = PhunServer2_DayNight,
+    translation = PhunServer2DayNight_DaySpeed,
+    valueTranslation = PhunServer2DayLength,
+}
+
+option PhunServer2DayNight.DayOffset
+{
+    type = integer,
+    default = 0,
+    min = -12,
+    max = 12,
+    page = PhunServer2_DayNight,
+    translation = PhunServer2DayNight_DayOffset,
+}
+
+option PhunServer2DayNight.NightSpeed
+{
+    type = enum,
+    numValues = 26,
+    default = 3,
+    page = PhunServer2_DayNight,
+    translation = PhunServer2DayNight_NightSpeed,
+    valueTranslation = PhunServer2DayLength,
+}
+
+option PhunServer2DayNight.NightOffset
+{
+    type = integer,
+    default = 0,
+    min = -12,
+    max = 12,
+    page = PhunServer2_DayNight,
+    translation = PhunServer2DayNight_NightOffset,
+}

@@ -1,0 +1,15 @@
+{
+  "IGUI_PhunServer2Chat_WelcomeFirstTime": "%1 has just joined the apocalypse!",
+  "IGUI_PhunServer2Chat_WelcomeMyFirstTime": "Welcome to the apocalypse %1",
+
+  "IGUI_PhunServer2Chat_WelcomeBack": "Welcome back %1",
+  "IGUI_PhunServer2Chat_Welcome0": "Welcome back %1",
+  "IGUI_PhunServer2Chat_Welcome1": "%1 has returned",
+  "IGUI_PhunServer2Chat_Welcome2": "%1 is back",
+  "IGUI_PhunServer2Chat_Welcome3": "%1 is back for more",
+
+  "IGUI_PhunServer2Chat_Goodbye0": "%1 has left",
+  "IGUI_PhunServer2Chat_Goodbye1": "%1 has bailed",
+  "IGUI_PhunServer2Chat_Goodbye2": "%1 has vanished",
+  "IGUI_PhunServer2Chat_Goodbye3": "%1 has exited"
+}

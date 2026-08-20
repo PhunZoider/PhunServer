@@ -1,0 +1,7 @@
+name=PhunServer 2: Core [DEV]
+id=phunserver2test
+author=UburGeek
+description=Development build. Do not run alongside the release version.
+poster=poster.png
+icon=icon.png
+versionMin=42.0.0

@@ -1,0 +1,18 @@
+{
+  "Sandbox_PhunServer2_Core": "PhunServer2: Core",
+
+  "Sandbox_PhunServer2_Verbose": "Verbose",
+  "Sandbox_PhunServer2_Verbose_tooltip": "Tick this for detailed PhunServer2 logging in your console and logs. Applies to every PhunServer2 module.",
+
+  "Sandbox_PhunServer2_RefreshSettingsOnStartup": "Fix Settings Cache Bug",
+  "Sandbox_PhunServer2_RefreshSettingsOnStartup_tooltip": "When ticked, refresh sandbox settings from your Sandbox_Vars file at startup. This works around a build bug where settings get cached and later edits are ignored.",
+
+  "Sandbox_PhunServer2_NotificationCountdown": "Countdown",
+  "Sandbox_PhunServer2_NotificationCountdown_tooltip": "Semicolon separated seconds at which to warn players before a shutdown. For example 300;60;10",
+
+  "Sandbox_PhunServer2_NotificationChime": "Chime",
+  "Sandbox_PhunServer2_NotificationChime_tooltip": "Play a chime alongside each shutdown warning",
+
+  "Sandbox_PhunServer2_QuitDelaySeconds": "Quit Delay",
+  "Sandbox_PhunServer2_QuitDelaySeconds_tooltip": "Seconds to wait after the final save before the server quits"
+}

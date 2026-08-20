@@ -1,0 +1,35 @@
+VERSION = 1,
+
+option PhunServer2Commands.PlayersCommand
+{
+    type = enum,
+    numValues = 3,
+    default = 3,
+    page = PhunServer2_Commands,
+    translation = PhunServer2Commands_PlayersCommand,
+    valueTranslation = PhunServer2PlayersCommand,
+}
+
+option PhunServer2Commands.PlayersOffline24
+{
+    type = boolean,
+    default = true,
+    page = PhunServer2_Commands,
+    translation = PhunServer2Commands_PlayersOffline24,
+}
+
+option PhunServer2Commands.GetHours
+{
+    type = boolean,
+    default = true,
+    page = PhunServer2_Commands,
+    translation = PhunServer2Commands_GetHours,
+}
+
+option PhunServer2Commands.SetHours
+{
+    type = boolean,
+    default = true,
+    page = PhunServer2_Commands,
+    translation = PhunServer2Commands_SetHours,
+}

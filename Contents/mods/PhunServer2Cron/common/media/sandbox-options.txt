@@ -1,0 +1,43 @@
+VERSION = 1,
+
+option PhunServer2Cron.EnableCron
+{
+    type = boolean,
+    default = true,
+    page = PhunServer2_Cron,
+    translation = PhunServer2Cron_EnableCron,
+}
+
+option PhunServer2Cron.SeedDefaults
+{
+    type = boolean,
+    default = true,
+    page = PhunServer2_Cron,
+    translation = PhunServer2Cron_SeedDefaults,
+}
+
+option PhunServer2Cron.EnableModWatch
+{
+    type = boolean,
+    default = true,
+    page = PhunServer2_ModWatch,
+    translation = PhunServer2Cron_EnableModWatch,
+}
+
+option PhunServer2Cron.RestartDelayMinutes
+{
+    type = integer,
+    default = 5,
+    min = 1,
+    max = 100,
+    page = PhunServer2_ModWatch,
+    translation = PhunServer2Cron_RestartDelayMinutes,
+}
+
+option PhunServer2Cron.PollOnDisconnect
+{
+    type = boolean,
+    default = true,
+    page = PhunServer2_ModWatch,
+    translation = PhunServer2Cron_PollOnDisconnect,
+}

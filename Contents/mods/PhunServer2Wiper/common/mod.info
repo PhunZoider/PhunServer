@@ -1,0 +1,8 @@
+name=PhunServer 2: Wiper
+id=phunserver2wiper
+author=UburGeek
+description=Wipe player maps and map symbols on a season change or a new character. Disabled by default.
+poster=poster.png
+icon=icon.png
+require=phunserver2
+versionMin=42.0.0

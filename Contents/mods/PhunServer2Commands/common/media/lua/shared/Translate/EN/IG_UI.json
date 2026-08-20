@@ -1,0 +1,13 @@
+{
+  "IGUI_PhunServer2Commands_NoOtherPlayerOnline": "You are the only player online",
+  "IGUI_PhunServer2Commands_OneOtherPlayerOnline": "Only you and %1 are online",
+  "IGUI_PhunServer2Commands_OtherPlayersOnline": "There are %1 online: %2 and you",
+
+  "IGUI_PhunServer2Commands_NoOtherPlayerRecently": "No one else has been online recently",
+  "IGUI_PhunServer2Commands_OneOtherPlayerRecently": "%1 was on recently",
+  "IGUI_PhunServer2Commands_OtherPlayersRecently": "%1 others have been on recently: %2",
+
+  "IGUI_PhunServer2Commands_PlayerHasSurvivedFor": "%1 has survived for %2",
+  "IGUI_PhunServer2Commands_NoSuchPlayer": "Could not find an online player named %1",
+  "IGUI_PhunServer2Commands_SetHoursUsage": "Usage: /sethours playername hours  OR  /sethours hours"
+}

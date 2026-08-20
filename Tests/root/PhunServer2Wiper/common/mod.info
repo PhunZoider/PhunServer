@@ -1,0 +1,8 @@
+name=PhunServer 2: Wiper [DEV]
+id=phunserver2wipertest
+author=UburGeek
+description=Development build. Do not run alongside the release version.
+poster=poster.png
+icon=icon.png
+require=phunserver2test
+versionMin=42.0.0

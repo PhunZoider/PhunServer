@@ -1,0 +1,8 @@
+name=PhunServer 2: Day/Night
+id=phunserver2daynight
+author=UburGeek
+description=Run day and night at different speeds, with adjustable dawn and dusk offsets.
+poster=poster.png
+icon=icon.png
+require=phunserver2
+versionMin=42.0.0

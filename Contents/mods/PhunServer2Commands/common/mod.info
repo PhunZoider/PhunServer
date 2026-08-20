@@ -1,0 +1,8 @@
+name=PhunServer 2: Commands
+id=phunserver2commands
+author=UburGeek
+description=Adds the /players, /hours and /sethours chat commands.
+poster=poster.png
+icon=icon.png
+require=phunserver2
+versionMin=42.0.0

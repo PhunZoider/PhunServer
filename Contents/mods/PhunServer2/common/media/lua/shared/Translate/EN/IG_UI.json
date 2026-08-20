@@ -1,0 +1,28 @@
+{
+  "IGUI_PhunServer2_One": "Server will restart in one minute",
+  "IGUI_PhunServer2_Left": "Server will restart in %1 minutes",
+  "IGUI_PhunServer2_Second": "Server will restart in %1 second",
+  "IGUI_PhunServer2_Seconds": "Server will restart in %1 seconds",
+
+  "IGUI_PhunServer2_NoAccess": "You have insufficient access for this command",
+  "IGUI_PhunServer2_RestartCancelled": "The pending restart has been cancelled",
+  "IGUI_PhunServer2_NoRestartPending": "There is no restart pending",
+
+  "IGUI_PhunServer2_LessThanMinute": "less than a minute",
+  "IGUI_PhunServer2_X_Year": "%1 year",
+  "IGUI_PhunServer2_X_Years": "%1 years",
+  "IGUI_PhunServer2_X_Month": "%1 month",
+  "IGUI_PhunServer2_X_Months": "%1 months",
+  "IGUI_PhunServer2_X_Day": "%1 day",
+  "IGUI_PhunServer2_X_Days": "%1 days",
+  "IGUI_PhunServer2_X_Hour": "%1 hour",
+  "IGUI_PhunServer2_X_Hours": "%1 hours",
+  "IGUI_PhunServer2_X_Minute": "%1 minute",
+  "IGUI_PhunServer2_X_Minutes": "%1 minutes",
+
+  "IGUI_PhunServer2_Action_Shutdown": "Shut down the server",
+  "IGUI_PhunServer2_Action_Announce": "Announce a message",
+  "IGUI_PhunServer2_Field_Notice": "Minutes of notice",
+  "IGUI_PhunServer2_Field_RunIfEmpty": "Go early if empty",
+  "IGUI_PhunServer2_Field_Text": "Message"
+}

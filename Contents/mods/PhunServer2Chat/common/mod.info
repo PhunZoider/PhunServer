@@ -1,0 +1,8 @@
+name=PhunServer 2: Chat
+id=phunserver2chat
+author=UburGeek
+description=Welcome and goodbye announcements, username highlighting, and tidier music and radio lines.
+poster=poster.png
+icon=icon.png
+require=phunserver2
+versionMin=42.0.0

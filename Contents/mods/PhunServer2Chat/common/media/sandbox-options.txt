@@ -1,0 +1,65 @@
+VERSION = 1,
+
+option PhunServer2Chat.WelcomeAnnounce
+{
+    type = boolean,
+    default = true,
+    page = PhunServer2_Chat,
+    translation = PhunServer2Chat_WelcomeAnnounce,
+}
+
+option PhunServer2Chat.WelcomeAnnounceText
+{
+    type = string,
+    default =,
+    page = PhunServer2_Chat,
+    translation = PhunServer2Chat_WelcomeAnnounceText,
+}
+
+option PhunServer2Chat.GoodbyeAnnouncements
+{
+    type = boolean,
+    default = true,
+    page = PhunServer2_Chat,
+    translation = PhunServer2Chat_GoodbyeAnnouncements,
+}
+
+option PhunServer2Chat.GoodbyeAnnounceText
+{
+    type = string,
+    default =,
+    page = PhunServer2_Chat,
+    translation = PhunServer2Chat_GoodbyeAnnounceText,
+}
+
+option PhunServer2Chat.ColorUsernames
+{
+    type = boolean,
+    default = true,
+    page = PhunServer2_Chat,
+    translation = PhunServer2Chat_ColorUsernames,
+}
+
+option PhunServer2Chat.ColorUsernameText
+{
+    type = string,
+    default =,
+    page = PhunServer2_Chat,
+    translation = PhunServer2Chat_ColorUsernameText,
+}
+
+option PhunServer2Chat.ReplaceMusic
+{
+    type = boolean,
+    default = true,
+    page = PhunServer2_Chat,
+    translation = PhunServer2Chat_ReplaceMusic,
+}
+
+option PhunServer2Chat.ReplaceRadio
+{
+    type = boolean,
+    default = true,
+    page = PhunServer2_Chat,
+    translation = PhunServer2Chat_ReplaceRadio,
+}

@@ -1,7 +1,8 @@
 version=1
 id=3630484821
-title=PhunServer Tools TEST
-description=development and testing version of [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3623897097]PhunServer Tools[/url]
-description=This version is to test out changes and new features before being released. [b]Important[/b]: be sure to remove the original [b]phunserver[/b] from your modids if you intend to use this version
+title=PhunServer 2 [DEV]
+description=Development and testing build of PhunServer 2.
+description=This version exists to test changes before release. [b]Important:[/b] remove the release modids from your Mods line if you intend to run this, and expect it to break.
+description=Modids: phunserver2test, phunserver2crontest, phunserver2commandstest, phunserver2chattest, phunserver2daynighttest, phunserver2wipertest
 tags=
 visibility=unlisted

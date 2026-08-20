@@ -1,0 +1,7 @@
+name=PhunServer 2: Core
+id=phunserver2
+author=UburGeek
+description=Shared core for the PhunServer 2 family. Required by every other PhunServer 2 module.
+poster=poster.png
+icon=icon.png
+versionMin=42.0.0

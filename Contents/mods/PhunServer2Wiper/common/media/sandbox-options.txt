@@ -1,0 +1,41 @@
+VERSION = 1,
+
+option PhunServer2Wiper.EnableWipe
+{
+    type = boolean,
+    default = false,
+    page = PhunServer2_Wiper,
+    translation = PhunServer2Wiper_EnableWipe,
+}
+
+option PhunServer2Wiper.WipeKey
+{
+    type = string,
+    default =,
+    page = PhunServer2_Wiper,
+    translation = PhunServer2Wiper_WipeKey,
+}
+
+option PhunServer2Wiper.WipeMap
+{
+    type = boolean,
+    default = true,
+    page = PhunServer2_Wiper,
+    translation = PhunServer2Wiper_WipeMap,
+}
+
+option PhunServer2Wiper.WipeSymbols
+{
+    type = boolean,
+    default = true,
+    page = PhunServer2_Wiper,
+    translation = PhunServer2Wiper_WipeSymbols,
+}
+
+option PhunServer2Wiper.WipePerCharacter
+{
+    type = boolean,
+    default = false,
+    page = PhunServer2_Wiper,
+    translation = PhunServer2Wiper_WipePerCharacter,
+}

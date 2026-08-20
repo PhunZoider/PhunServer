@@ -1,0 +1,8 @@
+name=PhunServer 2: Cron [DEV]
+id=phunserver2crontest
+author=UburGeek
+description=Development build. Do not run alongside the release version.
+poster=poster.png
+icon=icon.png
+require=phunserver2test
+versionMin=42.0.0

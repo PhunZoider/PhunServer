@@ -1,0 +1,8 @@
+name=PhunServer 2: Cron
+id=phunserver2cron
+author=UburGeek
+description=Schedule server shutdowns, announcements and mod-update checks on a real-world clock. Includes ModWatch.
+poster=poster.png
+icon=icon.png
+require=phunserver2
+versionMin=42.0.0

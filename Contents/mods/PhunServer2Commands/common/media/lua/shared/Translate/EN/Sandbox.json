@@ -1,0 +1,19 @@
+{
+  "Sandbox_PhunServer2_Commands": "PhunServer2: Commands",
+
+  "Sandbox_PhunServer2Commands_PlayersCommand": "/players",
+  "Sandbox_PhunServer2Commands_PlayersCommand_tooltip": "Allow players to see who is online by typing /players into chat",
+
+  "Sandbox_PhunServer2PlayersCommand_option1": "Disable",
+  "Sandbox_PhunServer2PlayersCommand_option2": "Allow admin",
+  "Sandbox_PhunServer2PlayersCommand_option3": "Allow all",
+
+  "Sandbox_PhunServer2Commands_PlayersOffline24": "Include recent",
+  "Sandbox_PhunServer2Commands_PlayersOffline24_tooltip": "When using /players, also list players who have been online in the past 24 hours",
+
+  "Sandbox_PhunServer2Commands_GetHours": "/hours",
+  "Sandbox_PhunServer2Commands_GetHours_tooltip": "Allow players to see their hours survived with /hours. Admins and moderators can query another online player with /hours username.",
+
+  "Sandbox_PhunServer2Commands_SetHours": "/sethours",
+  "Sandbox_PhunServer2Commands_SetHours_tooltip": "Allow admins and moderators to set a player's hours survived with /sethours username hours. The target player must be online."
+}

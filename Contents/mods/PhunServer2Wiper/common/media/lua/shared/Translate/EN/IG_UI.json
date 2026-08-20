@@ -1,0 +1,6 @@
+{
+  "IGUI_PhunServer2Wiper_Usage": "Usage: /wipemap username  OR  /wipemap all",
+  "IGUI_PhunServer2Wiper_Wiped": "Wiped the map for %1",
+  "IGUI_PhunServer2Wiper_WipedAll": "Wiped the map for %1 online player(s)",
+  "IGUI_PhunServer2Wiper_NotOnline": "Could not find an online player named %1"
+}

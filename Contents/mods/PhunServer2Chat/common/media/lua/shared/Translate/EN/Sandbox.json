@@ -1,0 +1,27 @@
+{
+  "Sandbox_PhunServer2_Chat": "PhunServer2: Chat",
+
+  "Sandbox_PhunServer2Chat_WelcomeAnnounce": "Welcome Players",
+  "Sandbox_PhunServer2Chat_WelcomeAnnounce_tooltip": "Announce in chat when a player joins or returns",
+
+  "Sandbox_PhunServer2Chat_WelcomeAnnounceText": "Custom Welcome",
+  "Sandbox_PhunServer2Chat_WelcomeAnnounceText_tooltip": "Use this text instead of the default welcome messages. Use %1 as a placeholder for the player's name, for example: Welcome to the apocalypse %1. Leave blank for the defaults.",
+
+  "Sandbox_PhunServer2Chat_GoodbyeAnnouncements": "Player Goodbye",
+  "Sandbox_PhunServer2Chat_GoodbyeAnnouncements_tooltip": "Announce in chat when a player leaves",
+
+  "Sandbox_PhunServer2Chat_GoodbyeAnnounceText": "Custom Goodbye",
+  "Sandbox_PhunServer2Chat_GoodbyeAnnounceText_tooltip": "Use this text instead of the default goodbye messages. Use %1 as a placeholder for the player's name, for example: Goodbye %1. Leave blank for the defaults.",
+
+  "Sandbox_PhunServer2Chat_ColorUsernames": "Color Usernames",
+  "Sandbox_PhunServer2Chat_ColorUsernames_tooltip": "Highlight known usernames wherever they appear in chat",
+
+  "Sandbox_PhunServer2Chat_ColorUsernameText": "Custom Color",
+  "Sandbox_PhunServer2Chat_ColorUsernameText_tooltip": "RGB values to use for highlighting instead of the default 255,255,255. Leave blank for the default.",
+
+  "Sandbox_PhunServer2Chat_ReplaceMusic": "Replace Music Tag",
+  "Sandbox_PhunServer2Chat_ReplaceMusic_tooltip": "Replace [img=music] clutter in chat with a small music note icon",
+
+  "Sandbox_PhunServer2Chat_ReplaceRadio": "Replace Radio Prefix",
+  "Sandbox_PhunServer2Chat_ReplaceRadio_tooltip": "Replace the Radio (station): prefix with a speaker icon. Cleaner, but it does remove the station name."
+}

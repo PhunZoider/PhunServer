@@ -1,0 +1,45 @@
+{
+  "Sandbox_PhunServer2_DayNight": "PhunServer2: Day/Night",
+
+  "Sandbox_PhunServer2DayNight_EnableDayNightChange": "Enable",
+  "Sandbox_PhunServer2DayNight_EnableDayNightChange_tooltip": "When ticked, the options below change the speed of your day and night cycles. Untick to leave DayLength alone.",
+
+  "Sandbox_PhunServer2DayNight_DaySpeed": "Day Speed",
+  "Sandbox_PhunServer2DayNight_DaySpeed_tooltip": "How long a day takes to pass",
+
+  "Sandbox_PhunServer2DayNight_DayOffset": "Dawn Offset",
+  "Sandbox_PhunServer2DayNight_DayOffset_tooltip": "Shift when dawn is considered to start, in hours. For example 1 starts dawn an hour later, -1 an hour earlier.",
+
+  "Sandbox_PhunServer2DayNight_NightSpeed": "Night Speed",
+  "Sandbox_PhunServer2DayNight_NightSpeed_tooltip": "How long a night takes to pass",
+
+  "Sandbox_PhunServer2DayNight_NightOffset": "Dusk Offset",
+  "Sandbox_PhunServer2DayNight_NightOffset_tooltip": "Shift when dusk is considered to start, in hours. For example -1 starts night an hour earlier, 1 an hour later.",
+
+  "Sandbox_PhunServer2DayLength_option1": "15 minutes",
+  "Sandbox_PhunServer2DayLength_option2": "30 minutes",
+  "Sandbox_PhunServer2DayLength_option3": "1 hour",
+  "Sandbox_PhunServer2DayLength_option4": "1.5 hours",
+  "Sandbox_PhunServer2DayLength_option5": "2 hours",
+  "Sandbox_PhunServer2DayLength_option6": "3 hours",
+  "Sandbox_PhunServer2DayLength_option7": "4 hours",
+  "Sandbox_PhunServer2DayLength_option8": "5 hours",
+  "Sandbox_PhunServer2DayLength_option9": "6 hours",
+  "Sandbox_PhunServer2DayLength_option10": "7 hours",
+  "Sandbox_PhunServer2DayLength_option11": "8 hours",
+  "Sandbox_PhunServer2DayLength_option12": "9 hours",
+  "Sandbox_PhunServer2DayLength_option13": "10 hours",
+  "Sandbox_PhunServer2DayLength_option14": "11 hours",
+  "Sandbox_PhunServer2DayLength_option15": "12 hours",
+  "Sandbox_PhunServer2DayLength_option16": "13 hours",
+  "Sandbox_PhunServer2DayLength_option17": "14 hours",
+  "Sandbox_PhunServer2DayLength_option18": "15 hours",
+  "Sandbox_PhunServer2DayLength_option19": "16 hours",
+  "Sandbox_PhunServer2DayLength_option20": "17 hours",
+  "Sandbox_PhunServer2DayLength_option21": "18 hours",
+  "Sandbox_PhunServer2DayLength_option22": "19 hours",
+  "Sandbox_PhunServer2DayLength_option23": "20 hours",
+  "Sandbox_PhunServer2DayLength_option24": "21 hours",
+  "Sandbox_PhunServer2DayLength_option25": "22 hours",
+  "Sandbox_PhunServer2DayLength_option26": "23 hours"
+}
