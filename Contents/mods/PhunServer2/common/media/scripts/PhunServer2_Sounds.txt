@@ -1,9 +1,15 @@
-module Base {
-
+module Base
+{
     sound restartNotice
     {
-        category = Player, loop = false, is3D = false,
-        clip { file = media/sound/restart-notice.mp3, distanceMax = 20, volume = 1, reverbFactor = 0, }
+        category = Player,
+        loop = false,
+        is3D = true,
+        clip
+        {
+            file = media/sound/restart-notice.ogg,
+            distanceMax = 20,
+            volume = 1.0f
+        }
     }
-
 }

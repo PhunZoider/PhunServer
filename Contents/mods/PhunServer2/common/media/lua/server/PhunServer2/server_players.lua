@@ -17,6 +17,27 @@ end
 local onliners = {}
 local wasEmpty = nil
 
+local function accessLevelOf(player)
+    local level = player and player:getAccessLevel()
+    if not level or tostring(level) == "" then
+        return "none"
+    end
+    return string.lower(tostring(level))
+end
+
+-- True when the account has any access level above "none": admin, moderator,
+-- overseer, gm or observer.
+--
+-- Reads the level recorded on the player record rather than asking the
+-- IsoPlayer, because the caller that needs it most is the departure handler,
+-- and by the time that fires there is no IsoPlayer left to ask. An unknown
+-- username answers false, which treats a stranger as an ordinary player.
+function Core.isStaff(username)
+    local record = username and Core.data and Core.data.online and Core.data.online[username]
+    local level = record and record.accessLevel
+    return level ~= nil and level ~= "" and level ~= "none"
+end
+
 -- Polled from the server tick. Maintains data.online and fires the join/leave
 -- events other modules listen to. Deliberately emits no chat of its own -
 -- PhunServer2Chat subscribes to these events and decides what to say.
@@ -32,13 +53,27 @@ function Core.checkPlayers()
         if username and username ~= "" then
             onliners[username] = true
             local record = Core.data.online[username]
+            local firstTime = record == nil
 
-            if not record then
+            if firstTime then
                 -- Never seen this player before
                 record = {
                     firstSeen = now
                 }
                 Core.data.online[username] = record
+            end
+
+            -- Written before the events fire, not after. Handlers ask whether
+            -- the joining player is staff, and on a first connection the record
+            -- is the only place that answer can come from.
+            --
+            -- Refreshed every sweep rather than only at join, so promoting
+            -- someone mid-session takes effect without them reconnecting, and
+            -- it stays on the record after they go, which is what makes their
+            -- departure judgeable at all.
+            record.accessLevel = accessLevelOf(p)
+
+            if firstTime then
                 Core.verboseLn("Player connected for the first time: " .. username)
                 triggerEvent(Core.events.OnPlayerJoined, username, p)
             elseif not record.online then

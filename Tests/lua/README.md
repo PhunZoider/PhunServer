@@ -40,6 +40,7 @@ away, and how to write a suite.
 | `test_json.lua`   | `json.lua` — round trips, pretty printing, stable key order, refusals, decoding |
 | `test_config.lua` | `tools.lua` and `server_config.lua` — the file layer, legacy detection, the version envelope |
 | `test_cron.lua`   | `server_jobs.lua` and `schedule.lua` — seeding, the seeding guard, normalisation |
+| `test_players.lua`| `server_players.lua` and chat's `server_events.lua` — access levels, join/leave announcements, staff suppression |
 
 ## Why these exist
 
@@ -60,6 +61,12 @@ change might mistake any of them for a bug:
   truncates on open, so checking afterwards would mean replacing a good file
   with an empty one. `test_config.lua` asserts the file is byte-identical after
   a refused save.
+- **A player's access level is recorded before the join event fires, not
+  after.** The leave event carries only a username — by then the `IsoPlayer` is
+  gone — so suppressing an admin's goodbye depends entirely on the level having
+  been written to their record while they were connected. Recording it after
+  the join event, which is where it naturally wants to go, silently announces
+  every admin's *first* connection. `test_players.lua` caught exactly that.
 - **Cron will not seed defaults while an unconverted `.txt` is present.**
   Seeding would create a `.json`, which stops `loadConfig` ever reporting the
   problem again — the server would then run the default job set while the admin

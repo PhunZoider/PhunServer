@@ -10,8 +10,8 @@
   "Sandbox_PhunServer2_NotificationCountdown": "Countdown",
   "Sandbox_PhunServer2_NotificationCountdown_tooltip": "Semicolon separated seconds at which to warn players before a shutdown. For example 300;60;10",
 
-  "Sandbox_PhunServer2_NotificationChime": "Chime",
-  "Sandbox_PhunServer2_NotificationChime_tooltip": "Play a chime alongside each shutdown warning",
+  "Sandbox_PhunServer2_NotificationChime": "Chime Volume",
+  "Sandbox_PhunServer2_NotificationChime_tooltip": "How loudly to play the chime that accompanies each shutdown warning, from 0 to 100. Set it to 0 for warnings with no sound at all.",
 
   "Sandbox_PhunServer2_QuitDelaySeconds": "Quit Delay",
   "Sandbox_PhunServer2_QuitDelaySeconds_tooltip": "Seconds to wait after the final save before the server quits"

@@ -52,10 +52,13 @@ local function countdownText(seconds)
     return "IGUI_PhunServer2_Left", tools.formatWholeNumber(seconds / 60)
 end
 
+-- opts.volume is 0..100. Omitted means full, which is what a caller that has
+-- no opinion about loudness should get.
 function Core.broadcastNotify(textKey, args, opts)
     opts = opts or {}
     sendServerCommand(Core.name, Core.commands.notify, {
         soundName = opts.sound or "",
+        volume = opts.volume,
         text = textKey,
         args = args or {},
         types = opts.types or {
@@ -113,7 +116,10 @@ function Core.scheduleShutdown(timestamp, opts)
                    (opts.reason and (" (" .. opts.reason .. ")") or ""))
 
     local values = parseCountdown(opts.countdown or Core.getOption("NotificationCountdown", DEFAULT_COUNTDOWN))
-    local chime = Core.getOption("NotificationChime", true) == true
+    -- 0..100. At zero we send no sound name at all rather than a silent one, so
+    -- a server that wants quiet warnings does not ship a sound to every client
+    -- thirteen times per shutdown.
+    local chimeVolume = tonumber(Core.getOption("NotificationChime", 100)) or 100
     local runIfEmpty = opts.runIfEmpty == true
 
     -- Skip any threshold that is already behind us. Scheduling a shutdown four
@@ -152,7 +158,8 @@ function Core.scheduleShutdown(timestamp, opts)
         if crossed then
             local key, val = countdownText(crossed)
             Core.broadcastNotify(key, {val}, {
-                sound = chime and "restartNotice" or ""
+                sound = chimeVolume > 0 and "restartNotice" or "",
+                volume = chimeVolume
             })
         end
 

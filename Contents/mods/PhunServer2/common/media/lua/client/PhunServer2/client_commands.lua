@@ -7,7 +7,7 @@ local tools = Core.tools
 local Commands = {}
 
 Commands[Core.commands.notify] = function(args)
-    Core.notifyAll(args.soundName, args.types, args.text, args.args)
+    Core.notifyAll(args.soundName, args.types, args.text, args.args, args.volume)
 end
 
 Commands[Core.commands.message] = function(args)

@@ -80,11 +80,37 @@ function Core.message(text, args, options)
     Core.FakeMessage(txt, options.color)
 end
 
-function Core.notify(player, soundName, types, text, args)
-
-    if soundName and soundName ~= "" and not player:getEmitter():isPlaying(soundName) then
-        player:playSoundLocal(soundName)
+-- volume is the sandbox scale, 0..100. Nil means the caller has no opinion and
+-- gets full volume; 0 means play nothing.
+--
+-- Through SoundManager rather than the character emitter. The emitter route
+-- produces no audible sound for this clip: restartNotice is declared
+-- is3D = false, and a non-positional clip played through a positional emitter
+-- goes nowhere. playSoundLocal does work, but hands back no handle to set a
+-- volume on. SoundManager:PlaySound returns an Audio, which does.
+local function playChime(soundName, volume)
+    if not soundName or soundName == "" then
+        return
     end
+
+    local level = tonumber(volume)
+    if level == nil then
+        level = 100
+    end
+    level = math.max(0, math.min(100, level))
+    if level == 0 then
+        return
+    end
+
+    local audio = getSoundManager():PlaySound(soundName, false, 0)
+    if audio then
+        audio:setVolume(level / 100)
+    end
+end
+
+function Core.notify(player, soundName, types, text, args, volume)
+
+    playChime(soundName, volume)
 
     if types == nil or types.chat then
         Core.message(text, args)
@@ -96,12 +122,12 @@ function Core.notify(player, soundName, types, text, args)
     end
 end
 
-function Core.notifyAll(soundName, types, text, args)
+function Core.notifyAll(soundName, types, text, args, volume)
     local players = tools.onlinePlayers()
     for i = 0, players:size() - 1 do
         local p = players:get(i)
         if p:isLocalPlayer() then
-            Core.notify(p, soundName, types, text, args)
+            Core.notify(p, soundName, types, text, args, volume)
         end
     end
 end

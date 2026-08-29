@@ -159,6 +159,7 @@ The mapping table is in `workshop.txt`.
 Notable behaviour changes:
 
 - `Debug` is now `Verbose`, and it is a single switch shared by every module.
+- The shutdown chime is a 0-100 volume rather than a tickbox. 0 is silent.
 - Map wiping is off by default and never wipes on first sight of a player.
 - Day and night changes are server-authoritative; clients no longer compute
   their own transitions.

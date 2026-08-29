@@ -16,6 +16,14 @@ option PhunServer2Chat.WelcomeAnnounceText
     translation = PhunServer2Chat_WelcomeAnnounceText,
 }
 
+option PhunServer2Chat.AnnounceAdmins
+{
+    type = boolean,
+    default = true,
+    page = PhunServer2_Chat,
+    translation = PhunServer2Chat_AnnounceAdmins,
+}
+
 option PhunServer2Chat.GoodbyeAnnouncements
 {
     type = boolean,

@@ -7,6 +7,9 @@
   "Sandbox_PhunServer2Chat_WelcomeAnnounceText": "Custom Welcome",
   "Sandbox_PhunServer2Chat_WelcomeAnnounceText_tooltip": "Use this text instead of the default welcome messages. Use %1 as a placeholder for the player's name, for example: Welcome to the apocalypse %1. Leave blank for the defaults.",
 
+  "Sandbox_PhunServer2Chat_AnnounceAdmins": "Announce Admins",
+  "Sandbox_PhunServer2Chat_AnnounceAdmins_tooltip": "Untick to keep staff arrivals and departures out of chat. Covers anyone with an access level above none - admin, moderator, overseer, gm or observer - and applies to both joining and leaving.",
+
   "Sandbox_PhunServer2Chat_GoodbyeAnnouncements": "Player Goodbye",
   "Sandbox_PhunServer2Chat_GoodbyeAnnouncements_tooltip": "Announce in chat when a player leaves",
 

@@ -26,8 +26,10 @@ option PhunServer2.NotificationCountdown
 
 option PhunServer2.NotificationChime
 {
-    type = boolean,
-    default = true,
+    type = integer,
+    default = 50,
+    min = 0,
+    max = 100,
     page = PhunServer2_Core,
     translation = PhunServer2_NotificationChime,
 }
