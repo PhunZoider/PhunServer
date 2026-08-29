@@ -1,7 +1,7 @@
 -- PhunServer2Cron
 --
 -- A real-world-clock scheduler for PhunServer2. Admins define jobs in
--- <Zomboid>/Lua/PhunServer2Cron.txt; each job runs a named action from the
+-- <Zomboid>/Lua/PhunServer2Cron.json; each job runs a named action from the
 -- core action registry.
 --
 -- ModWatch lives here too: watching the Workshop for mod updates is just
@@ -16,7 +16,7 @@ PhunServer2Cron = {
     -- jobs[name] = normalised job table
     jobs = {},
     const = {
-        configFile = "PhunServer2Cron.txt",
+        configFile = "PhunServer2Cron.json",
         modDataName = "PhunServer2Cron",
         configVersion = 1
     },

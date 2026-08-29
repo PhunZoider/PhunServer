@@ -1,8 +1,7 @@
 -- Local utility surface for the PhunServer2 family.
 -- Everything in here was previously borrowed from the PhunLib mod. It is folded
 -- in so that no PhunServer2 module carries an external dependency.
-local luautils = luautils
-local loadstring = loadstring
+local json = require "PhunServer2/json"
 local tools = {}
 
 tools.isLocal = not isClient() and not isServer() and not isCoopHost()
@@ -207,130 +206,122 @@ end
 -- ---------------------------------------------------------------------------
 -- FILE IO
 -- Paths are relative to the game's Lua folder (<Zomboid>/Lua/).
+--
+-- These files used to be Lua source: saveTable wrote "return { ... }" and
+-- loadTable handed the text back to loadstring. B42.20.4 removed loadstring,
+-- load and loadfile, so that round trip no longer completes. Nothing errors:
+-- loadstring is simply nil, the pcall around it fails, and every config file on
+-- disk reads back as nil. An admin's customisations do not survive a restart,
+-- and the next save writes the defaults over the top of them.
+--
+-- The format is therefore JSON, which needs a parser rather than an
+-- interpreter. The trade is that a config file can no longer hold Lua
+-- expressions. None of ours ever did, but a hand-written one might, and there
+-- is no way to read those on the new runtime: hence the converter below.
 -- ---------------------------------------------------------------------------
 
--- Converts a table to a source string that loadstring can turn back into a table.
--- The array part is emitted before the hash part so output stays stable.
-function tools.tableToString(tbl, indent)
-    indent = indent or 0
-    local prefix = string.rep("  ", indent + 1)
-    local result = {}
-    local doneKeys = {}
+-- Where an admin converts a pre-B42.20.4 config file. The page is format
+-- generic and lives in the PhunZones repository because that is where it was
+-- first needed; it handles every Phun mod's files, this one included.
+tools.converterUrl = "https://phunzoider.github.io/PhunZones/converter/"
 
-    for i = 1, #tbl do
-        local value = tbl[i]
-        doneKeys[i] = true
-        local line
-        if type(value) == "table" then
-            line = prefix .. tools.tableToString(value, indent + 1)
-        elseif type(value) == "string" then
-            line = string.format("%s%q", prefix, value)
-        else
-            line = string.format("%s%s", prefix, tostring(value))
-        end
-        table.insert(result, line)
+-- The pre-JSON name for a config file: PhunServer2Cron.json -> ...Cron.txt.
+-- Only used to notice that an old file is sitting there unconverted.
+function tools.legacyNameFor(filename)
+    return (filename:gsub("%.json$", ".txt"))
+end
+
+-- Whole file as one string, or nil when it is not there.
+local function readAll(filename, createIfNotExists)
+    local reader = getFileReader(filename, createIfNotExists == true)
+    if not reader then
+        return nil
     end
-
-    for key, value in pairs(tbl) do
-        if not doneKeys[key] then
-            local keyStr
-            if type(key) == "string" then
-                -- Bare key if it is a valid identifier, bracketed and quoted otherwise
-                if string.match(key, "^[%a_][%w_]*$") then
-                    keyStr = key .. " = "
-                else
-                    keyStr = string.format("[%q] = ", key)
-                end
-            else
-                keyStr = "[" .. tostring(key) .. "] = "
-            end
-
-            local line
-            if type(value) == "table" then
-                line = prefix .. keyStr .. tools.tableToString(value, indent + 1)
-            elseif type(value) == "string" then
-                line = string.format("%s%s%q", prefix, keyStr, value)
-            else
-                line = string.format("%s%s%s", prefix, keyStr, tostring(value))
-            end
-            table.insert(result, line)
-        end
+    local lines = {}
+    local line = reader:readLine()
+    while line do
+        lines[#lines + 1] = line
+        line = reader:readLine()
     end
+    reader:close()
+    return table.concat(lines, "\n")
+end
 
-    return "{\n" .. table.concat(result, ",\n") .. "\n" .. string.rep("  ", indent) .. "}"
+-- True when an old-format file is present and its JSON replacement is not.
+-- Callers use this to tell "the admin has not converted yet" apart from "the
+-- admin has never configured this", which loadTable reports the same way.
+function tools.needsConversion(filename)
+    local legacy = tools.legacyNameFor(filename)
+    if legacy == filename then
+        return false
+    end
+    local current = readAll(filename, false)
+    if current and current ~= "" then
+        return false
+    end
+    local old = readAll(legacy, false)
+    return old ~= nil and old ~= ""
 end
 
 -- NOTE the argument order: (filename, data). PhunServer v1 called the PhunLib
 -- equivalent the other way round, which silently serialised the filename.
+--
+-- Written indented rather than minified: these are files admins edit by hand.
+-- @return true on success, false if nothing was written
 function tools.saveTable(filename, data)
     if not data then
-        return
+        return false
     end
+
+    local encoded, err = json.encode(data, true)
+    if not encoded then
+        -- Deliberately before getFileWriter. That call truncates on open, so
+        -- opening it and only then finding we have nothing to write would
+        -- replace a good file with an empty one. The likeliest cause is a
+        -- non-string table key, which the Lua format allowed and JSON does not.
+        print("[PhunServer2] refusing to save '" .. filename .. "': " .. tostring(err))
+        print("[PhunServer2] the file on disk has been left as it was")
+        return false
+    end
+
     local fileWriterObj = getFileWriter(filename, true, false)
     if not fileWriterObj then
-        return
+        return false
     end
-    fileWriterObj:write("return " .. tools.tableToString(data))
+    fileWriterObj:write(encoded)
     fileWriterObj:close()
+    return true
 end
 
-local function tableOfStringsToTable(lines)
-    if not lines or type(lines) ~= "table" or #lines == 0 then
-        return nil, "invalid input: empty or non-table"
-    end
-
-    local startsWithReturn = luautils.stringStarts(lines[1], "return")
-    local src
-    if startsWithReturn then
-        src = table.concat(lines, "\n")
-    else
-        src = "return {\n" .. table.concat(lines, "\n") .. "\n}"
-    end
-
-    local ok, chunk = pcall(loadstring, src)
-    if not ok or not chunk then
-        return nil, "loadstring error: " .. tostring(chunk)
-    end
-
-    local ok2, result = pcall(chunk)
-    if not ok2 then
-        return nil, "execution error: " .. tostring(result)
-    end
-
-    return result, nil
-end
-
--- Reads a Lua file from the Lua folder and returns its table.
+-- Reads a JSON file from the Lua folder and returns its table, or nil when the
+-- file is missing, empty or malformed.
 --
--- Unlike require, this bypasses Lua's module cache so it always reflects the
--- current state of the file on disk. Use this for mutable config files; use
--- require for static data that never changes at runtime.
+-- Unlike require, this reads from disk every time, so it always reflects the
+-- current state of the file. Use this for mutable config files; use require for
+-- static data that never changes at runtime.
+--
+-- nil for malformed is the same answer as for missing, which is not ideal, but
+-- every caller already treats nil as "nothing configured" and the alternative
+-- is refusing to start. The message on the way out is what makes the
+-- difference visible.
 function tools.loadTable(filename, createIfNotExists)
-    local fileReaderObj = getFileReader(filename, createIfNotExists == true)
-    if not fileReaderObj then
+    local src = readAll(filename, createIfNotExists)
+    if not src or src == "" then
         return nil
     end
 
-    local lines = {}
-    local line = fileReaderObj:readLine()
-    while line do
-        lines[#lines + 1] = line
-        line = fileReaderObj:readLine()
-    end
-    fileReaderObj:close()
-
-    if #lines == 0 then
-        return nil
-    end
-
-    -- Defensive: hand-edited files often leave a trailing comma
-    if lines[#lines]:sub(-1) == "," then
-        lines[#lines] = lines[#lines]:sub(1, -2)
-    end
-
-    local result, err = tableOfStringsToTable(lines)
+    local result, err = json.decode(src)
     if err then
-        print("[PhunServer2] error loading '" .. tostring(filename) .. "': " .. err)
+        print("[PhunServer2] could not read '" .. filename .. "': " .. tostring(err))
+        print("[PhunServer2] its settings are not being applied; the file has not been changed")
+        return nil
+    end
+
+    -- A JSON file whose top level is a string or a number parses fine and is
+    -- still not a config. Callers index the result, so hand back nil rather
+    -- than something that errors on first use.
+    if type(result) ~= "table" then
+        print("[PhunServer2] '" .. filename .. "' does not contain a JSON object")
         return nil
     end
 

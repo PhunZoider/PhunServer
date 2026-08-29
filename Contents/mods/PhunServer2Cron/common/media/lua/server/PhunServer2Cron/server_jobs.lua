@@ -47,10 +47,19 @@ end
 
 function Cron.loadJobs()
 
-    local data, version = Core.loadConfig(Cron.const.configFile, Cron.name)
+    local data, version, needsConversion = Core.loadConfig(Cron.const.configFile, Cron.name)
 
     if data == nil then
-        if Cron.getOption("SeedDefaults", true) then
+        if needsConversion then
+            -- An unconverted pre-JSON file is sitting there. Seeding now would
+            -- write a defaults file that stops loadConfig ever reporting the
+            -- problem again, and the server would quietly run the default job
+            -- set while the admin believes their own jobs are live. Running no
+            -- jobs is the honest outcome, and the warning repeats every start
+            -- until the file is converted or removed.
+            Cron.logLn("Not seeding defaults while an unconverted config is present; no jobs will run")
+            data = {}
+        elseif Cron.getOption("SeedDefaults", true) then
             Cron.logLn("Seeding default jobs and writing ./Lua/" .. Cron.const.configFile)
             data = DEFAULT_JOBS
             Core.saveConfig(Cron.const.configFile, data, Cron.const.configVersion, Cron.name)

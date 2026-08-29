@@ -41,33 +41,35 @@ description=
 description=[h2]PhunServer 2: Cron[/h2]
 description=Schedule shutdowns, announcements, mod-update checks or arbitrary Lua events against the real-world clock.
 description=
-description=Jobs are defined in [b]<Zomboid>/Lua/PhunServer2Cron.txt[/b]. If that file does not exist it is created for you with a five minute mod-update check, so a fresh install behaves like the old ModWatch did.
+description=Jobs are defined in [b]<Zomboid>/Lua/PhunServer2Cron.json[/b]. If that file does not exist it is created for you with a five minute mod-update check, so a fresh install behaves like the old ModWatch did.
 description=
 description=[code]
-description=return {
-description=  version = 1,
-description=  data = {
-description=    ["nightly-restart"] = {
-description=      enabled = true,
-description=      action  = "shutdown",
-description=      args    = { notice = 15 },
-description=      at      = {"03:00", "15:00"},
-description=      announcements = {
-description=        { before = 1800, text = "Server restarts in half an hour" },
-description=      },
+description={
+description=  "version": 1,
+description=  "data": {
+description=    "nightly-restart": {
+description=      "enabled": true,
+description=      "action": "shutdown",
+description=      "args": { "notice": 15 },
+description=      "at": ["03:00", "15:00"],
+description=      "announcements": [
+description=        { "before": 1800, "text": "Server restarts in half an hour" }
+description=      ]
 description=    },
-description=    ["modwatch"] = {
-description=      enabled = true, action = "modcheck",
-description=      every = 5, everyUnit = "minutes",
+description=    "modwatch": {
+description=      "enabled": true, "action": "modcheck",
+description=      "every": 5, "everyUnit": "minutes"
 description=    },
-description=    ["happy-hour"] = {
-description=      enabled = true, action = "announce",
-description=      args = { text = "Loot respawn is boosted for the next hour" },
-description=      at = {"20:00"}, days = {"fri"},
-description=    },
-description=  },
+description=    "happy-hour": {
+description=      "enabled": true, "action": "announce",
+description=      "args": { "text": "Loot respawn is boosted for the next hour" },
+description=      "at": ["20:00"], "days": ["fri"]
+description=    }
+description=  }
 description=}
 description=[/code]
+description=
+description=[b]Upgrading from an earlier build?[/b] B42.20.4 removed loadstring, so the old Lua-format .txt config can no longer be read back, and the failure is silent. Convert it at [url=https://phunzoider.github.io/PhunZones/converter/]the Phun config converter[/url] - browser only, nothing is uploaded - and save the result as PhunServer2Cron.json. Until you do, cron reports it on every start and runs no jobs at all, rather than seeding defaults over a config you still believe is live.
 description=
 description=A job uses one of two timing modes:
 description=[list]
