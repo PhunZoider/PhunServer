@@ -236,8 +236,8 @@ option PhunServer.NightOffset
 { 
     type = integer, 
     default = 0,
-    min = 0,
-    max = 24,
+    min = -12,
+    max = 12,
     page = PhunServer_Cycles,
     translation = PhunServer_NightOffset,
 }
@@ -256,8 +256,8 @@ option PhunServer.DayOffset
 { 
     type = integer, 
     default = 0,
-    min = 0,
-    max = 24,
+    min = -12,
+    max = 12,
     page = PhunServer_Cycles,
     translation = PhunServer_DayOffset,
 }
