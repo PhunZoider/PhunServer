@@ -19,6 +19,10 @@ Commands[Core.commands.message] = function(args)
     Core.message(args.text, args.args)
 end
 
+Commands[Core.commands.roster] = function(args)
+    Core.rememberPlayers(args and args.names)
+end
+
 Commands[Core.commands.quit] = function(args)
     getCore():quit()
 end

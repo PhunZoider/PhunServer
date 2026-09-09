@@ -13,6 +13,75 @@ local tools = Core.tools
 -- PhunServer2Chat builds its cosmetic features on top of these.
 -- ---------------------------------------------------------------------------
 
+-- ---------------------------------------------------------------------------
+-- Delivery, and why it is not just a call to addLineInChat.
+--
+-- Chat is not ready the instant a player connects. ISChat.instance exists well
+-- before its tabs arrive from the server, and every renderer - vanilla's and
+-- PhunServer2Chat's replacement alike - quietly drops a line whose tab it
+-- cannot find. The join announcement fires within the server's two second
+-- sweep, which lands squarely inside that window, so the welcome a player is
+-- meant to see on arrival was being built and then thrown away.
+--
+-- Lines are held until there is somewhere to put them instead.
+-- ---------------------------------------------------------------------------
+
+-- Tab 0 is the General tab, which is where everything here is addressed.
+local function chatReady()
+    local instance = ISChat.instance
+    if not instance or not instance.tabs then
+        return false
+    end
+    for _, tab in ipairs(instance.tabs) do
+        if tab and tab.tabID == 0 then
+            return true
+        end
+    end
+    return false
+end
+
+-- A cap in case chat never becomes ready at all: better to lose the oldest
+-- notice than to grow a queue for the length of a session.
+local maxPending = 32
+local pending = {}
+local waiting = false
+local flushPending
+
+flushPending = function()
+    if not chatReady() then
+        return
+    end
+
+    Events.OnTick.Remove(flushPending)
+    waiting = false
+
+    -- Swapped out before delivering: addLineInChat is replaced by other mods,
+    -- and one that emits a line of its own must not append to the list being
+    -- walked.
+    local queued = pending
+    pending = {}
+    for _, msg in ipairs(queued) do
+        ISChat.addLineInChat(msg, 0)
+    end
+end
+
+local function deliver(msg)
+    if chatReady() then
+        ISChat.addLineInChat(msg, 0)
+        return
+    end
+
+    if #pending >= maxPending then
+        table.remove(pending, 1)
+    end
+    table.insert(pending, msg)
+
+    if not waiting then
+        waiting = true
+        Events.OnTick.Add(flushPending)
+    end
+end
+
 -- Builds a duck-typed ChatMessage the vanilla chat renderer will accept, so a
 -- message can be injected without going through the network chat layer.
 function Core.FakeMessage(message, color, options)
@@ -64,11 +133,7 @@ function Core.FakeMessage(message, color, options)
         end
     }
 
-    if not ISChat.instance or not ISChat.instance.chatText then
-        return
-    end
-
-    ISChat.addLineInChat(msg, 0)
+    deliver(msg)
 end
 
 -- text may be a translation key or a literal.

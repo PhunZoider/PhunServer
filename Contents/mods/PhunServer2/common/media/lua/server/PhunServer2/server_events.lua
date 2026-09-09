@@ -23,6 +23,30 @@ Events.OnClientCommand.Add(function(module, command, playerObj, arguments)
     end
 end)
 
+-- Tells everyone already here about a new arrival, so they can highlight the
+-- name. The full list goes out once per client on the playerSetup handshake;
+-- this only has to carry what changed since.
+--
+-- One name rather than the whole roster: sendServerCommand serialises its
+-- payload in full on every call, with no delta of its own, so resending the
+-- list would repeat to every client what all of them already hold. There is no
+-- matching leave broadcast, because clients never drop a name - a departing
+-- player stays highlightable for the rest of the session, which is the point.
+--
+-- Deliberately independent of the chat module's announcement settings: an admin
+-- who has turned off join announcements still wants names highlighted.
+local function announceArrival(username)
+    if not username or username == "" then
+        return
+    end
+    sendServerCommand(Core.name, Core.commands.roster, {
+        names = {username}
+    })
+end
+
+Events[Core.events.OnPlayerJoined].Add(announceArrival)
+Events[Core.events.OnPlayerRejoined].Add(announceArrival)
+
 local nextPlayerCheck = 0
 
 Events.OnTickEvenPaused.Add(function()

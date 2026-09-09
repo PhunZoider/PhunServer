@@ -13,6 +13,26 @@ function Core.getPlayerCount()
     return getOnlinePlayers():size()
 end
 
+-- The roster a client is handed on its playerSetup handshake, so it can
+-- recognise usernames in chat. Arrivals after that are sent one name at a time.
+--
+-- Read from the live player list rather than data.online: a player's record is
+-- not marked online until after their join event has fired, and the handshake
+-- can land inside that gap. Reading the registry would then leave the asker out
+-- of their own roster. Asking the game directly always includes them.
+function Core.getOnlineUsernames()
+    local names = {}
+    local online = tools.onlinePlayers()
+    for i = 0, online:size() - 1 do
+        local username = online:get(i):getUsername()
+        if username and username ~= "" then
+            table.insert(names, username)
+        end
+    end
+    table.sort(names)
+    return names
+end
+
 -- Usernames seen in the most recent sweep, so departures can be detected.
 local onliners = {}
 local wasEmpty = nil

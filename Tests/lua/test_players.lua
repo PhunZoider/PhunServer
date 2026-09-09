@@ -153,4 +153,36 @@ harness.sandbox["PhunServer2Chat.WelcomeAnnounce"] = true
 harness.sandbox["PhunServer2Chat.GoodbyeAnnouncements"] = true
 
 ---------------------------------------------------------------------------
+check.section("the roster sent to clients")
+
+-- A client cannot work out who else is connected: getOnlinePlayers there covers
+-- only its loaded cells. The server sends it this list so chat can recognise
+-- usernames, which is why the contents matter rather than just the call.
+
+freshServer()
+
+connect("bob", "none")
+connect("amy", "admin")
+check.equal("lists everyone connected, sorted", Core.getOnlineUsernames(), {"amy", "bob"})
+
+disconnect("bob")
+check.equal("and drops a player who has gone", Core.getOnlineUsernames(), {"amy"})
+
+-- A player's record is not marked online until after their join event has
+-- fired, and the handshake that asks for this list can land inside that gap.
+-- Read from data.online the roster would then leave the asker out of their own
+-- copy, making them the one name nobody could highlight. Reading the live
+-- player list is what avoids that, so the gap is what gets tested.
+--
+-- Registered last on purpose: the harness cannot unregister handlers, so this
+-- would otherwise fire for every connect in the sections above.
+local rosterAtJoin
+Events[Core.events.OnPlayerJoined].Add(function(username)
+    rosterAtJoin = Core.getOnlineUsernames()
+end)
+
+connect("carl", "none")
+check.equal("and includes a joining player while their own join is still firing", rosterAtJoin, {"amy", "carl"})
+
+---------------------------------------------------------------------------
 check.finish()
