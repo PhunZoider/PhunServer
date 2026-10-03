@@ -45,8 +45,19 @@ local function accessLevelOf(player)
     return string.lower(tostring(level))
 end
 
--- True when the account has any access level above "none": admin, moderator,
--- overseer, gm or observer.
+-- Matched by name rather than "anything but none". B42's role system reports an
+-- ordinary player as "user" (or "priority", "newuser"...), not "none", so the
+-- old test counted every player as staff and AnnounceAdmins = false silenced
+-- all joins and leaves.
+local staffLevels = {
+    admin = true,
+    moderator = true,
+    overseer = true,
+    gm = true,
+    observer = true
+}
+
+-- True when the account is admin, moderator, overseer, gm or observer.
 --
 -- Reads the level recorded on the player record rather than asking the
 -- IsoPlayer, because the caller that needs it most is the departure handler,
@@ -55,7 +66,7 @@ end
 function Core.isStaff(username)
     local record = username and Core.data and Core.data.online and Core.data.online[username]
     local level = record and record.accessLevel
-    return level ~= nil and level ~= "" and level ~= "none"
+    return level ~= nil and staffLevels[level] == true
 end
 
 -- Polled from the server tick. Maintains data.online and fires the join/leave

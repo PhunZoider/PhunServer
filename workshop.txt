@@ -36,6 +36,8 @@ description=Schedule shutdowns, announcements, mod-update checks or arbitrary Lu
 description=
 description=Jobs are defined in [b]<Zomboid>/Lua/PhunServer2Cron.json[/b]. If that file does not exist it is created for you with a five minute mod-update check, so a fresh install behaves like the old ModWatch did.
 description=
+description=ModWatch needs the server running with Steam, and your mods' ids listed in [b]WorkshopItems=[/b] in the server ini. The engine caches those ids at startup and can only check items it installed itself, so mods added by hand or by a host panel cannot be checked. If either is missing the server log now says so on every check.
+description=
 description=[code]
 description={
 description=  "version": 1,

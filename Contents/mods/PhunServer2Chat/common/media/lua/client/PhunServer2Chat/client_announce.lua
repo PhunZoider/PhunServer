@@ -32,13 +32,18 @@ end
 -- `text` is either one of our translation keys or an admin's literal string.
 -- getText only substitutes %1 for a string it actually resolved, so a custom
 -- literal has to be substituted by hand. v1 didn't, which meant the documented
--- %1 placeholder silently appeared verbatim in chat.
+-- %1 placeholder silently appeared verbatim in chat. {name} is the documented
+-- placeholder because the sandbox tooltip can't contain a literal %1 (getText
+-- treats it as a format specifier and throws); %1 still works for old configs.
 local function resolve(text, username)
     local translated = getTextOrNull(text, username)
     if translated then
         return translated
     end
-    return (tostring(text):gsub("%%1", username))
+    local safeName = tostring(username):gsub("%%", "%%%%")
+    -- %1$s is the Java-style spelling admins reach for; without it the
+    -- trailing $s was left in the line.
+    return (tostring(text):gsub("{name}", safeName):gsub("%%1%$s", safeName):gsub("%%1", safeName))
 end
 
 local function announce(text, username, color)

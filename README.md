@@ -24,6 +24,34 @@ Only `phunserver2` is mandatory. Mod-update restarts and nothing else:
 Mods=phunserver2;phunserver2cron
 ```
 
+## ModWatch
+
+ModWatch asks Steam whether any of your workshop mods have been published since
+this server booted, and schedules a restart when they have. It runs as the
+`modcheck` cron action, so its cadence is a job like any other — a fresh
+install gets one every five minutes.
+
+### It needs Steam, and it needs `WorkshopItems=`
+
+Two server-side requirements, both of which are easy to miss on a dedicated
+server and neither of which PhunServer can work around:
+
+1. **The server has to be running with Steam enabled.** Started with `-nosteam`
+   (or without `-Dzomboid.steam=1`), the engine returns no workshop data at all
+   and ModWatch cannot function.
+2. **Your mods' workshop ids have to be in `WorkshopItems=` in the server ini.**
+   `Mods=` alone is not enough. On a dedicated server the engine only knows
+   about workshop items *it* installed at boot, so mods placed on disk by hand,
+   by SteamCMD, or by a hosting panel are invisible to any update check —
+   including vanilla's own `checkModsNeedUpdate` console command.
+
+If either is unmet, ModWatch now says so explicitly in the server log on every
+poll rather than looking like it is working. Run `/check` as an admin to poll
+on demand and get the answer in chat.
+
+ModWatch only ever *stops* the server. Bringing it back up, and thereby letting
+Steam apply the updates, is your host's or service manager's job.
+
 ## Cron job format
 
 Jobs live in `<Zomboid>/Lua/PhunServer2Cron.json`. If the file is missing it is
@@ -115,6 +143,18 @@ expressions has to be rewritten by hand.
 
 The `/command` hook lives in core, so each module's commands work whether or
 not `phunserver2commands` is installed.
+
+### They are in-game chat commands only
+
+None of these work from the server console or over RCON, and they cannot be
+made to. The engine dispatches console and RCON input in Java, matching it
+against a fixed list of built-in command classes and answering anything else
+with `Unknown command`. There is no Lua hook on that path, so no mod can add a
+command to it. Typing `/restart 1` into the console will always fail.
+
+Run them from the in-game chat box as an admin instead. The vanilla console
+equivalents worth knowing are `quit` (save and stop, no warning to players),
+`save`, `servermsg "..."` and `checkModsNeedUpdate`.
 
 ## Map wiping is never implicit
 

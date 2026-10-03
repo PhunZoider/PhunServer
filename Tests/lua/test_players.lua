@@ -65,6 +65,18 @@ check.ok("an unknown username is not staff", Core.isStaff("nobody") == false)
 connect("bob", "none")
 check.ok("an ordinary player is not staff", Core.isStaff("bob") == false)
 
+-- B42 roles report ordinary players by role name rather than "none".
+for _, level in ipairs({"user", "User", "priority", "newuser", ""}) do
+    freshServer()
+    connect("pleb", level)
+    check.ok("'" .. level .. "' is not staff", Core.isStaff("pleb") == false)
+end
+
+freshServer()
+harness.sandbox["PhunServer2Chat.AnnounceAdmins"] = false
+connect("roleuser", "user")
+check.equal("a B42 'user' is still welcomed with admins hidden", announced(), {"welcomeFirstTime:roleuser"})
+
 for _, level in ipairs({"admin", "moderator", "overseer", "gm", "observer"}) do
     freshServer()
     connect("staffer", level)

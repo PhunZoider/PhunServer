@@ -1,6 +1,9 @@
 {
   "IGUI_PhunServer2Cron_Poll_PendingReboot": "Cannot check the workshop, a restart is already in progress",
-  "IGUI_PhunServer2Cron_Poll_NoIDs": "No workshop ids to check. You may not be connected to Steam.",
+  "IGUI_PhunServer2Cron_Poll_NoIDs": "No workshop ids to check. Set WorkshopItems= in the server ini.",
+  "IGUI_PhunServer2Cron_Poll_NoSteam": "This server was started without Steam, so mod updates cannot be checked.",
+  "IGUI_PhunServer2Cron_Poll_QueryFailed": "Steam did not answer the workshop query. Try again shortly.",
+  "IGUI_PhunServer2Cron_Poll_NotReady": "The server is still starting up, try again in a moment.",
   "IGUI_PhunServer2Cron_Poll_Updated": "%1 mod is outdated: %2",
   "IGUI_PhunServer2Cron_Poll_UpdatedPlural": "There are %1 outdated mods: %2",
   "IGUI_PhunServer2Cron_Poll_UpToDate": "All workshop mods are up to date",
