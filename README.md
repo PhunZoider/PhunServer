@@ -5,13 +5,13 @@ mods so a server only loads what it actually uses.
 
 This is a rewrite of PhunServer 1. It drops the PhunLib dependency, drops B41
 support, drops the map features that B42 now provides natively, and adds a
-scheduler.
+scheduler and admin diagnostics.
 
 ## Modules
 
 | Mod id | Folder | What it does |
 | --- | --- | --- |
-| `phunserver2` | `PhunServer2` | Required by all the others. Shared plumbing, verbose logging, player tracking, chat primitives, shutdown machinery, and the action and command registries. |
+| `phunserver2` | `PhunServer2` | Required by all the others. Shared plumbing, verbose logging, player tracking, chat primitives, shutdown machinery, the action and command registries, and [diagnostics](Docs/diagnostics.md). |
 | `phunserver2cron` | `PhunServer2Cron` | Scheduled jobs on a real-world clock. Includes ModWatch as a `modcheck` action. |
 | `phunserver2commands` | `PhunServer2Commands` | `/players`, `/hours`, `/sethours`. |
 | `phunserver2chat` | `PhunServer2Chat` | Join and leave announcements, username highlighting, music and radio tidying. |
@@ -24,137 +24,25 @@ Only `phunserver2` is mandatory. Mod-update restarts and nothing else:
 Mods=phunserver2;phunserver2cron
 ```
 
-## ModWatch
+## Documentation
 
-ModWatch asks Steam whether any of your workshop mods have been published since
-this server booted, and schedules a restart when they have. It runs as the
-`modcheck` cron action, so its cadence is a job like any other — a fresh
-install gets one every five minutes.
+| Page | Covers |
+| --- | --- |
+| [Docs/cron.md](Docs/cron.md) | The cron job file, timing, actions, and ModWatch's Steam and `WorkshopItems=` requirements. |
+| [Docs/commands.md](Docs/commands.md) | Every chat command, who can use it, and why none of them work from the console or RCON. |
+| [Docs/diagnostics.md](Docs/diagnostics.md) | `/diag`: the client and server square probe, Map health, and the check that runs at every server start. |
+| [Docs/migrating.md](Docs/migrating.md) | Moving from PhunServer 1: the old-to-new settings table and behaviour changes. |
+| [Tests/lua/README.md](Tests/lua/README.md) | The offline test suites. |
 
-### It needs Steam, and it needs `WorkshopItems=`
+Every sandbox setting has an in-game tooltip, so these pages do not repeat
+them.
 
-Two server-side requirements, both of which are easy to miss on a dedicated
-server and neither of which PhunServer can work around:
+## Shutdowns, not restarts
 
-1. **The server has to be running with Steam enabled.** Started with `-nosteam`
-   (or without `-Dzomboid.steam=1`), the engine returns no workshop data at all
-   and ModWatch cannot function.
-2. **Your mods' workshop ids have to be in `WorkshopItems=` in the server ini.**
-   `Mods=` alone is not enough. On a dedicated server the engine only knows
-   about workshop items *it* installed at boot, so mods placed on disk by hand,
-   by SteamCMD, or by a hosting panel are invisible to any update check —
-   including vanilla's own `checkModsNeedUpdate` console command.
-
-If either is unmet, ModWatch now says so explicitly in the server log on every
-poll rather than looking like it is working. Run `/check` as an admin to poll
-on demand and get the answer in chat.
-
-ModWatch only ever *stops* the server. Bringing it back up, and thereby letting
-Steam apply the updates, is your host's or service manager's job.
-
-## Cron job format
-
-Jobs live in `<Zomboid>/Lua/PhunServer2Cron.json`. If the file is missing it is
-created with a five minute mod-update check, matching PhunServer 1's default.
-
-```json
-{
-  "version": 1,
-  "data": {
-    "nightly-restart": {
-      "enabled": true,
-      "action": "shutdown",
-      "args": { "notice": 15 },
-      "at": ["03:00", "15:00"],
-      "days": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"],
-      "announcements": [
-        { "before": 1800, "text": "Server restarts in half an hour" }
-      ]
-    },
-    "modwatch": {
-      "enabled": true,
-      "action": "modcheck",
-      "every": 5,
-      "everyUnit": "minutes"
-    }
-  }
-}
-```
-
-### Timing
-
-A job uses exactly one of two modes.
-
-| Field | Mode | Meaning |
-| --- | --- | --- |
-| `at` | clock | List of `HH:MM` times, server local. |
-| `every` + `everyUnit` | interval | `minutes`, `hours` or `days`. |
-| `days` | both | Optional filter: `mon` … `sun`. Omit for every day. |
-| `startTime` / `endTime` | interval | Optional window. Windows may wrap past midnight. |
-| `runIfEmpty` | both | `false` skips the job when nobody is online. |
-| `announcements` | both | `{ before = <seconds>, text = "…" }`, sent ahead of the job. |
-
-`at` is when the job's **effect** lands, not when it starts. A `shutdown` at
-`03:00` with `notice = 15` begins its countdown at 02:45, so the server is
-genuinely down at 03:00. Actions declare this via `leadSeconds`.
-
-### Actions
-
-| Action | Provided by | Args |
-| --- | --- | --- |
-| `shutdown` | core | `notice` (minutes), `runIfEmpty` |
-| `announce` | core | `text` |
-| `modcheck` | cron | none |
-| `event` | cron | `event` (Lua event name to fire) |
-
-Other mods add their own with `PhunServer2.registerAction(name, definition)`.
-Registered actions automatically become schedulable and will appear in the
-admin UI when that ships.
-
-Edit the file and run `/cron reload` to pick up changes without a restart.
-
-### Why JSON and not Lua
-
-B42.20.4 removed `loadstring`, `load` and `loadfile`, so a config file that is
-Lua source can no longer be read back. The failure is silent — `loadstring` is
-just nil, so the file reads as empty and the mod carries on with its defaults.
-
-If you already have a `PhunServer2Cron.txt` from an earlier build, convert it at
-<https://phunzoider.github.io/PhunZones/converter/> (browser only, nothing is
-uploaded) and save the result beside it as `PhunServer2Cron.json`. Until you do,
-cron says so on every start and **runs no jobs at all**, rather than seeding
-defaults over a config you still believe is live.
-
-The converter takes data tables only. A config containing actual Lua
-expressions has to be rewritten by hand.
-
-## Commands
-
-| Command | Access | Provided by |
-| --- | --- | --- |
-| `/restart <minutes?>` | admin | core |
-| `/cancelrestart` | admin | core |
-| `/check` | admin | cron |
-| `/cron reload` | admin | cron |
-| `/players` | per setting | commands |
-| `/hours <username?>` | per setting | commands |
-| `/sethours <username?> <n>` | admin | commands |
-| `/wipemap <username\|all>` | admin | wiper |
-
-The `/command` hook lives in core, so each module's commands work whether or
-not `phunserver2commands` is installed.
-
-### They are in-game chat commands only
-
-None of these work from the server console or over RCON, and they cannot be
-made to. The engine dispatches console and RCON input in Java, matching it
-against a fixed list of built-in command classes and answering anything else
-with `Unknown command`. There is no Lua hook on that path, so no mod can add a
-command to it. Typing `/restart 1` into the console will always fail.
-
-Run them from the in-game chat box as an admin instead. The vanilla console
-equivalents worth knowing are `quit` (save and stop, no warning to players),
-`save`, `servermsg "..."` and `checkModsNeedUpdate`.
+PhunServer never restarts your server. Whether it comes from `/restart`, a cron
+job or ModWatch, a shutdown stops the server cleanly; bringing it back up (and
+thereby letting Steam apply mod updates) is your host's or service manager's
+job.
 
 ## Map wiping is never implicit
 
@@ -177,32 +65,18 @@ extension.
 `Tests/root/<Mod>/common/mod.info` carries the `*test` mod ids so a dev build
 can sit alongside a release build in one install.
 
+`workshop.txt` is the release Workshop page and `Tests/workshop.txt` the dev
+one. Steam caps the description at 8000 characters, so long-form material
+belongs in `Docs/` with a link from the Workshop page.
+
 ## Tests
 
 ```
 ..\PhunTestKit\run.cmd
 ```
 
-Offline suites for the JSON layer, the config envelope and cron job loading,
-run against a Lua runtime cut down to what B42.20.4 actually offers. The
-harness itself lives in the sibling [PhunTestKit](../PhunTestKit) repo so it
-stays out of the mod repos. See [Tests/lua/README.md](Tests/lua/README.md).
-
-## Migrating from PhunServer 1
-
-Remove `phunserver` from your `Mods` line and add the modules you want.
-`phunlib` is no longer required by any of them.
-
-Settings do not carry over — sandbox options moved to per-module names.
-The mapping table is in `workshop.txt`.
-
-Notable behaviour changes:
-
-- `Debug` is now `Verbose`, and it is a single switch shared by every module.
-- The shutdown chime is a 0-100 volume rather than a tickbox. 0 is silent.
-- Map wiping is off by default and never wipes on first sight of a player.
-- Day and night changes are server-authoritative; clients no longer compute
-  their own transitions.
-- `NightOffset` and `DayOffset` accept negative values, which the v1 tooltips
-  advertised but the option ranges disallowed.
-- Players-on-map is gone. Use `MapRemotePlayerVisibility` in your server ini.
+Offline suites for the JSON layer, the config envelope, cron job loading,
+player tracking and Map health, run against a Lua runtime cut down to what
+B42.20.4 actually offers. The harness itself lives in the sibling
+[PhunTestKit](../PhunTestKit) repo so it stays out of the mod repos. See
+[Tests/lua/README.md](Tests/lua/README.md).
