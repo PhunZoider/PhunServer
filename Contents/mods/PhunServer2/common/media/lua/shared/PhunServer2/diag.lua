@@ -19,7 +19,10 @@ local Diag = {
     name = "PhunServer2Diag",
     commands = {
         probe = "probe",
-        probeResult = "probeResult"
+        probeResult = "probeResult",
+        health = "health",
+        healthResult = "healthResult",
+        healthAlert = "healthAlert"
     },
     -- Handlers by command name, filled in by server_diag.lua and
     -- client_diag.lua. Kept here so single player can call across without

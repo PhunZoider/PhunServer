@@ -88,6 +88,25 @@ Probe.FIELDS = {{
         return buildingKind(getWorld():getMetaGrid():getBuildingAt(ctx.x, ctx.y))
     end
 }, {
+    -- The engine's guard against building a player-built stand-in over a real
+    -- building (WorldRegionToMetaGrid.isAdjacentToOrOverlappingAPredefinedBuilding)
+    -- ignores any map building whose isBasement() differs from the stand-in's.
+    -- isBasement() is "the FIRST room in the list is below ground", so a house
+    -- with a basement whose basement room happens to be listed first is never
+    -- protected, and the client builds a stand-in over its ground floor: no
+    -- roof cutaway, no power for TVs. This shows that flag for the map building.
+    key = "mapBuildingBasement",
+    read = function(ctx)
+        local def = getWorld():getMetaGrid():getBuildingAt(ctx.x, ctx.y)
+        if not def or def:isUserDefined() then
+            return "-"
+        end
+        local rooms = def:getRooms()
+        local first = rooms and rooms:size() > 0 and rooms:get(0):getZ()
+        return string.format("%s (first room level %s, levels %d..%d)", tostring(def:isBasement()),
+            tostring(first), def:getMinLevel(), def:getMaxLevel())
+    end
+}, {
     key = "hasGridPower",
     read = squareBool("hasGridPower")
 }, {
@@ -162,6 +181,37 @@ Probe.FIELDS = {{
     read = function(ctx)
         local cell = cellData(ctx)
         return cell and tostring(cell:getBuildingCount() - cell:getBuildingCount(true)) or "no cell data"
+    end
+}, {
+    -- Where the player-built stand-ins are, so one can be walked into and
+    -- probed. The region system makes one for any enclosed, roofed area no map
+    -- building covers, and it never takes grid power, so a cluster of them in
+    -- a town means a map drew structures without buildings, or lost its own.
+    key = "cellUserBuildingList",
+    long = true,
+    read = function(ctx)
+        local list = ArrayList.new()
+        getWorld():getMetaGrid():getBuildingsIntersecting(ctx.cellX * 256, ctx.cellY * 256, 256, 256, list)
+        local found = {}
+        for i = 0, list:size() - 1 do
+            local def = list:get(i)
+            if def:isUserDefined() then
+                table.insert(found, string.format("%d,%d %dx%d", def:getX(), def:getY(), def:getW(), def:getH()))
+            end
+        end
+        if #found == 0 then
+            return "none"
+        end
+        table.sort(found)
+        local shown = {}
+        for i = 1, math.min(#found, 12) do
+            shown[i] = found[i]
+        end
+        local text = table.concat(shown, "; ")
+        if #found > 12 then
+            text = text .. "; +" .. (#found - 12) .. " more"
+        end
+        return text
     end
 }, {
     -- Every zone, not getZoneType(), which reports one per square and so hid
