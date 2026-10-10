@@ -2,14 +2,14 @@ version=1
 id=3792193021
 title=PhunServer 2
 description=PhunServer 2 is a set of lightweight, independent server tools for multiplayer Project Zomboid.
-description=Add only the pieces you actually want. Every module is its own mod id, so a server that just wants mod-update restarts never loads chat overrides or day/night code.
+description=Every module is its own mod id, so you load only the pieces you actually want.
 description=
-description=[b]This is a rewrite of [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3623897097]PhunServer Tools[/url] and replaces it.[/b] Settings are NOT carried over - the sandbox options have moved to per-module names. See the migration notes at the bottom.
+description=[b]This is a rewrite of [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3623897097]PhunServer Tools[/url] and replaces it.[/b] Settings do NOT carry over; see the notes at the bottom.
 description=
 description=[h2]Modules[/h2]
 description=[table]
 description=[tr][th]Mod Id[/th][th]What it does[/th][/tr]
-description=[tr][td][b]phunserver2[/b][/td][td]Required by all the others. Shared plumbing, verbose logging, player tracking and the shutdown machinery.[/td][/tr]
+description=[tr][td][b]phunserver2[/b][/td][td]Required by all the others. Shared plumbing, shutdown machinery and admin diagnostics.[/td][/tr]
 description=[tr][td][b]phunserver2cron[/b][/td][td]Scheduled jobs on a real-world clock, plus ModWatch.[/td][/tr]
 description=[tr][td][b]phunserver2commands[/b][/td][td]The /players, /hours and /sethours chat commands.[/td][/tr]
 description=[tr][td][b]phunserver2chat[/b][/td][td]Join and leave announcements, username highlighting, tidier radio and music lines.[/td][/tr]
@@ -17,13 +17,15 @@ description=[tr][td][b]phunserver2daynight[/b][/td][td]Independent day and night
 description=[tr][td][b]phunserver2wiper[/b][/td][td]Map and symbol wipes on a season change or a new character.[/td][/tr]
 description=[/table]
 description=
-description=Example, mod-update restarts and nothing else:
+description=Example, mod-update restarts only:
 description=[code]Mods=phunserver2;phunserver2cron[/code]
 description=
-description=Every setting has an in-game tooltip, so this page does not repeat them.
+description=Every setting has an in-game tooltip. Commands are typed in game chat, not the server console or RCON ([url=https://github.com/PhunZoider/PhunServer/blob/main/Docs/commands.md]why[/url]).
 description=
 description=[h2]PhunServer 2: Core[/h2]
-description=Required by every other module. On its own it does nothing player-facing, but it owns the shutdown countdown that the other modules use, so its settings apply to every restart however it was triggered.
+description=Owns the shutdown countdown, so its settings apply to every restart however it was triggered.
+description=
+description=[b]Important:[/b] PhunServer never restarts your server. It shuts it down cleanly; bringing it back up (letting Steam apply mod updates) is your host's job.
 description=
 description=Related commands:
 description=[list]
@@ -31,56 +33,27 @@ description=[*][b]/restart <minutes?>[/b] - Start a restart countdown. With no a
 description=[*][b]/cancelrestart[/b] - Cancel a pending restart.
 description=[/list]
 description=
-description=[h2]PhunServer 2: Cron[/h2]
-description=Schedule shutdowns, announcements, mod-update checks or arbitrary Lua events against the real-world clock.
-description=
-description=Jobs are defined in [b]<Zomboid>/Lua/PhunServer2Cron.json[/b]. If that file does not exist it is created for you with a five minute mod-update check, so a fresh install behaves like the old ModWatch did.
-description=
-description=ModWatch needs the server running with Steam, and your mods' ids listed in [b]WorkshopItems=[/b] in the server ini. The engine caches those ids at startup and can only check items it installed itself, so mods added by hand or by a host panel cannot be checked. If either is missing the server log now says so on every check.
-description=
-description=[code]
-description={
-description=  "version": 1,
-description=  "data": {
-description=    "nightly-restart": {
-description=      "enabled": true,
-description=      "action": "shutdown",
-description=      "args": { "notice": 15 },
-description=      "at": ["03:00", "15:00"],
-description=      "announcements": [
-description=        { "before": 1800, "text": "Server restarts in half an hour" }
-description=      ]
-description=    },
-description=    "modwatch": {
-description=      "enabled": true, "action": "modcheck",
-description=      "every": 5, "everyUnit": "minutes"
-description=    },
-description=    "happy-hour": {
-description=      "enabled": true, "action": "announce",
-description=      "args": { "text": "Loot respawn is boosted for the next hour" },
-description=      "at": ["20:00"], "days": ["fri"]
-description=    }
-description=  }
-description=}
-description=[/code]
-description=
-description=A job uses one of two timing modes:
+description=[h3]Diagnostics[/h3]
+description=Read-only admin tools for when the world is not what it should be.
 description=[list]
-description=[*][b]at[/b] - a list of HH:MM clock times, optionally filtered by [b]days[/b]
-description=[*][b]every[/b] + [b]everyUnit[/b] - an interval in minutes, hours or days, optionally confined to a [b]startTime[/b] to [b]endTime[/b] window
+description=[*][b]/diag[/b] - Probe the square you stand on. Client and server facts (power, buildings, zones) side by side, differences in red.
+description=[*][b]/diag <x> <y> <z?>[/b] - Probe any square, even where nobody is standing.
+description=[*][b]/diag health[/b] - Is every map in Map= installed, and did its zones load?
 description=[/list]
+description=Map health also runs at server start. If it finds a problem it logs MAP HEALTH lines and shows the window to admins as they join. It catches a Map= entry whose mod is inactive (later maps lose their buildings and indoor power) and a broken map file that leaves maps above it with no zones. [url=https://github.com/PhunZoider/PhunServer/blob/main/Docs/diagnostics.md]More[/url].
 description=
-description=Available actions: [b]shutdown[/b], [b]announce[/b], [b]modcheck[/b], [b]event[/b]. Other mods can register their own.
+description=[h2]PhunServer 2: Cron[/h2]
+description=Schedule shutdowns, announcements, mod-update checks or Lua events on the real-world clock, at set times or on an interval.
 description=
-description=Note that [b]at[/b] is the time the job's effect lands, not when it starts. A shutdown at 03:00 with 15 minutes of notice begins its countdown at 02:45 so the server is genuinely down at 03:00.
+description=Jobs live in [b]<Zomboid>/Lua/PhunServer2Cron.json[/b], created on first run with a five minute mod-update check. See the [url=https://github.com/PhunZoider/PhunServer/blob/main/Docs/cron.md]cron guide[/url] for the format and examples.
+description=
+description=ModWatch needs the server running with Steam, and your mods' ids in [b]WorkshopItems=[/b] in the server ini. The engine only checks items it installed itself, so mods added by hand or a host panel cannot be checked. If either is missing the log says so.
 description=
 description=Related commands:
 description=[list]
 description=[*][b]/check[/b] - Check the workshop for updated mods right now.
 description=[*][b]/cron reload[/b] - Re-read the job file without restarting.
 description=[/list]
-description=
-description=[b]Important:[/b] PhunServer does not restart your server. It shuts it down cleanly; bringing it back up (and thereby letting Steam apply mod updates) is your host's or a service's job.
 description=
 description=ModWatch is heavily inspired by the excellent [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2844315442]Udderly Up To Date[/url].
 description=
@@ -97,12 +70,12 @@ description=Greet returning players by name, colour usernames wherever they appe
 description=
 description=[h2]PhunServer 2: Day/Night[/h2]
 description=Run day and night at different speeds. The server decides and tells clients, so everyone agrees on what time it is.
-description=Long days to build in, short nights for mercy - or the reverse, if you would rather your players were afraid of the dark. Dawn and dusk shift separately.
+description=Long days to build in, short nights for mercy, or the reverse if you would rather your players were afraid of the dark. Dawn and dusk shift separately.
 description=
 description=[h2]PhunServer 2: Wiper[/h2]
 description=Wipe player maps when a season rolls over, or when a player rolls a new character.
 description=
-description=[b]It will never wipe anyone by surprise.[/b] Wiping is off by default, and the first time the mod sees a player it records your current wipe key as their baseline rather than wiping them. Only a key that changes after that causes a wipe. Installing this mid-season is safe.
+description=[b]It will never wipe anyone by surprise.[/b] Wiping is off by default, and a player seen for the first time is recorded, not wiped. Only a wipe key that changes after that wipes, so installing mid-season is safe.
 description=
 description=Related commands:
 description=[list]
@@ -111,12 +84,10 @@ description=[*][b]/wipemap all[/b] - Wipe every online player's map now.
 description=[/list]
 description=
 description=[h2]Coming from PhunServer 1?[/h2]
-description=Remove [b]phunserver[/b] from your Mods line and add the modules you want. PhunLib is no longer required by any of them.
-description=
-description=Settings do not carry over - the sandbox options moved to per-module names. The full old-to-new mapping table is in the [url=https://github.com/PhunZoider/PhunServer]GitHub README[/url].
+description=Remove [b]phunserver[/b] from your Mods line and add the modules you want. PhunLib is no longer required. Settings moved to per-module names; the [url=https://github.com/PhunZoider/PhunServer/blob/main/Docs/migrating.md]migration guide[/url] maps old to new.
 description=
 description=[h2]More Phun Stuff[/h2]
-description=[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3689006725][img]https://i.ibb.co/4ZLgMZ4m/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3676252660][img]https://i.ibb.co/3mQpB8ST/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3676252110][img]https://i.ibb.co/d4y0BhnF/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3676251425][img]https://i.ibb.co/fYNn5BLC/preview.png[/img][/url][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3676250472][img]https://i.ibb.co/svW9sVvK/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3793624522][img]https://i.ibb.co/k2k39f8w/preview.png[/img][/url]
+description=[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3812500419][img]https://i.ibb.co/DggjJWss/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3812506730][img]https://i.ibb.co/QvxxrqJD/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3689006725][img]https://i.ibb.co/4ZLgMZ4m/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3793624522][img]https://i.ibb.co/k2k39f8w/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3816322755][img]https://i.ibb.co/GfPVgK6f/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3676252660][img]https://i.ibb.co/3mQpB8ST/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3676252110][img]https://i.ibb.co/4rxBnRX/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3676251425][img]https://i.ibb.co/fYNn5BLC/preview.png[/img][/url] [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3676250472][img]https://i.ibb.co/svW9sVvK/preview.png[/img][/url] 
 description=
 description=Coded with love for our awesome [url=https://discord.gg/v2USyAtP6q]PhunZoid[/url] community.
 description=Check out the [url=https://github.com/PhunZoider/PhunServer]GitHub repo[/url] for more info.
