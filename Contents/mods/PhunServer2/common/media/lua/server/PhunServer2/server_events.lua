@@ -6,6 +6,7 @@ local Core = require "PhunServer2/core"
 require "PhunServer2/server_config"
 require "PhunServer2/server_players"
 require "PhunServer2/server_shutdown"
+require "PhunServer2/server_diag"
 local Commands = require "PhunServer2/server_commands"
 
 Events.OnInitGlobalModData.Add(function()
