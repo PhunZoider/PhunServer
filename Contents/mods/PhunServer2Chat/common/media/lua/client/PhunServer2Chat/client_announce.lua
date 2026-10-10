@@ -7,20 +7,24 @@ local Chat = require "PhunServer2Chat/core"
 
 -- Known usernames, lowercased, used both for highlighting and to keep a
 -- departed player's name coloured for the rest of the session.
-Chat.players = {}
-
-function Chat.rememberPlayer(username)
-    if username and username ~= "" then
-        Chat.players[string.lower(username)] = username
-    end
-end
+--
+-- The table belongs to core, which the server pushes its roster into. That is
+-- the only way a client can learn a username belonging to somebody outside its
+-- loaded cells. This used to be built from tools.onlinePlayers, which narrows
+-- to local players on a client, so the lookup held little beyond your own name
+-- plus whoever you happened to watch arrive - which is why highlighting worked
+-- for some names and not others.
+Chat.players = Core.knownPlayers
+Chat.rememberPlayer = Core.rememberPlayer
 
 function Chat.getPlayers()
-    -- Refresh from whoever is currently visible, keeping past names
-    local online = Core.tools.onlinePlayers()
+    -- Top up from whoever is locally visible. The roster covers multiplayer;
+    -- this is what keeps highlighting working in single player and on a coop
+    -- host, where no roster is ever sent. Passing false asks the helper for
+    -- every player it can see rather than only the local ones.
+    local online = Core.tools.onlinePlayers(false)
     for i = 0, online:size() - 1 do
-        local p = online:get(i)
-        Chat.rememberPlayer(p:getUsername())
+        Chat.rememberPlayer(online:get(i):getUsername())
     end
     return Chat.players
 end
@@ -28,13 +32,18 @@ end
 -- `text` is either one of our translation keys or an admin's literal string.
 -- getText only substitutes %1 for a string it actually resolved, so a custom
 -- literal has to be substituted by hand. v1 didn't, which meant the documented
--- %1 placeholder silently appeared verbatim in chat.
+-- %1 placeholder silently appeared verbatim in chat. {name} is the documented
+-- placeholder because the sandbox tooltip can't contain a literal %1 (getText
+-- treats it as a format specifier and throws); %1 still works for old configs.
 local function resolve(text, username)
     local translated = getTextOrNull(text, username)
     if translated then
         return translated
     end
-    return (tostring(text):gsub("%%1", username))
+    local safeName = tostring(username):gsub("%%", "%%%%")
+    -- %1$s is the Java-style spelling admins reach for; without it the
+    -- trailing $s was left in the line.
+    return (tostring(text):gsub("{name}", safeName):gsub("%%1%$s", safeName):gsub("%%1", safeName))
 end
 
 local function announce(text, username, color)

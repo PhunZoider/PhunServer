@@ -39,6 +39,7 @@ PhunServer2 = {
         playerSetup = "playerSetup",
         notify = "notify",
         message = "message",
+        roster = "roster",
         quit = "quit",
         restart = "restart",
         cancelRestart = "cancelRestart"
@@ -123,6 +124,36 @@ end
 function Core.logger(moduleName)
     return function(str)
         Core.verboseLn(str, moduleName)
+    end
+end
+
+-- ---------------------------------------------------------------------------
+-- KNOWN PLAYERS
+--
+-- Every username the server has told this client about, keyed by the lowercased
+-- name so lookups are case insensitive, valued by the original spelling.
+--
+-- A client cannot build this list for itself. getOnlinePlayers() on a client
+-- returns only players in its loaded cells, and tools.onlinePlayers narrows
+-- that further to local players, so anyone out of range is invisible. The
+-- server pushes the roster instead: once on the playerSetup handshake, and
+-- again whenever somebody joins or leaves.
+--
+-- Names are never removed. A player who logs off mid-conversation should stay
+-- recognisable for the rest of the session.
+-- ---------------------------------------------------------------------------
+
+Core.knownPlayers = {}
+
+function Core.rememberPlayer(username)
+    if type(username) == "string" and username ~= "" then
+        Core.knownPlayers[string.lower(username)] = username
+    end
+end
+
+function Core.rememberPlayers(usernames)
+    for _, username in ipairs(usernames or {}) do
+        Core.rememberPlayer(username)
     end
 end
 

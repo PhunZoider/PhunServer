@@ -26,12 +26,26 @@ local function isEmptyTable(t)
     return true
 end
 
--- Zomboid mixes 0..1 float RGB and 0..255 integer RGB tags, so reuse whatever
--- tag the line already carries rather than assuming a format.
-local function getRestoreRGBTag(text)
-    return text:match("(<RGB:[^>]+>)") or "<RGB:1.0,1.0,1.0>"
-end
-
+-- Wrapping a name in colour tags is not just a matter of concatenation, because
+-- of how ISRichTextPanel:paginate reads the line. It splits on spaces, treats
+-- any token containing <...> as a command, and starts a fresh chunk positioned
+-- at the running x. Three consequences decide what gets emitted here:
+--
+--   * A character touching a tag is swallowed with it. "(<PUSHRGB:...>" parses
+--     as the command and the bracket is simply gone, so every tag needs a
+--     literal space either side to stay a token of its own.
+--   * Chunk boundaries carry no width, so a visible gap only appears where a
+--     <SPACE> command asks for one. That is why the tags cannot just be
+--     dropped in: without it the name runs into the following word.
+--   * <SPACE> is unconditional, so emitting it on both sides regardless of
+--     context pushed punctuation off the name - "Bob ," rather than "Bob," -
+--     and doubled the gap between two names that sat next to each other. It is
+--     emitted only where the source text actually had whitespace, and only once
+--     per gap.
+--
+-- Written with find and sub rather than gsub with a position capture, because
+-- the game runs Kahlua rather than a reference Lua and the pattern extensions
+-- are not worth relying on.
 local function highlightRawText(raw, lookup)
     if not raw or raw == "" then
         return raw
@@ -43,15 +57,43 @@ local function highlightRawText(raw, lookup)
         highlightColor = color
     end
 
-    -- gsub returns two values; parenthesise so only the string escapes
-    local s = raw:gsub("([%w_%.%-]+)", function(token)
-        if lookup[string.lower(token)] then
-            return "<PUSHRGB:" .. highlightColor .. "><SPACE> " .. token .. " <SPACE><POPRGB>"
-        end
-        return token
-    end)
+    local out = {}
+    local pos = 1
+    local prevTrailed = false
 
-    return s
+    while true do
+        local s, e, token = raw:find("([%w_%.%-]+)", pos)
+        if not s then
+            break
+        end
+
+        local gap = raw:sub(pos, s - 1)
+
+        if lookup[string.lower(token)] then
+            local before = s > 1 and raw:sub(s - 1, s - 1) or ""
+            local after = raw:sub(e + 1, e + 1)
+            local lead = before:match("%s") and "<SPACE>" or ""
+            local trail = after:match("%s") and "<SPACE>" or ""
+
+            -- The name before this one already paid for the gap between them.
+            if prevTrailed and gap:match("^%s*$") then
+                lead = ""
+            end
+
+            out[#out + 1] = gap
+            out[#out + 1] = " <PUSHRGB:" .. highlightColor .. ">" .. lead .. " " .. token .. " " ..
+                                trail .. "<POPRGB> "
+            prevTrailed = trail ~= ""
+        else
+            out[#out + 1] = raw:sub(pos, e)
+            prevTrailed = false
+        end
+
+        pos = e + 1
+    end
+
+    out[#out + 1] = raw:sub(pos)
+    return table.concat(out)
 end
 
 local function findLastPlain(haystack, needle)

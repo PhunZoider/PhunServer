@@ -2,10 +2,11 @@
 
 Offline tests for the parts of PhunServer2 that can be exercised without the
 game: JSON encoding and decoding, the file layer on top of it, the versioned
-config envelope, and cron job loading.
+config envelope, cron job loading, player tracking, and the Map health check
+behind `/diag health`.
 
 The harness lives in a separate repo, [PhunTestKit][kit], so it stays out of the
-mod repos and does not drift between them. Nothing here is deployed —
+mod repos and does not drift between them. Nothing here is deployed:
 `deploy.cmd` copies only `Contents\mods\*` and removes `Tests` from the workshop
 staging folders outright.
 
@@ -35,12 +36,13 @@ away, and how to write a suite.
 
 ## The suites
 
-| File              | Covers                                                                        |
-| ----------------- | ----------------------------------------------------------------------------- |
-| `test_json.lua`   | `json.lua` — round trips, pretty printing, stable key order, refusals, decoding |
-| `test_config.lua` | `tools.lua` and `server_config.lua` — the file layer, legacy detection, the version envelope |
-| `test_cron.lua`   | `server_jobs.lua` and `schedule.lua` — seeding, the seeding guard, normalisation |
-| `test_players.lua`| `server_players.lua` and chat's `server_events.lua` — access levels, join/leave announcements, staff suppression |
+| File | Covers |
+| --- | --- |
+| `test_json.lua` | `json.lua`: round trips, pretty printing, stable key order, refusals, decoding |
+| `test_config.lua` | `tools.lua` and `server_config.lua`: the file layer, legacy detection, the version envelope |
+| `test_cron.lua` | `server_jobs.lua` and `schedule.lua`: seeding, the seeding guard, normalisation |
+| `test_players.lua` | `server_players.lua` and chat's `server_events.lua`: access levels, join/leave announcements, staff suppression, the client roster |
+| `test_diag_health.lua` | `diag_health.lua`: Map health verdicts for a healthy list, a `Map=` entry with no folder or an inactive mod, an `objects.lua` that stops zone loading, sample selection, unreadable files, and the client side. See [Docs/diagnostics.md](../../Docs/diagnostics.md). |
 
 ## Why these exist
 
@@ -50,7 +52,7 @@ be Lua source read back through `loadstring`, and the failure mode was silent:
 with its defaults, and the next save writes them over the admin's settings.
 
 The harness makes those globals raise, so reintroducing one fails here rather
-than in someone's server. Three behaviours are pinned deliberately, and a future
+than in someone's server. Four behaviours are pinned deliberately, and a future
 change might mistake any of them for a bug:
 
 - **Encoding refuses a non-string key rather than coercing it.** JSON object
@@ -62,13 +64,13 @@ change might mistake any of them for a bug:
   with an empty one. `test_config.lua` asserts the file is byte-identical after
   a refused save.
 - **A player's access level is recorded before the join event fires, not
-  after.** The leave event carries only a username — by then the `IsoPlayer` is
-  gone — so suppressing an admin's goodbye depends entirely on the level having
+  after.** The leave event carries only a username (by then the `IsoPlayer` is
+  gone), so suppressing an admin's goodbye depends entirely on the level having
   been written to their record while they were connected. Recording it after
   the join event, which is where it naturally wants to go, silently announces
   every admin's *first* connection. `test_players.lua` caught exactly that.
 - **Cron will not seed defaults while an unconverted `.txt` is present.**
   Seeding would create a `.json`, which stops `loadConfig` ever reporting the
-  problem again — the server would then run the default job set while the admin
+  problem again: the server would then run the default job set while the admin
   believes their own jobs are live. Running nothing is the honest outcome, and
   the warning repeats every start until the file is converted or removed.

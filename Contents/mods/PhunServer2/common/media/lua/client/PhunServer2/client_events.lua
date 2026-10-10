@@ -5,6 +5,7 @@ end
 local Core = require "PhunServer2/core"
 require "PhunServer2/client_notify"
 require "PhunServer2/client_chat_commands"
+require "PhunServer2/client_diag"
 local Commands = require "PhunServer2/client_commands"
 
 -- One-shot bootstrap. OnGameStart is unreliable for this in MP, so we take the

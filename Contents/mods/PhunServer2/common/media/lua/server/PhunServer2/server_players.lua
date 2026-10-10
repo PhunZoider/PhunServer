@@ -13,6 +13,26 @@ function Core.getPlayerCount()
     return getOnlinePlayers():size()
 end
 
+-- The roster a client is handed on its playerSetup handshake, so it can
+-- recognise usernames in chat. Arrivals after that are sent one name at a time.
+--
+-- Read from the live player list rather than data.online: a player's record is
+-- not marked online until after their join event has fired, and the handshake
+-- can land inside that gap. Reading the registry would then leave the asker out
+-- of their own roster. Asking the game directly always includes them.
+function Core.getOnlineUsernames()
+    local names = {}
+    local online = tools.onlinePlayers()
+    for i = 0, online:size() - 1 do
+        local username = online:get(i):getUsername()
+        if username and username ~= "" then
+            table.insert(names, username)
+        end
+    end
+    table.sort(names)
+    return names
+end
+
 -- Usernames seen in the most recent sweep, so departures can be detected.
 local onliners = {}
 local wasEmpty = nil
@@ -25,8 +45,19 @@ local function accessLevelOf(player)
     return string.lower(tostring(level))
 end
 
--- True when the account has any access level above "none": admin, moderator,
--- overseer, gm or observer.
+-- Matched by name rather than "anything but none". B42's role system reports an
+-- ordinary player as "user" (or "priority", "newuser"...), not "none", so the
+-- old test counted every player as staff and AnnounceAdmins = false silenced
+-- all joins and leaves.
+local staffLevels = {
+    admin = true,
+    moderator = true,
+    overseer = true,
+    gm = true,
+    observer = true
+}
+
+-- True when the account is admin, moderator, overseer, gm or observer.
 --
 -- Reads the level recorded on the player record rather than asking the
 -- IsoPlayer, because the caller that needs it most is the departure handler,
@@ -35,7 +66,7 @@ end
 function Core.isStaff(username)
     local record = username and Core.data and Core.data.online and Core.data.online[username]
     local level = record and record.accessLevel
-    return level ~= nil and level ~= "" and level ~= "none"
+    return level ~= nil and staffLevels[level] == true
 end
 
 -- Polled from the server tick. Maintains data.online and fires the join/leave

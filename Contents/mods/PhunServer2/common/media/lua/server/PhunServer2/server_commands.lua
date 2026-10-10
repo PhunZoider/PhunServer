@@ -13,6 +13,13 @@ Commands[Core.commands.playerSetup] = function(player, args)
         return
     end
     Core.verboseLn("Setting up player " .. tostring(player:getUsername()))
+    -- The client asks for this the moment its Lua is up, which is the earliest
+    -- point it can be told who else is here. Join and leave broadcasts keep it
+    -- current from then on. Targeted rather than broadcast: everyone else
+    -- already has a roster, and this one is only news to the asker.
+    sendServerCommand(player, Core.name, Core.commands.roster, {
+        names = Core.getOnlineUsernames()
+    })
     -- Modules hook OnPlayerJoined/Rejoined rather than extending this.
 end
 

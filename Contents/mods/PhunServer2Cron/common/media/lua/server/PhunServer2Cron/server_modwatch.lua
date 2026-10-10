@@ -68,17 +68,54 @@ function Cron.pollWorkshop(player)
     lastPoll = getTimestamp()
 
     local ok, err = pcall(function()
+        -- On a dedicated server getSteamWorkshopItemIDs() is not a live Steam
+        -- call: it maps GameServer.workshopInstallFolders, which the engine
+        -- fills in once at boot from the ini's WorkshopItems= list. The two
+        -- ways it comes back empty are completely different problems for an
+        -- admin to fix, so they get separate messages instead of one vague one
+        -- that fits neither.
         local ids = getSteamWorkshopItemIDs()
 
-        if not ids or (ids.size and ids:size() == 0) then
-            Cron.logLn("No workshop IDs to poll. Either no workshop mods are installed or Steam is unreachable.")
+        if ids == nil then
+            -- nil rather than an empty list means Steam mode is off. Nothing
+            -- ModWatch does can work in that state.
+            Cron.logLn("ModWatch cannot run: this server was started without Steam.")
+            Cron.logLn("  Mod-update checks need the server launched with Steam enabled, i.e. without -nosteam.")
+            reply("IGUI_PhunServer2Cron_Poll_NoSteam")
+            return
+        end
+
+        local count = ids:size()
+
+        if count == 0 then
+            -- Steam is up, but the engine recorded no workshop items, which
+            -- means the ini asked it to install none.
+            Cron.logLn("ModWatch has nothing to poll: this server has no workshop items registered.")
+            Cron.logLn("  List your mods' workshop ids in WorkshopItems= in the server ini. Mods= alone is not enough:")
+            Cron.logLn("  the engine only tracks items it installed itself, so hand-installed mods cannot be checked.")
             reply("IGUI_PhunServer2Cron_Poll_NoIDs")
             return
         end
 
+        Cron.verboseLn("Polling " .. count .. " workshop item(s)")
+
         return querySteamWorkshopItemDetails(ids, function(_, status, info)
             local ok2, err2 = pcall(function()
+                -- Steam answered, but not with an answer. Silence here reads
+                -- to an admin exactly like "everything is up to date", which
+                -- is the one thing it does not mean.
                 if status ~= "Completed" or not info then
+                    Cron.logLn("Steam did not complete the workshop query (status: " .. tostring(status) .. ").")
+                    reply("IGUI_PhunServer2Cron_Poll_QueryFailed")
+                    return
+                end
+
+                -- The baseline every item is judged against. Without it every
+                -- comparison below is false, so the poll would quietly report
+                -- "all up to date" forever rather than admit it cannot tell.
+                if not Core.serverStarted then
+                    Cron.logLn("Cannot judge workshop items yet: the server start time is not known.")
+                    reply("IGUI_PhunServer2Cron_Poll_NotReady")
                     return
                 end
 
@@ -87,7 +124,7 @@ function Cron.pollWorkshop(player)
                     local details = info:get(i)
                     if details then
                         local updated = details:getTimeUpdated()
-                        if Core.serverStarted and updated and updated >= Core.serverStarted then
+                        if updated and updated >= Core.serverStarted then
                             table.insert(names, details:getTitle())
                         end
                     end
