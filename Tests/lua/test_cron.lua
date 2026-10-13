@@ -159,12 +159,29 @@ refuses("no action", {
 }, "action")
 refuses("no timing at all", {
     action = "modcheck"
-}, "either")
+}, "one of")
 refuses("both timing modes", {
     action = "modcheck",
     every = 5,
     at = {"03:00"}
-}, "both")
+}, "only one")
+refuses("a clock time and a phase", {
+    action = "modcheck",
+    at = {"03:00"},
+    on = {"dusk"}
+}, "only one")
+refuses("an unknown phase", {
+    action = "modcheck",
+    on = {"noon"}
+}, "dawn or dusk")
+refuses("announcements on a phase job", {
+    action = "modcheck",
+    on = "dusk",
+    announcements = {{
+        before = 60,
+        text = "soon"
+    }}
+}, "announcements")
 refuses("a bad clock time", {
     action = "modcheck",
     at = {"3pm"}
@@ -184,6 +201,165 @@ refuses("an unknown day", {
     days = {"funday"}
 }, "unknown day")
 refuses("something that is not a table", "nope", "not a table")
+
+---------------------------------------------------------------------------
+check.section("bare strings")
+
+local single = schedule.normalise("x", {
+    action = "modcheck",
+    at = "22:00"
+})
+check.equal("a single 'at' time is taken as a list of one", single and single.at, {79200})
+
+local phase = schedule.normalise("x", {
+    action = "modcheck",
+    on = "Dusk"
+})
+check.ok("a single phase is too, case-insensitively", phase and phase.on.dusk == true and phase.on.dawn == nil)
+check.ok("and it runs on startup by default", phase and phase.onStart == true)
+check.ok("unless told not to", schedule.normalise("x", {
+    action = "modcheck",
+    on = "dawn",
+    onStart = false
+}).onStart == false)
+check.same("it is never due by the clock", phase and schedule.secondsUntilDue(phase, 0, 1, nil, 0), nil)
+
+---------------------------------------------------------------------------
+check.section("dawn and dusk jobs")
+
+local ran = {}
+local function registerProbe()
+    Core.registerAction("probe", {
+        handler = function(job, args)
+            ran[#ran + 1] = job.name .. ":" .. tostring(args.profile)
+        end
+    })
+end
+
+local function phaseJobs()
+    harness.reset()
+    harness.sandbox["PhunServer2Cron.SeedDefaults"] = true
+    Core.saveConfig(CONFIG, {
+        night = {
+            action = "probe",
+            on = {"dusk"},
+            args = {
+                profile = "night"
+            }
+        },
+        day = {
+            action = "probe",
+            on = {"dawn"},
+            onStart = false,
+            args = {
+                profile = "none"
+            }
+        }
+    }, 1, Cron.name)
+end
+
+-- Day/Night publishes dusk before cron has loaded: nothing to run yet, and it
+-- must not be swallowed either.
+Cron.jobs = nil
+PhunServer2DayNight = {
+    isNight = true
+}
+triggerEvent("OnPhunServer2Dusk")
+check.same("a phase before jobs load runs nothing", #ran, 0)
+
+-- The real startup order: core loads jobs and Day/Night publishes dusk from
+-- OnServerStarted, possibly before PhunZones has registered zoneprofile in its
+-- own OnServerStarted. Nothing may run, or be marked done, until the first tick.
+phaseJobs()
+Cron.loadJobs()
+triggerEvent("OnPhunServer2Dusk")
+check.same("phase jobs are held until the first tick", #ran, 0)
+
+registerProbe()
+Cron.startPhases()
+check.equal("the first tick catches up on dusk, with a late-registered action", ran, {"night:night"})
+
+Cron.loadJobs()
+check.same("a reload in the same phase does not run it again", #ran, 1)
+
+triggerEvent("OnPhunServer2Dusk")
+check.same("nor does a repeat of the same phase", #ran, 1)
+
+triggerEvent("OnPhunServer2Dawn")
+check.equal("dawn runs the dawn job", ran, {"night:night", "day:none"})
+
+triggerEvent("OnPhunServer2Dusk")
+check.equal("and dusk the dusk job again", ran, {"night:night", "day:none", "night:night"})
+
+check.same("the clock runner leaves phase jobs alone", (function()
+    local before = #ran
+    Cron.evaluate()
+    return #ran - before
+end)(), 0)
+
+PhunServer2DayNight = nil
+
+---------------------------------------------------------------------------
+check.section("game clock jobs")
+
+refuses("a bad game time", {
+    action = "probe",
+    gameAt = {"25:00"}
+}, "gameAt")
+refuses("a game time and a real one", {
+    action = "probe",
+    gameAt = {"22:00"},
+    at = {"22:00"}
+}, "only one")
+refuses("announcements on a game time", {
+    action = "probe",
+    gameAt = "22:00",
+    announcements = {{
+        before = 60,
+        text = "soon"
+    }}
+}, "announcements")
+
+local gameJob = schedule.normalise("x", {
+    action = "probe",
+    gameAt = {"22:30", "06:00"}
+})
+check.equal("game times are fractional hours, sorted", gameJob and gameJob.gameAt, {6, 22.5})
+check.same("it is never due by the real clock", gameJob and schedule.secondsUntilDue(gameJob, 0, 1, nil, 0), nil)
+check.same("and it describes itself", gameJob and schedule.describe(gameJob), "probe at game time 06:00, 22:30")
+
+check.ok("a crossing within the day", schedule.gameTimeCrossed(22, 21.9, 22.1))
+check.ok("landing exactly on it counts", schedule.gameTimeCrossed(22, 21.9, 22))
+check.ok("starting exactly on it does not", not schedule.gameTimeCrossed(22, 22, 22.1))
+check.ok("a crossing over midnight", schedule.gameTimeCrossed(0, 23.95, 0.05))
+check.ok("a late time just before midnight", schedule.gameTimeCrossed(23.98, 23.95, 0.05))
+check.ok("no crossing far from it", not schedule.gameTimeCrossed(6, 23.95, 0.05))
+
+harness.reset()
+harness.sandbox["PhunServer2Cron.SeedDefaults"] = true
+Core.saveConfig(CONFIG, {
+    curfew = {
+        action = "probe",
+        gameAt = {"22:00", "22:30"},
+        args = {
+            profile = "night"
+        }
+    }
+}, 1, Cron.name)
+Cron.loadJobs()
+ran = {}
+
+Cron.evaluateGameClock(22.2)
+check.same("the first reading after boot runs nothing", #ran, 0)
+Cron.evaluateGameClock(22.4)
+check.same("nor does a step that crosses nothing", #ran, 0)
+Cron.evaluateGameClock(22.5)
+check.equal("crossing a time runs the job", ran, {"curfew:night"})
+Cron.evaluateGameClock(22.5)
+check.same("a repeated reading does not run it again", #ran, 1)
+Cron.evaluateGameClock(21.5)
+Cron.evaluateGameClock(22.75)
+check.same("a big step over both times runs it once", #ran, 2)
 
 ---------------------------------------------------------------------------
 check.finish()

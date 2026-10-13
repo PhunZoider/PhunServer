@@ -39,7 +39,16 @@ Events.OnTickEvenPaused.Add(function()
         return
     end
     nextTick = now + 1
+    if not Cron.phasesStarted and Cron.jobs then
+        Cron.phasesStarted = true
+        Cron.startPhases()
+    end
     Cron.evaluate()
+end)
+
+-- Game-clock jobs. EveryOneMinute is a game minute, and stops while paused.
+Events.EveryOneMinute.Add(function()
+    Cron.evaluateGameClock()
 end)
 
 -- A departing player is a good moment to check: the server may now be empty,

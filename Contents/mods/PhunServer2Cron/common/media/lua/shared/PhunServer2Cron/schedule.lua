@@ -22,6 +22,13 @@ local DAYS = {
     sun = 7
 }
 
+-- In-game phases an 'on' job can follow, in the order describe() lists them.
+-- They come from PhunServer2DayNight's OnPhunServer2Dawn/OnPhunServer2Dusk.
+local PHASES = {
+    dawn = 1,
+    dusk = 2
+}
+
 local VALID_UNITS = {
     minutes = 60,
     hours = 3600,
@@ -150,21 +157,63 @@ function schedule.normalise(name, raw)
         return nil, "missing 'action'"
     end
 
-    -- Timing mode: 'at' (clock times) or 'every' (interval). Not both.
-    local hasAt = type(raw.at) == "table" and #raw.at > 0
+    -- A single time or phase written as a bare string is an easy slip to make
+    -- by hand, and its meaning is unambiguous, so take it as a list of one.
+    local rawAt = type(raw.at) == "string" and {raw.at} or raw.at
+    local rawOn = type(raw.on) == "string" and {raw.on} or raw.on
+    local rawGameAt = type(raw.gameAt) == "string" and {raw.gameAt} or raw.gameAt
+
+    -- Timing mode: 'at' (clock times), 'every' (interval), 'on' (in-game
+    -- dawn/dusk) or 'gameAt' (in-game clock times). Exactly one.
+    local hasAt = type(rawAt) == "table" and #rawAt > 0
     local hasEvery = tonumber(raw.every) ~= nil
+    local hasOn = type(rawOn) == "table" and #rawOn > 0
+    local hasGameAt = type(rawGameAt) == "table" and #rawGameAt > 0
 
-    if hasAt and hasEvery then
-        return nil, "has both 'at' and 'every'; use one or the other"
+    local modes = (hasAt and 1 or 0) + (hasEvery and 1 or 0) + (hasOn and 1 or 0) + (hasGameAt and 1 or 0)
+    if modes > 1 then
+        return nil, "has more than one of 'at', 'every', 'on' and 'gameAt'; use only one"
     end
-    if not hasAt and not hasEvery then
-        return nil, "needs either 'at' or 'every'"
+    if modes == 0 then
+        return nil, "needs one of 'at', 'every', 'on' or 'gameAt'"
     end
 
-    if hasAt then
+    -- Neither game-time mode has a real-seconds countdown: how long until a
+    -- game time depends on day length, speed changes and pauses.
+    if (hasOn or hasGameAt) and type(raw.announcements) == "table" and #raw.announcements > 0 then
+        return nil, "'announcements' need a real clock time and cannot be used with '" ..
+                   (hasOn and "on" or "gameAt") .. "'"
+    end
+
+    if hasGameAt then
+        job.mode = "gameAt"
+        job.gameAt = {}
+        for _, t in ipairs(rawGameAt) do
+            local secs = schedule.parseClock(t)
+            if not secs then
+                return nil, "bad time '" .. tostring(t) .. "' in 'gameAt' (expected HH:MM)"
+            end
+            -- Game time is read as fractional hours, so store it that way
+            table.insert(job.gameAt, secs / 3600)
+        end
+        table.sort(job.gameAt)
+    elseif hasOn then
+        job.mode = "on"
+        job.on = {}
+        for _, p in ipairs(rawOn) do
+            local key = tostring(p):lower()
+            if not PHASES[key] then
+                return nil, "unknown phase '" .. tostring(p) .. "' in 'on' (expected dawn or dusk)"
+            end
+            job.on[key] = true
+        end
+        -- Runs the job for whichever phase the server boots into, so state like
+        -- a zone profile matches the time of day after a restart.
+        job.onStart = raw.onStart ~= false
+    elseif hasAt then
         job.mode = "at"
         job.at = {}
-        for _, t in ipairs(raw.at) do
+        for _, t in ipairs(rawAt) do
             local secs = schedule.parseClock(t)
             if not secs then
                 return nil, "bad time '" .. tostring(t) .. "' in 'at' (expected HH:MM)"
@@ -278,7 +327,21 @@ end
 
 -- Seconds until this job should next fire, or nil if it cannot be determined.
 -- For 'every' jobs, lastRun is an epoch timestamp (nil if it has never run).
+-- True when a game-clock time falls in (prev, now], both in fractional hours.
+-- 'now' below 'prev' means midnight passed in between. Assumes less than a
+-- game day between checks, which a per-game-minute check guarantees.
+function schedule.gameTimeCrossed(t, prev, now)
+    if now >= prev then
+        return t > prev and t <= now
+    end
+    return t > prev or t <= now
+end
+
+-- 'on' and 'gameAt' jobs are never due by the real clock; game time runs them.
 function schedule.secondsUntilDue(job, nowSecs, nowDow, lastRun, nowEpoch)
+    if job.mode == "on" or job.mode == "gameAt" then
+        return nil
+    end
     if job.mode == "at" then
         return secondsUntilAt(job, nowSecs, nowDow)
     end
@@ -308,7 +371,30 @@ end
 -- glance that the file was understood the way they meant it.
 function schedule.describe(job)
     local bits = {}
-    if job.mode == "at" then
+    if job.mode == "on" then
+        local phases = {}
+        for key, order in pairs(PHASES) do
+            if job.on[key] then
+                phases[order] = key
+            end
+        end
+        local ordered = {}
+        for i = 1, 2 do
+            if phases[i] then
+                table.insert(ordered, phases[i])
+            end
+        end
+        table.insert(bits, "at in-game " .. table.concat(ordered, ", "))
+        if not job.onStart then
+            table.insert(bits, "(not on startup)")
+        end
+    elseif job.mode == "gameAt" then
+        local times = {}
+        for _, t in ipairs(job.gameAt) do
+            table.insert(times, secondsToClock(math.floor(t * 3600 + 0.5)))
+        end
+        table.insert(bits, "at game time " .. table.concat(times, ", "))
+    elseif job.mode == "at" then
         local times = {}
         for _, t in ipairs(job.at) do
             table.insert(times, secondsToClock(t))

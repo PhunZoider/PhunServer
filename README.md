@@ -12,7 +12,7 @@ scheduler and admin diagnostics.
 | Mod id | Folder | What it does |
 | --- | --- | --- |
 | `phunserver2` | `PhunServer2` | Required by all the others. Shared plumbing, verbose logging, player tracking, chat primitives, shutdown machinery, the action and command registries, and [diagnostics](Docs/diagnostics.md). |
-| `phunserver2cron` | `PhunServer2Cron` | Scheduled jobs on a real-world clock. Includes ModWatch as a `modcheck` action. |
+| `phunserver2cron` | `PhunServer2Cron` | Scheduled jobs on the real-world clock or the game clock. Includes ModWatch as a `modcheck` action. |
 | `phunserver2commands` | `PhunServer2Commands` | `/players`, `/hours`, `/sethours`. |
 | `phunserver2chat` | `PhunServer2Chat` | Join and leave announcements, username highlighting, music and radio tidying. |
 | `phunserver2daynight` | `PhunServer2DayNight` | Independent day and night speeds. |

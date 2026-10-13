@@ -10,7 +10,7 @@ description=[h2]Modules[/h2]
 description=[table]
 description=[tr][th]Mod Id[/th][th]What it does[/th][/tr]
 description=[tr][td][b]phunserver2[/b][/td][td]Required by all the others. Shared plumbing, shutdown machinery and admin diagnostics.[/td][/tr]
-description=[tr][td][b]phunserver2cron[/b][/td][td]Scheduled jobs on a real-world clock, plus ModWatch.[/td][/tr]
+description=[tr][td][b]phunserver2cron[/b][/td][td]Scheduled jobs on the real-world clock or the game clock, plus ModWatch.[/td][/tr]
 description=[tr][td][b]phunserver2commands[/b][/td][td]The /players, /hours and /sethours chat commands.[/td][/tr]
 description=[tr][td][b]phunserver2chat[/b][/td][td]Join and leave announcements, username highlighting, tidier radio and music lines.[/td][/tr]
 description=[tr][td][b]phunserver2daynight[/b][/td][td]Independent day and night speeds with dawn and dusk offsets.[/td][/tr]
@@ -43,7 +43,7 @@ description=[/list]
 description=Map health also runs at server start. If it finds a problem it logs MAP HEALTH lines and shows the window to admins as they join. It catches a Map= entry whose mod is inactive (later maps lose their buildings and indoor power) and a broken map file that leaves maps above it with no zones. [url=https://github.com/PhunZoider/PhunServer/blob/main/Docs/diagnostics.md]More[/url].
 description=
 description=[h2]PhunServer 2: Cron[/h2]
-description=Schedule shutdowns, announcements, mod-update checks or Lua events on the real-world clock, at set times or on an interval.
+description=Schedule shutdowns, announcements, mod-update checks or Lua events on the real-world clock (at set times or on an interval) or on the game clock (at in-game times, or at dawn and dusk with Day/Night). Handy for switching a PhunZones profile when night falls.
 description=
 description=Jobs live in [b]<Zomboid>/Lua/PhunServer2Cron.json[/b], created on first run with a five minute mod-update check. See the [url=https://github.com/PhunZoider/PhunServer/blob/main/Docs/cron.md]cron guide[/url] for the format and examples.
 description=
@@ -70,7 +70,7 @@ description=Greet returning players by name, colour usernames wherever they appe
 description=
 description=[h2]PhunServer 2: Day/Night[/h2]
 description=Run day and night at different speeds. The server decides and tells clients, so everyone agrees on what time it is.
-description=Long days to build in, short nights for mercy, or the reverse if you would rather your players were afraid of the dark. Dawn and dusk shift separately.
+description=Long days to build in, short nights for mercy, or the reverse if you would rather your players were afraid of the dark. Dawn and dusk shift separately. Cron jobs can run at dawn and dusk too.
 description=
 description=[h2]PhunServer 2: Wiper[/h2]
 description=Wipe player maps when a season rolls over, or when a player rolls a new character.

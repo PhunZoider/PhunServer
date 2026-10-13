@@ -40,7 +40,7 @@ away, and how to write a suite.
 | --- | --- |
 | `test_json.lua` | `json.lua`: round trips, pretty printing, stable key order, refusals, decoding |
 | `test_config.lua` | `tools.lua` and `server_config.lua`: the file layer, legacy detection, the version envelope |
-| `test_cron.lua` | `server_jobs.lua` and `schedule.lua`: seeding, the seeding guard, normalisation |
+| `test_cron.lua` | `server_jobs.lua` and `schedule.lua`: seeding, the seeding guard, normalisation, dawn/dusk (`on`) and game-clock (`gameAt`) jobs |
 | `test_players.lua` | `server_players.lua` and chat's `server_events.lua`: access levels, join/leave announcements, staff suppression, the client roster |
 | `test_diag_health.lua` | `diag_health.lua`: Map health verdicts for a healthy list, a `Map=` entry with no folder or an inactive mod, an `objects.lua` that stops zone loading, sample selection, unreadable files, and the client side. See [Docs/diagnostics.md](../../Docs/diagnostics.md). |
 
