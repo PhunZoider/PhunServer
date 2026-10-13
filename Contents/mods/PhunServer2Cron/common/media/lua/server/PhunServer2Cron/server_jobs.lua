@@ -70,12 +70,14 @@ function Cron.loadJobs()
 
     local jobs = {}
     local loaded, skipped = 0, 0
+    local followsPhase = false
 
     for name, raw in pairs(data or {}) do
         local job, err = schedule.normalise(name, raw)
         if job then
             jobs[name] = job
             loaded = loaded + 1
+            followsPhase = followsPhase or (job.enabled and job.mode == "on")
             if job.enabled then
                 Cron.logLn("Job '" .. name .. "': " .. schedule.describe(job))
             else
@@ -89,7 +91,13 @@ function Cron.loadJobs()
 
     Cron.jobs = jobs
     Cron.logLn("Loaded " .. loaded .. " job(s)" .. (skipped > 0 and (", skipped " .. skipped) or ""))
+
+    if followsPhase and not PhunServer2DayNight then
+        Cron.logLn("WARNING: dawn/dusk jobs need PhunServer 2: Day/Night enabled; they will not run without it")
+    end
+
     triggerEvent(Cron.events.OnJobsLoaded, jobs)
+    Cron.syncPhase()
 
     return jobs
 end
@@ -155,6 +163,119 @@ local function announce(job, secondsUntil)
                     chat = true
                 }
             })
+        end
+    end
+end
+
+-- ---------------------------------------------------------------------------
+-- In-game dawn and dusk.
+--
+-- 'on' jobs follow PhunServer2DayNight's phase events. Day/Night is not a
+-- dependency: the event names are declared here so listening is safe either
+-- way, and without it they simply never fire.
+-- ---------------------------------------------------------------------------
+
+local PHASE_EVENTS = {
+    dawn = "OnPhunServer2Dawn",
+    dusk = "OnPhunServer2Dusk"
+}
+
+-- The phase 'on' jobs last ran for. In memory on purpose: after a restart the
+-- current phase's jobs run again, which is what keeps a zone profile in step
+-- with the time of day.
+local currentPhase = nil
+
+-- Phase jobs are held until the first tick after startup. Day/Night publishes
+-- its first phase from OnServerStarted, which is also where other mods (such as
+-- PhunZones' zoneprofile) register their actions, in no guaranteed order. By
+-- the first tick every OnServerStarted handler has run.
+local phasesReady = false
+
+function Cron.onPhase(phase, startup)
+    -- Not recorded while held, so startPhases still runs the jobs once ready.
+    if not phasesReady or not Cron.jobs or phase == currentPhase then
+        return
+    end
+    currentPhase = phase
+
+    if Cron.getOption("EnableCron", true) ~= true then
+        return
+    end
+
+    local _, nowDow = schedule.localNow()
+    local nowEpoch = getTimestamp()
+
+    for _, job in pairs(Cron.jobs) do
+        if job.enabled and job.mode == "on" and job.on[phase] and Core.hasAction(job.action) and
+            schedule.dayAllowed(job, nowDow) and not (startup and not job.onStart) then
+            fire(job, nowEpoch)
+        end
+    end
+end
+
+-- Catches up on the phase Day/Night already settled on, if any.
+function Cron.syncPhase()
+    local DN = PhunServer2DayNight
+    if DN and DN.isNight ~= nil then
+        Cron.onPhase(DN.isNight and "dusk" or "dawn", true)
+    end
+end
+
+-- Called once, on the first tick after startup.
+function Cron.startPhases()
+    phasesReady = true
+    Cron.syncPhase()
+end
+
+for phase, event in pairs(PHASE_EVENTS) do
+    if not Events[event] then
+        LuaEventManager.AddEvent(event)
+    end
+    Events[event].Add(function()
+        Cron.onPhase(phase, currentPhase == nil)
+    end)
+end
+
+-- ---------------------------------------------------------------------------
+-- In-game clock.
+--
+-- 'gameAt' jobs run when the game clock passes one of their times. Checking
+-- for a crossing rather than an exact minute means a fast day length that
+-- steps over a minute between checks cannot skip a job.
+-- ---------------------------------------------------------------------------
+
+-- Game time of day (fractional hours) at the previous check. In memory, so
+-- the first check after a boot only takes a reading: a game time is a moment,
+-- and a restart should not replay one that has already passed.
+local prevGameTime = nil
+
+function Cron.evaluateGameClock(now)
+    if type(now) ~= "number" then
+        local gt = getGameTime and getGameTime()
+        now = gt and gt:getTimeOfDay()
+    end
+    if not now then
+        return
+    end
+
+    local prev = prevGameTime
+    prevGameTime = now
+    if prev == nil or prev == now or not Cron.jobs or Cron.getOption("EnableCron", true) ~= true then
+        return
+    end
+
+    local _, nowDow = schedule.localNow()
+    local nowEpoch = getTimestamp()
+
+    for _, job in pairs(Cron.jobs) do
+        if job.enabled and job.mode == "gameAt" and Core.hasAction(job.action) and schedule.dayAllowed(job, nowDow) then
+            for _, t in ipairs(job.gameAt) do
+                if schedule.gameTimeCrossed(t, prev, now) then
+                    fire(job, nowEpoch)
+                    -- Once per check, even if two of its times were crossed
+                    break
+                end
+            end
         end
     end
 end

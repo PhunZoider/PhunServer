@@ -1,7 +1,8 @@
 # Cron and ModWatch
 
-`phunserver2cron` runs jobs on a real-world clock: shutdowns, announcements,
-mod-update checks, or any Lua event. ModWatch is one of those jobs.
+`phunserver2cron` runs jobs on the real-world clock or the game clock:
+shutdowns, announcements, mod-update checks, PhunZones profile changes, or any
+Lua event. ModWatch is one of those jobs.
 
 ## Cron job format
 
@@ -42,20 +43,85 @@ Edit the file and run `/cron reload` to pick up changes without a restart.
 
 ### Timing
 
-A job uses exactly one of two modes.
+A job uses exactly one of four modes.
 
 | Field | Mode | Meaning |
 | --- | --- | --- |
 | `at` | clock | List of `HH:MM` times, server local. |
 | `every` + `everyUnit` | interval | `minutes`, `hours` or `days`. |
-| `days` | both | Optional filter: `mon` to `sun`. Omit for every day. |
+| `on` | phase | `dawn` and/or `dusk`, in game time. See below. |
+| `gameAt` | game clock | List of `HH:MM` times on the in-game clock. See below. |
+| `days` | all | Optional filter: `mon` to `sun` (real-world day). Omit for every day. |
 | `startTime` / `endTime` | interval | Optional window. Windows may wrap past midnight. |
-| `runIfEmpty` | both | `false` skips the job when nobody is online. |
-| `announcements` | both | `{ "before": <seconds>, "text": "..." }`, sent ahead of the job. |
+| `onStart` | phase | `false` stops the job running for the phase the server boots into. |
+| `runIfEmpty` | all | `false` skips the job when nobody is online. |
+| `announcements` | clock, interval | `{ "before": <seconds>, "text": "..." }`, sent ahead of the job. |
+
+`at`, `on` and `gameAt` take either a list or a single string.
 
 `at` is when the job's **effect** lands, not when it starts. A `shutdown` at
 `03:00` with `notice: 15` begins its countdown at 02:45, so the server is
 genuinely down at 03:00. Actions declare this via `leadSeconds`.
+
+### Dawn and dusk
+
+`on` jobs run at in-game dawn and dusk instead of on the real-world clock. A
+typical use is switching a PhunZones profile when night falls:
+
+```json
+"night-zones": {
+  "enabled": true,
+  "action": "zoneprofile",
+  "on": ["dusk"],
+  "args": { "profile": "night" }
+},
+"day-zones": {
+  "enabled": true,
+  "action": "zoneprofile",
+  "on": ["dawn"],
+  "args": { "profile": "none" }
+}
+```
+
+Dawn and dusk come from **PhunServer 2: Day/Night** (`phunserver2daynight`),
+which has to be enabled. It follows the season, and its `DayOffset` /
+`NightOffset` sandbox options shift the times when its day/night speed change
+is on. Without it, `on` jobs never run and cron logs a warning at load.
+
+When the server starts, the jobs for the phase it boots into run once, so a
+restart at night still puts the night profile in place. Set `"onStart": false`
+on jobs that should only run on an actual transition, such as an announcement.
+
+`on` jobs can't have `announcements`. How many real seconds are left until
+dawn depends on day length, speed changes and pauses, so there's no reliable
+countdown to announce against.
+
+### Game clock
+
+`gameAt` jobs run when the in-game clock reaches a time, however fast your
+days run:
+
+```json
+"curfew": {
+  "enabled": true,
+  "action": "zoneprofile",
+  "gameAt": ["22:00"],
+  "args": { "profile": "curfew" }
+}
+```
+
+The clock is checked every in-game minute, and a job runs when its time has
+passed since the last check. A short day length that skips a minute can't make
+a job miss its time. A paused game doesn't advance the clock, so nothing runs
+while paused.
+
+Unlike `on` jobs, a `gameAt` job does **not** run when the server starts. A
+game time is a single moment, and a restart shouldn't replay one that has
+already passed. If something must be right after a restart, drive it from
+`on` instead, or pair it with a second job.
+
+Like `on`, `gameAt` can't have `announcements`. `days` still filters on the
+real-world weekday, not the in-game one.
 
 ### Actions
 

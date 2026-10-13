@@ -1,7 +1,7 @@
 name=PhunServer 2: Cron
 id=phunserver2cron
 author=UburGeek
-description=Schedule server shutdowns, announcements and mod-update checks on a real-world clock. Includes ModWatch.
+description=Schedule server shutdowns, announcements, mod-update checks and other actions on the real-world clock or the game clock. Includes ModWatch.
 poster=poster.png
 icon=icon.png
 require=phunserver2
