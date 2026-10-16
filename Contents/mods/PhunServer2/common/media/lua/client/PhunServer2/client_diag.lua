@@ -363,7 +363,7 @@ function Window:refreshHealth()
     end
     if server and not Core.isLocal then
         for _, row in ipairs(server.maps or {}) do
-            if row.status == "missing" then
+            if row.status == "missing" or row.status == "broken" then
                 serverMissing = serverMissing + 1
                 local mine = clientByDir[row.dir]
                 if mine and mine.status == "present" then

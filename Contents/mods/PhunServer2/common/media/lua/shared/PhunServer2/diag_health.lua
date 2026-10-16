@@ -115,8 +115,9 @@ end
 --     maps = {{dir, status, entries, sample}, ...}   in Map= order
 --     stoppedAt = index into maps or nil,
 --   }
--- status is "present", "missing", "no objects.lua", "no sample" or
--- "error: ...". sample is "Type x,y,z" or "".
+-- status is "present", "missing", "broken", "no objects.lua", "no sample" or
+-- "error: ...". sample is "Type x,y,z" or "". stale is set on a missing map
+-- that sits under a present one, so a stale save rather than a throw.
 function Health.run()
     local result = {
         maps = {},
@@ -194,12 +195,26 @@ function Health.run()
         end
     end
 
+    -- A throw stops zone loading for every map above it in Map=, so a map
+    -- missing zones under one that has them did not stop anything. Its zones
+    -- came from a save written before its objects.lua gained them, which is
+    -- also how a map can be first in and last out without having thrown.
+    local presentAbove = false
+    for _, row in ipairs(result.maps) do
+        if row.status == "present" then
+            presentAbove = true
+        elseif presentAbove and (row.status == "missing" or row.status == "broken") then
+            row.status = "missing"
+            row.stale = true
+        end
+    end
+
     -- Zones load from the bottom of the list up, so the first missing map met
     -- that way is where loading stopped. It is that map, or the one just below
     -- it if that one threw after its own last zone.
     for i = #result.maps, 1, -1 do
-        local status = result.maps[i].status
-        if status == "missing" or status == "broken" then
+        local row = result.maps[i]
+        if (row.status == "missing" or row.status == "broken") and not row.stale then
             result.stoppedAt = i
             break
         end
@@ -222,7 +237,7 @@ function Health.problems(result)
         local missing = 0
         for i = 1, result.stoppedAt do
             local status = result.maps[i].status
-            if status == "missing" or status == "broken" then
+            if (status == "missing" or status == "broken") and not result.maps[i].stale then
                 missing = missing + 1
             end
         end
@@ -239,6 +254,19 @@ function Health.problems(result)
                     "does when a map is added to an existing world. /diag health on a client tells the two apart.",
                 missing, row.dir, row.dir, below and (" or '" .. below.dir .. "'") or ""))
         end
+    end
+    local stale = {}
+    for _, row in ipairs(result.maps) do
+        if row.stale then
+            table.insert(stale, row.dir)
+        end
+    end
+    if #stale > 0 then
+        table.insert(lines, string.format(
+            "zones missing for %d map(s) (%s) while maps above them in Map= have theirs, so nothing " ..
+                "stopped zone loading. This save's map_zone.bin predates their current objects.lua, as it " ..
+                "does when a map is added to or extended in an existing world.",
+            #stale, table.concat(stale, ", ")))
     end
     return lines
 end

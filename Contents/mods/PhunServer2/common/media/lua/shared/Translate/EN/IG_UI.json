@@ -39,7 +39,7 @@
   "IGUI_PhunServer2_Diag_NoMapOption": "The server has no Map= option to check.",
   "IGUI_PhunServer2_Diag_Map": "Map, in Map= order",
   "IGUI_PhunServer2_Diag_Sample": "    checked: %1",
-  "IGUI_PhunServer2_Diag_StaleSave": "the client has zones the server does not, for %1 map(s) starting with '%2'. The map files themselves load fine, as the client shows. Most likely the server restored its zones from the save, which was written before these maps were added, as happens when a map is added to an existing world. The boxes above hold one of those zones: press Probe to see it.",
+  "IGUI_PhunServer2_Diag_StaleSave": "the client has zones the server does not, for %1 map(s) starting with '%2'. The map files themselves load fine, as the client shows. Most likely the server restored its zones from the save, which was written before these maps were added or gained zones, as happens when a map is added to or extended in an existing world. The boxes above hold one of those zones: press Probe to see it.",
   "IGUI_PhunServer2_Diag_At": "Square %1",
   "IGUI_PhunServer2_Diag_SinglePlayer": "Single player: both columns read the same world, so they always agree.",
   "IGUI_PhunServer2_Diag_Waiting": "Waiting for the server...",
